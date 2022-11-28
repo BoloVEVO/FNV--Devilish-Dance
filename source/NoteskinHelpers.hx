@@ -15,25 +15,8 @@ class NoteskinHelpers
 	{
 		noteskinArray = [];
 		xmlData = [];
-		#if FEATURE_FILESYSTEM
-		var count:Int = 0;
-		for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/shared/images/noteskins")))
-		{
-			if (i.contains("-pixel"))
-				continue;
-			if (i.endsWith(".xml"))
-			{
-				xmlData.push(sys.io.File.getContent(FileSystem.absolutePath("assets/shared/images/noteskins") + "/" + i));
-				continue;
-			}
 
-			if (!i.endsWith(".png"))
-				continue;
-			noteskinArray.push(i.replace(".png", ""));
-		}
-		#else
-		noteskinArray = ["Arrows", "Circles"];
-		#end
+		noteskinArray = ["Arrows", "Circles", "Voltex-Arrows", "Voltex-Circles", "Voltex-Bars"];
 
 		return noteskinArray;
 	}

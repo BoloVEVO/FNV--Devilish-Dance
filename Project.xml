@@ -58,7 +58,7 @@
 	<!-- Defines whether the mp4 videos should be enabled. -->
 	<define name="FEATURE_MP4VIDEOS" unless="32bits"/>
 	<!-- Defines whether the Mods menu will display before launching. -->
-	<define name="FEATURE_MODCORE" if="desktop" />
+	<!--<define name="FEATURE_MODCORE" if="desktop" />-->
 	<!-- Defines if webm videos are enabled. Doesn't work in browser -->
 	<define name="FEATURE_WEBM" if="desktop" />
 
@@ -68,14 +68,7 @@
 	<section if="PRELOAD_ALL">
 		<library name="songs"    preload="true" />
 		<library name="shared"   preload="true" />
-		<library name="tutorial" preload="true" />
-		<library name="week1"    preload="true" />
-		<library name="week2"    preload="true" />
-		<library name="week3"    preload="true" />
-		<library name="week4"    preload="true" />
-		<library name="week5"    preload="true" />
-		<library name="week6"    preload="true" />
-		<library name="week7"    preload="true" />
+		<library name="voltex" preload="true" />
 		<library name="sm"    preload="true" />
 		<library name="videos"    preload="true" />
 	</section>
@@ -83,14 +76,7 @@
 	<section if="NO_PRELOAD_ALL">
 		<library name="songs"    preload="false" />
 		<library name="shared"   preload="false" />
-		<library name="tutorial" preload="false" />
-		<library name="week1"    preload="false" />
-		<library name="week2"    preload="false" />
-		<library name="week3"    preload="false" />
-		<library name="week4"    preload="false" />
-		<library name="week5"    preload="false" />
-		<library name="week6"    preload="false" />
-		<library name="week7"    preload="false" />
+		<library name="voltex" preload="false" />
 		<library name="sm"    preload="false" />
 		<library name="videos"    preload="false" />
 	</section>
@@ -100,26 +86,12 @@
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.mp3" unless="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.ogg" if="web"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.mp3" unless="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/week7"    library="week7"    exclude="*.ogg" if="web"/>
-	<assets path="assets/week7"    library="week7"    exclude="*.mp3" unless="web"/>
+	<assets path="assets/voltex"    library="voltex"    exclude="*.ogg" if="web"/>
+	<assets path="assets/voltex"    library="voltex"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/sm"    library="sm"    exclude="*.ogg" if="web"/>
 	<assets path="assets/sm"    library="sm"    exclude="*.mp3" unless="web"/>
 
-	<assets path='example_mods' rename='mods' embed='false'/>
+	<!--<assets path='example_mods' rename='mods' embed='false'/>-->
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
 	<assets path='LICENSE' rename='LICENSE.txt' />
 	<!-- <template path='mods' /> -->
@@ -142,7 +114,7 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="hscript" />
-	<haxelib name="polymod" if="FEATURE_MODCORE"/>
+	<!--<haxelib name="polymod" if="FEATURE_MODCORE"/>-->
 	<haxelib name="discord_rpc" if="FEATURE_DISCORD"/>
 	<haxelib name="linc_luajit" if="FEATURE_LUAMODCHART"/>
 	<haxelib name="hxcpp-debug-server" if="cpp"/>

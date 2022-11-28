@@ -9,9 +9,18 @@ using StringTools;
 
 class CoolUtil
 {
-	public static var difficultyArray:Array<String> = ['Easy', "Normal", "Hard"];
+	public static var difficultyArray:Array<String> = ['Easy', "Normal", "Hard", "Novice", "Advanced", "Exhaust", "Maximum", "Heavenly"];
 
-	public static var suffixDiffsArray:Array<String> = ['-easy', "", "-hard"];
+	public static var suffixDiffsArray:Array<String> = [
+		'-easy',
+		"",
+		"-hard",
+		"-novice",
+		"-advanced",
+		"-exhaust",
+		"-maximum",
+		"-heavenly"
+	];
 
 	public static var daPixelZoom:Float = 6;
 

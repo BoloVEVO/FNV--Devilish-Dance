@@ -63,7 +63,7 @@ class KadeEngineFPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat(openfl.utils.Assets.getFont("assets/fonts/vcr.ttf").fontName, 14, color);
+		defaultTextFormat = new TextFormat(openfl.utils.Assets.getFont("assets/fonts/airone.ttf").fontName, 14, color);
 		text = "FPS: ";
 		width += 800;
 
@@ -166,8 +166,8 @@ class KadeEngineFPS extends TextField
 			text = (FlxG.save.data.fps ? "FPS: "
 				+ '$currentFPS\n'
 				+ '$memoryUsage\n'
-				+ "FNF v"
-				+ MainMenuState.gameVer
+				+ "FNV: Devilish Dance v"
+				+ MainMenuState.modVer
 				+ (Main.watermarks?'\n$engineName ' + "v" + MainMenuState.kadeEngineVer #if debug + "\nDEBUG MODE" #end : "") : memoryUsage
 				+ '\nFNF v'
 				+ MainMenuState.gameVer

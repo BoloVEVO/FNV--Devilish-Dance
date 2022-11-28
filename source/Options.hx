@@ -2152,6 +2152,34 @@ class HitSoundMode extends Option
 	}
 }
 
+class NoteCamera extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function left():Bool
+	{
+		FlxG.save.data.noteCamera = !FlxG.save.data.noteCamera;
+
+		display = updateDisplay();
+		return true;
+	}
+
+	public override function right():Bool
+	{
+		left();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Note Camera Movement: < " + (FlxG.save.data.noteCamera ? "On" : "Off") + " >";
+	}
+}
+
 class Shader extends Option
 {
 	public function new(desc:String)

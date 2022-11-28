@@ -1,0 +1,41 @@
+{
+	"name": "Tamaneko",
+	"asset": "characters/Tamaneko",
+	"flipX": true,
+	"scale": 1,
+	"barColor": "#B7D855",
+	"camPos": [0,0],
+	"startingAnim": "idle",
+	"animations": [
+		{
+			"looped": false,
+			"offsets": [0,0],
+			"name": "idle",
+			"prefix": "Pico Idle Dance"
+		},
+		{
+			"looped": false,
+			"offsets": [65,9],
+			"name": "singLEFT",
+			"prefix": "Pico Note Right0"
+		},
+		{
+			"looped": false,
+			"offsets": [-68,-7],
+			"name": "singRIGHT",
+			"prefix": "Pico NOTE LEFT0"
+		},
+		{
+			"looped": false,
+			"offsets": [-29,27],
+			"name": "singUP",
+			"prefix": "pico Up note0"
+		},
+		{
+			"looped": false,
+			"offsets": [200,-70],
+			"name": "singDOWN",
+			"prefix": "Pico Down Note0"
+		}
+	]
+}

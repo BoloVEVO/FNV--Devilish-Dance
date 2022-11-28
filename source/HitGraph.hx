@@ -12,6 +12,7 @@ import flash.text.TextFormatAlign;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
+import PlayState;
 
 /**
  * stolen from https://github.com/HaxeFlixel/flixel/blob/master/flixel/system/debug/stats/StatsGraph.hx
@@ -221,11 +222,29 @@ class HitGraph extends Sprite
 			switch (judge)
 			{
 				case "sick":
-					gfx.beginFill(0x00FFFF);
+					switch (PlayState.SONG.noteStyle)
+					{
+						case 'voltex':
+							gfx.beginFill(0x00CEF1);
+						default:
+							gfx.beginFill(0x00FFFF);
+					}
 				case "good":
-					gfx.beginFill(0x00FF00);
+					switch (PlayState.SONG.noteStyle)
+					{
+						case 'voltex':
+							gfx.beginFill(0xFFF700);
+						default:
+							gfx.beginFill(0x00FF00);
+					}
 				case "bad":
-					gfx.beginFill(0xFF0000);
+					switch (PlayState.SONG.noteStyle)
+					{
+						case 'voltex':
+							gfx.beginFill(0x9EFFF5);
+						default:
+							gfx.beginFill(0xFF0000);
+					}
 				case "shit":
 					gfx.beginFill(0x8b0000);
 				case "miss":

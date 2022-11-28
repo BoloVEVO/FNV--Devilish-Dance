@@ -29,13 +29,28 @@ class Stage extends MusicBeatState
 	public var slowBacks:Map<Int,
 		Array<FlxSprite>> = []; // Change/add/remove backgrounds mid song! Format: "slowBacks[StepToBeActivated] = [Sprites,To,Be,Changed,Or,Added];"
 
-	public var staticCam:Bool = false;
+	public var staticCam:Bool = false; // To not toggle camera movements in opponent/bf turn
+
+	public var loadGF:Bool = true; // To load GF into the Stage (If you're not gonna use gf for the entire song).
+
+	public var hideGF:Bool = false; // To hide GF (for future appeareance or smth)
 
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// All of the above must be set or used in your stage case code block!!
 	public var positions:Map<String, Map<String, Array<Int>>> = [
 		// Assign your characters positions on stage here!
+		'voltexStage' => [
+			// The full Voltex Gang!
+			// lmao I forgot how painful is to correctly positionate characters in Kade Engine lol. +respect for Psych lol
+			'gf' => [275, 25],
+			'Tamaneko' => [-350, 275],
+			'TamaNekoDark' => [-350, 275],
+			'Rasis' => [-275, -50],
+			'Tamarasis' => [-275, -50],
+			'Bi' => [-275, -50],
+			'bf' => [1150, 300]
+		],
 		'halloween' => ['spooky' => [100, 300], 'monster' => [100, 200]],
 		'philly' => ['pico' => [100, 400]],
 		'limo' => ['bf-car' => [1030, 230]],
@@ -57,8 +72,15 @@ class Stage extends MusicBeatState
 		]
 	];
 
-	public var camOffsets:Map<String, Array<Float>> = ['halloween' => [350, -50]];
-	public var stageCamZooms:Map<String, Float> = ['limo' => 0.90, 'mall' => 0.80, 'tank' => 0.90, 'void' => 0.9, 'stage' => 0.90];
+	public var camOffsets:Map<String, Array<Float>> = ['halloween' => [350, -50], 'voltexStage' => [650, 350]];
+	public var stageCamZooms:Map<String, Float> = [
+		'limo' => 0.90,
+		'mall' => 0.80,
+		'tank' => 0.90,
+		'void' => 0.9,
+		'stage' => 0.90,
+		'voltexStage' => 0.65
+	];
 
 	public function new(daStage:String, ?forceLoad:Bool = false)
 	{
@@ -68,11 +90,39 @@ class Stage extends MusicBeatState
 
 		// camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
 
+		// SWITCH STATEMENT FOR STAGE DEFINITIONS
+		switch (daStage)
+		{
+			case 'voltexStage':
+				curStage = 'voltexStage';
+				staticCam = true;
+				loadGF = false;
+				hideGF = true;
+			default:
+				curStage = 'stage';
+				staticCam = false;
+				loadGF = true;
+				hideGF = false;
+		}
+
 		if (!FlxG.save.data.background && !forceLoad)
 			return;
 
+		// SWITCH STATEMENT FOR SPRITES
 		switch (daStage)
 		{
+			case 'voltexStage':
+				var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image(PlayState.SONG.songId.toLowerCase(), 'voltex'));
+				bg.antialiasing = FlxG.save.data.antialiasing;
+				bg.screenCenter();
+				swagBacks['bg'] = bg;
+				toAdd.push(bg);
+
+				var stageFront:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
+				stageFront.antialiasing = FlxG.save.data.antialiasing;
+				swagBacks['stageFront'] = stageFront;
+				stageFront.screenCenter();
+				toAdd.push(stageFront);
 			case 'halloween':
 				{
 					if (FlxG.save.data.distractions)

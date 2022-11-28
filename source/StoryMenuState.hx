@@ -26,32 +26,16 @@ class StoryMenuState extends MusicBeatState
 
 	public static function weekData():Array<Dynamic>
 	{
-		return [
-			['tutorial'],
-			['bopeebo', 'fresh', 'dadbattle'],
-			['spookeez', 'south', "monster"],
-			['pico', 'philly', "blammed"],
-			['satin-panties', "high", "milf"],
-			['cocoa', 'eggnog', 'winter-horrorland'],
-			['senpai', 'roses', 'thorns'],
-			['ugh', 'guns', 'stress']
-		];
+		return [['666']];
 	}
-
-	var curDifficulty:Int = 1;
 
 	public static var weekUnlocked:Array<Bool> = [];
 
-	var weekCharacters:Array<Dynamic> = [
-		['', 'bf', 'gf'],
-		['dad', 'bf', 'gf'],
-		['spooky', 'bf', 'gf'],
-		['pico', 'bf', 'gf'],
-		['mom', 'bf', 'gf'],
-		['parents-christmas', 'bf', 'gf'],
-		['senpai', 'bf', 'gf'],
-		['tankman', 'bf', 'gf']
-	];
+	var weekCharacters:Array<Dynamic> = [['', 'bf', 'gf']];
+
+	var weekDifficulties:Array<Array<String>> = [['Exhaust']];
+
+	var curDifficulty:Int = 1;
 
 	var weekNames:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/weekNames'));
 
@@ -76,7 +60,6 @@ class StoryMenuState extends MusicBeatState
 	var sprDifficulty:FlxSprite;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
-	var diffsThatExists:Array<String>;
 
 	function unlockWeeks():Array<Bool>
 	{
@@ -93,47 +76,6 @@ class StoryMenuState extends MusicBeatState
 			weeks.push(true);
 
 		return weeks;
-	}
-
-	function cleanDifficulties()
-	{
-		diffsThatExists = [];
-		diffList = CoolUtil.coolTextFile(Paths.txt('data/weeksDifficulties'));
-
-		try
-		{
-			var splitDiffs:Array<String> = diffList[curWeek].split(':');
-
-			// WTF Epic YandereDev moment 😭
-
-			if (splitDiffs[0].contains('easy'))
-				diffsThatExists.push('easy');
-			else if (splitDiffs[0].contains('normal'))
-				diffsThatExists.push('normal');
-			else if (splitDiffs[0].contains('hard'))
-				diffsThatExists.push('hard');
-
-			if (splitDiffs[1].contains('easy'))
-				diffsThatExists.push('easy');
-			else if (splitDiffs[1].contains('normal'))
-				diffsThatExists.push('normal');
-			else if (splitDiffs[1].contains('hard'))
-				diffsThatExists.push('hard');
-
-			if (splitDiffs[2].contains('easy'))
-				diffsThatExists.push('easy');
-			else if (splitDiffs[2].contains('normal'))
-				diffsThatExists.push('normal');
-			else if (splitDiffs[2].contains('hard'))
-				diffsThatExists.push('hard');
-		}
-		catch (e)
-		{
-			Debug.logWarn(e);
-		}
-
-		if (diffsThatExists.length == 0)
-			diffsThatExists = ["easy", "normal", "hard"];
 	}
 
 	override function create()
@@ -239,8 +181,6 @@ class StoryMenuState extends MusicBeatState
 
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = FlxG.save.data.antialiasing;
-		cleanDifficulties();
-		changeDifficulty();
 
 		difficultySelectors.add(sprDifficulty);
 
@@ -251,6 +191,8 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.play('idle');
 		rightArrow.antialiasing = FlxG.save.data.antialiasing;
 		difficultySelectors.add(rightArrow);
+
+		changeDifficulty();
 
 		trace("Line 150");
 
@@ -439,11 +381,10 @@ class StoryMenuState extends MusicBeatState
 
 			PlayState.isSM = false;
 
-			PlayState.storyDifficulty = curDifficulty;
+			PlayState.storyDifficulty = CoolUtil.difficultyArray.indexOf(weekDifficulties[curWeek][curDifficulty]);
 
-			var diff:String = '-${diffsThatExists[PlayState.storyDifficulty]}';
-			if (diff == '-normal')
-				diff = '';
+			var diff:String = '${CoolUtil.suffixDiffsArray[PlayState.storyDifficulty]}';
+
 			PlayState.sicks = 0;
 			PlayState.bads = 0;
 			PlayState.shits = 0;
@@ -467,17 +408,23 @@ class StoryMenuState extends MusicBeatState
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
-			curDifficulty = diffsThatExists.length - 1;
-		if (curDifficulty > diffsThatExists.length - 1)
+			curDifficulty = Std.int(weekDifficulties[curWeek].length - 1);
+		if (curDifficulty > weekDifficulties[curWeek].length - 1)
 			curDifficulty = 0;
 
-		var newImage:FlxGraphic = Paths.image('menuDifficulties/${diffsThatExists[curDifficulty]}');
+		Debug.logInfo(curDifficulty);
+
+		var graphicName:String = '';
+
+		graphicName = weekDifficulties[curWeek][curDifficulty].toLowerCase();
+
+		var newImage:FlxGraphic = Paths.image('menuDifficulties/$graphicName');
 
 		if (sprDifficulty.graphic != newImage)
 		{
 			sprDifficulty.loadGraphic(newImage);
 			sprDifficulty.x = leftArrow.x + 60;
-			sprDifficulty.x += (308 - sprDifficulty.width) / 3;
+			// sprDifficulty.x += (308 - sprDifficulty.width) / 3;
 			sprDifficulty.alpha = 0;
 			sprDifficulty.y = leftArrow.y - 15;
 
@@ -490,6 +437,8 @@ class StoryMenuState extends MusicBeatState
 				}
 			});
 		}
+
+		rightArrow.x = leftArrow.x + sprDifficulty.width + 68;
 
 		sprDifficulty.alpha = 0;
 
@@ -511,13 +460,12 @@ class StoryMenuState extends MusicBeatState
 	{
 		curWeek += change;
 
-		cleanDifficulties();
-		changeDifficulty();
-
 		if (curWeek >= weekData().length)
 			curWeek = 0;
 		if (curWeek < 0)
 			curWeek = weekData().length - 1;
+
+		changeDifficulty();
 
 		var bullShit:Int = 0;
 

@@ -322,12 +322,12 @@ class FreeplayState extends MusicBeatState
 			var diffs = [];
 			var diffsThatExist = [];
 
-			if (Paths.doesTextAssetExist(Paths.json('songs/$songId/$songId-easy')))
-				diffsThatExist.push("Easy");
-			if (Paths.doesTextAssetExist(Paths.json('songs/$songId/$songId')))
-				diffsThatExist.push("Normal");
-			if (Paths.doesTextAssetExist(Paths.json('songs/$songId/$songId-hard')))
-				diffsThatExist.push("Hard");
+			for (i in 0...CoolUtil.suffixDiffsArray.length)
+			{
+				var leDiff = CoolUtil.suffixDiffsArray[i];
+				if (Paths.doesTextAssetExist(Paths.json('songs/$songId/$songId$leDiff')))
+					diffsThatExist.push(CoolUtil.difficultyArray[i]);
+			}
 
 			var customDiffs = CoolUtil.coolTextFile(Paths.txt('data/songs/$songId/customDiffs'));
 
@@ -353,12 +353,12 @@ class FreeplayState extends MusicBeatState
 				Debug.displayAlert(meta.songName + " Chart", "No difficulties found for chart, skipping.");
 			}
 
-			if (diffsThatExist.contains("Easy"))
-				FreeplayState.loadDiff(0, songId, diffs);
-			if (diffsThatExist.contains("Normal"))
-				FreeplayState.loadDiff(1, songId, diffs);
-			if (diffsThatExist.contains("Hard"))
-				FreeplayState.loadDiff(2, songId, diffs);
+			for (i in 0...CoolUtil.difficultyArray.length)
+			{
+				var leDiff = CoolUtil.difficultyArray[i];
+				if (diffsThatExist.contains(leDiff))
+					FreeplayState.loadDiff(CoolUtil.difficultyArray.indexOf(leDiff), songId, diffs);
+			}
 
 			if (customDiffs != null)
 			{
@@ -397,12 +397,12 @@ class FreeplayState extends MusicBeatState
 		var diffs = [];
 		var diffsThatExist = [];
 
-		if (Paths.doesTextAssetExist(Paths.json('songs/$songName/$songName-easy')))
-			diffsThatExist.push("Easy");
-		if (Paths.doesTextAssetExist(Paths.json('songs/$songName/$songName')))
-			diffsThatExist.push("Normal");
-		if (Paths.doesTextAssetExist(Paths.json('songs/$songName/$songName-hard')))
-			diffsThatExist.push("Hard");
+		for (i in 0...CoolUtil.suffixDiffsArray.length)
+		{
+			var leDiff = CoolUtil.suffixDiffsArray[i];
+			if (Paths.doesTextAssetExist(Paths.json('songs/$songName/$songName$leDiff')))
+				diffsThatExist.push(CoolUtil.difficultyArray[i]);
+		}
 
 		var customDiffs = CoolUtil.coolTextFile(Paths.txt('data/songs/$songName/customDiffs'));
 
@@ -428,12 +428,12 @@ class FreeplayState extends MusicBeatState
 			Debug.displayAlert(meta.songName + " Chart", "No difficulties found for chart, skipping.");
 		}
 
-		if (diffsThatExist.contains("Easy"))
-			FreeplayState.loadDiff(0, songName, diffs);
-		if (diffsThatExist.contains("Normal"))
-			FreeplayState.loadDiff(1, songName, diffs);
-		if (diffsThatExist.contains("Hard"))
-			FreeplayState.loadDiff(2, songName, diffs);
+		for (i in 0...CoolUtil.difficultyArray.length)
+		{
+			var leDiff = CoolUtil.difficultyArray[i];
+			if (diffsThatExist.contains(leDiff))
+				FreeplayState.loadDiff(CoolUtil.difficultyArray.indexOf(leDiff), songName, diffs);
+		}
 
 		if (customDiffs != null)
 		{
@@ -792,11 +792,12 @@ class FreeplayState extends MusicBeatState
 			case 'M.I.L.F':
 				songHighscore = 'Milf';
 		}
+		var abDiff = CoolUtil.difficultyArray.indexOf(songs[curSelected].diffs[curDifficulty]);
 		#if !switch
-		intendedScore = Highscore.getScore(songHighscore, curDifficulty, rate);
-		combo = Highscore.getCombo(songHighscore, curDifficulty, rate);
-		letter = Highscore.getLetter(songHighscore, curDifficulty, rate);
-		intendedaccuracy = Highscore.getAcc(songHighscore, curDifficulty, rate);
+		intendedScore = Highscore.getScore(songHighscore, abDiff, rate);
+		combo = Highscore.getCombo(songHighscore, abDiff, rate);
+		letter = Highscore.getLetter(songHighscore, abDiff, rate);
+		intendedaccuracy = Highscore.getAcc(songHighscore, abDiff, rate);
 		#end
 	}
 

@@ -5,7 +5,7 @@
       "label": "Build Windows (Debug)",
       "type": "lime",
       "targetConfiguration": "Build Windows (Debug)",
-      "command": "build",
+      "command": "test",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -15,7 +15,7 @@
       "label": "Build Windows (Release)",
       "type": "lime",
       "targetConfiguration": "Build Windows (Release)",
-      "command": "build",
+      "command": "test",
       "group": {
         "kind": "build",
         "isDefault": true

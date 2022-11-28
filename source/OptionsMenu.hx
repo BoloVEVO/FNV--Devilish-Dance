@@ -134,6 +134,7 @@ class OptionsMenu extends FlxSubState
 				new ScrollSpeedOption("Change your scroll speed. (1 = Chart dependent)"),
 				new OffsetThing("Change the note visual offset (how many milliseconds a note looks like it is offset in a chart)"),
 				new AccuracyDOption("Change how accuracy is calculated. (Accurate = Simple, Complex = Milisecond Based)"),
+				new NoteCamera("Toggle Camera movement to the note direction the character sings"),
 				new HitSoundOption("Toogle hitsound every time you hit a Strum Note."),
 				new HitSoundVolume("Set hitsound volume."),
 				new HitSoundMode("Set at what condition you want the hitsound to play."),
@@ -771,7 +772,7 @@ class OptionsMenu extends FlxSubState
 				case 0:
 					selectedCat.optionObjects.members[2].color = FlxColor.YELLOW;
 					if (PlayState.isStoryMode)
-						selectedCat.optionObjects.members[8].color = FlxColor.YELLOW;
+						selectedCat.optionObjects.members[9].color = FlxColor.YELLOW;
 
 					selectedCat.optionObjects.members[15].color = FlxColor.YELLOW;
 				case 1:

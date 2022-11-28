@@ -28,6 +28,7 @@ import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
 #end
+import openfl.system.System;
 
 class Main extends Sprite
 {
@@ -169,6 +170,7 @@ class Main extends Sprite
 			}
 		}
 		Assets.cache.clear("songs");
+		System.gc();
 		#end
 		// */
 	}

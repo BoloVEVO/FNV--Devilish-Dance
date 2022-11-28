@@ -287,6 +287,10 @@ class Note extends FlxSprite
 					{
 						case 0:
 							prevNote.scale.y *= 1.0064 + (1.0 / prevNote.frameHeight);
+						case 2, 4:
+							prevNote.scale.y *= 0.985 + (1.0 / prevNote.frameHeight);
+						case 3:
+							prevNote.scale.y *= 1.0075 + (1.0 / prevNote.frameHeight);
 						default:
 							prevNote.scale.y *= 0.995 + (1.0 / prevNote.frameHeight);
 					}

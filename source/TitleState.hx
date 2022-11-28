@@ -54,7 +54,7 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		getBuildVer();
+		// getBuildVer();
 		#if FEATURE_MULTITHREADING
 		MasterObjectLoader.mutex = new Mutex();
 		#end

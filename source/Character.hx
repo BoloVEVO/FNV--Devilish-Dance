@@ -244,7 +244,7 @@ class Character extends FlxSprite
 		{
 			if (FlxG.save.data.characters)
 			{
-				if (animation.curAnim != null)
+				if (this != null && exists && alive && animation.curAnim != null)
 				{
 					var canInterrupt = animInterrupt.get(animation.curAnim.name);
 
@@ -284,7 +284,7 @@ class Character extends FlxSprite
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
-		if (FlxG.save.data.characters)
+		if (this != null && exists && alive && FlxG.save.data.characters)
 		{
 			if (AnimName.endsWith('alt') && animation.getByName(AnimName) == null)
 			{

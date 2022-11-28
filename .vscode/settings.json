@@ -15,7 +15,7 @@
       "label": "Build Windows (Release)",
       "target": "windows",
       "args": [
-        "-release"
+        ""
       ]
     },
     {
@@ -29,7 +29,7 @@
       "label": "Build Linux (Release)",
       "target": "linux",
       "args": [
-        "-release"
+        ""
       ]
     },
     {
@@ -43,7 +43,7 @@
       "label": "Build MacOS (Release)",
       "target": "macos",
       "args": [
-        "-release"
+        ""
       ]
     },
     {
@@ -57,7 +57,7 @@
       "label": "Build HTML5 (Release)",
       "target": "html5",
       "args": [
-        "-release"
+        ""
       ]
     }
   ]
