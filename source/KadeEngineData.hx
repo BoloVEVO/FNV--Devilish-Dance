@@ -222,6 +222,12 @@ class KadeEngineData
 		if (FlxG.save.data.overrideNoteskins == null)
 			FlxG.save.data.overrideNoteskins = false;
 
+		if (FlxG.save.data.characters == null)
+			FlxG.save.data.characters = true;
+
+		if (FlxG.save.data.strumOffset == null)
+			FlxG.save.data.strumOffset = ['downscroll' => 0, 'upscroll' => 0];
+
 		if (FlxG.save.data.gpuRender == null)
 		{
 			#if html5

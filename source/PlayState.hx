@@ -983,33 +983,33 @@ class PlayState extends MusicBeatState
 		else
 			strumLine.y = FlxG.height - 670;
 
-		laneunderlayOpponent = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
-		laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
-		laneunderlayOpponent.color = FlxColor.BLACK;
-		laneunderlayOpponent.scrollFactor.set();
+		/*laneunderlayOpponent = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
+			laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
+			laneunderlayOpponent.color = FlxColor.BLACK;
+			laneunderlayOpponent.scrollFactor.set();
 
-		laneunderlay = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
-		laneunderlay.alpha = FlxG.save.data.laneTransparency;
-		laneunderlay.color = FlxColor.BLACK;
-		laneunderlay.scrollFactor.set();
+			laneunderlay = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
+			laneunderlay.alpha = FlxG.save.data.laneTransparency;
+			laneunderlay.color = FlxColor.BLACK;
+			laneunderlay.scrollFactor.set();
 
-		if (isStoryMode)
-		{
-			if ((storyPlaylist.length >= 3 && inCutscene) || inCinematic)
+			if (isStoryMode)
 			{
-				laneunderlayOpponent.alpha = 0;
-				laneunderlay.alpha = 0;
+				if ((storyPlaylist.length >= 3 && inCutscene) || inCinematic)
+				{
+					laneunderlayOpponent.alpha = 0;
+					laneunderlay.alpha = 0;
+				}
 			}
-		}
 
-		if (FlxG.save.data.laneUnderlay)
-		{
-			if (!FlxG.save.data.middleScroll)
+			if (FlxG.save.data.laneUnderlay)
 			{
-				add(laneunderlayOpponent);
-			}
-			add(laneunderlay);
-		}
+				if (!FlxG.save.data.middleScroll)
+				{
+					add(laneunderlayOpponent);
+				}
+				add(laneunderlay);
+		}*/
 
 		strumLineNotes = new FlxTypedGroup<StaticArrow>();
 		add(strumLineNotes);
@@ -1031,6 +1031,11 @@ class PlayState extends MusicBeatState
 
 		generateStaticArrows(0, tweenBoolshit);
 		generateStaticArrows(1, tweenBoolshit);
+
+		strumLineNotes.forEach(function(arrow:StaticArrow)
+		{
+			add(arrow.bgLane);
+		});
 
 		// startCountdown();
 
@@ -1065,18 +1070,18 @@ class PlayState extends MusicBeatState
 		}
 
 		// Update lane underlay positions AFTER static arrows :)
-		if (arrowsGenerated)
-		{
-			laneunderlay.x = playerStrums.members[0].x - 25;
-
-			if (!FlxG.save.data.middleScroll || executeModchart)
+		/*if (arrowsGenerated)
 			{
-				laneunderlayOpponent.x = cpuStrums.members[0].x - 25;
-			}
-		}
+				laneunderlay.x = playerStrums.members[0].x - 25;
 
-		laneunderlay.screenCenter(Y);
-		laneunderlayOpponent.screenCenter(Y);
+				if (!FlxG.save.data.middleScroll || executeModchart)
+				{
+					laneunderlayOpponent.x = cpuStrums.members[0].x - 25;
+				}
+			}
+
+			laneunderlay.screenCenter(Y);
+			laneunderlayOpponent.screenCenter(Y); */
 
 		#if FEATURE_LUAMODCHART
 		if (executeModchart)
@@ -1279,8 +1284,8 @@ class PlayState extends MusicBeatState
 		iconP1.cameras = [camHUD];
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
-		laneunderlay.cameras = [camHUD];
-		laneunderlayOpponent.cameras = [camHUD];
+		/*laneunderlay.cameras = [camHUD];
+			laneunderlayOpponent.cameras = [camHUD]; */
 
 		if (isStoryMode)
 			doof.cameras = [mainCam];
@@ -1658,9 +1663,9 @@ class PlayState extends MusicBeatState
 	{
 		if (inCinematic || inCutscene)
 		{
-			createTween(laneunderlay, {alpha: FlxG.save.data.laneTransparency}, 0.75, {ease: FlxEase.bounceOut});
-			if (!FlxG.save.data.middleScroll)
-				createTween(laneunderlayOpponent, {alpha: FlxG.save.data.laneTransparency}, 0.75, {ease: FlxEase.bounceOut});
+			/*createTween(laneunderlay, {alpha: FlxG.save.data.laneTransparency}, 0.75, {ease: FlxEase.bounceOut});
+				if (!FlxG.save.data.middleScroll)
+					createTween(laneunderlayOpponent, {alpha: FlxG.save.data.laneTransparency}, 0.75, {ease: FlxEase.bounceOut}); */
 
 			if (!arrowsGenerated)
 			{
@@ -2310,7 +2315,10 @@ class PlayState extends MusicBeatState
 		for (i in 0...4)
 		{
 			// FlxG.log.add(i);
-			var babyArrow:StaticArrow = new StaticArrow(-10, strumLine.y);
+			var babyArrow:StaticArrow = new StaticArrow(43,
+				strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
+
+			babyArrow.bgLane.camera = camHUD;
 
 			// defaults if no noteStyle was found in chart
 			var noteTypeCheck:String = 'normal';
@@ -2395,45 +2403,35 @@ class PlayState extends MusicBeatState
 			{
 				case 0:
 					if (!PlayStateChangeables.opponentMode)
-					{
-						babyArrow.x += 20;
 						cpuStrums.add(babyArrow);
-					}
 					else
-					{
-						babyArrow.x += 20;
 						playerStrums.add(babyArrow);
-					}
+					babyArrow.x += 20.5;
+
 				case 1:
 					if (!PlayStateChangeables.opponentMode)
-					{
 						playerStrums.add(babyArrow);
-						babyArrow.x -= 5;
-					}
 					else
-					{
-						babyArrow.x -= 20;
 						cpuStrums.add(babyArrow);
-					}
 			}
 
 			babyArrow.playAnim('static');
-			babyArrow.x += 98.5;
 			babyArrow.x += ((FlxG.width / 2) * player);
+			babyArrow.x += 48.5;
 
 			if (FlxG.save.data.middleScroll)
 			{
 				if (!PlayStateChangeables.opponentMode)
 				{
-					babyArrow.x -= 303.5;
+					babyArrow.x -= 310;
 					if (player == 0)
-						babyArrow.x -= 275 / Math.pow(FlxG.save.data.zoom, 3);
+						babyArrow.x -= 275;
 				}
 				else
 				{
-					babyArrow.x += 311.5;
+					babyArrow.x += 310;
 					if (player == 1)
-						babyArrow.x += 275 / Math.pow(FlxG.save.data.zoom, 3);
+						babyArrow.x += 275;
 				}
 			}
 
@@ -3894,10 +3892,10 @@ class PlayState extends MusicBeatState
 	{
 		for (i in SONG.notes)
 		{
-			var start = TimingStruct.getTimeFromBeat((TimingStruct.getBeatFromTime(i.startTime)));
-			var end = TimingStruct.getTimeFromBeat((TimingStruct.getBeatFromTime(i.endTime)));
+			/*var start = TimingStruct.getTimeFromBeat((TimingStruct.getBeatFromTime(i.startTime)));
+				var end = TimingStruct.getTimeFromBeat((TimingStruct.getBeatFromTime(i.endTime))); */
 
-			if (ms >= start && ms < end)
+			if (ms >= i.startTime && ms < i.endTime)
 			{
 				return i;
 			}
@@ -3921,7 +3919,7 @@ class PlayState extends MusicBeatState
 			if (currentSeg == null)
 				return;
 
-			var start:Float = ((currentBeat - currentSeg.startBeat) / ((currentSeg.bpm) / 60)) / songMultiplier;
+			var start:Float = ((currentBeat - currentSeg.startBeat) / ((currentSeg.bpm) / 60));
 
 			section.startTime = (((currentSeg.startTime + start)) * 1000);
 
@@ -5776,9 +5774,6 @@ class PlayState extends MusicBeatState
 		else
 			healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
 		healthBar.updateBar();
-		laneunderlay.alpha = FlxG.save.data.laneTransparency;
-		if (!FlxG.save.data.middleScroll)
-			laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
 
 		if (!isStoryMode)
 			PlayStateChangeables.botPlay = FlxG.save.data.botplay;
