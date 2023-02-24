@@ -5,8 +5,12 @@ class Ratings
 	public static function GenerateComboRank(accuracy:Float) // generate a letter ranking
 	{
 		var comboranking:String = "N/A";
-		if (PlayState.misses == 0 && PlayState.bads == 0 && PlayState.shits == 0 && PlayState.goods == 0) // Marvelous (SICK) Full Combo
+		if (PlayState.misses == 0 && PlayState.bads == 0 && PlayState.shits == 0 && PlayState.goods == 0 && PlayState.sicks == 0) // Marvelous (SWAG) Full Combo
 			comboranking = "(MFC)";
+		else if (PlayState.misses == 0 && PlayState.bads == 0 && PlayState.shits == 0 && PlayState.goods == 0 && PlayState.sicks >= 1)
+		{ // Perfect (SWAGS & SICK) Full Comb{
+			comboranking = "(PFC)";
+		}
 		else if (PlayState.misses == 0 && PlayState.bads == 0 && PlayState.shits == 0 && PlayState.goods >= 1) // Good Full Combo (Nothing but Goods & Sicks)
 			comboranking = "(GFC)";
 		else if (PlayState.misses == 0) // Regular FC
@@ -15,7 +19,6 @@ class Ratings
 			comboranking = "(SDCB)";
 		else
 			comboranking = "(Clear)";
-
 		return comboranking;
 		// WIFE TIME :)))) (based on Wife3)
 	}
@@ -100,6 +103,8 @@ class Ratings
 	public static function judgeNote(noteDiff:Float)
 	{
 		var diff = Math.abs(noteDiff);
+		if (PlayStateChangeables.botPlay)
+			return "swag";
 		for (index in 0...timingWindows.length) // based on 4 timing windows, will break with anything else
 		{
 			var time = timingWindows[index];
@@ -116,10 +121,12 @@ class Ratings
 						return "good";
 					case 3: // sick
 						return "sick";
+					case 4: // swag
+						return "swag";
 				}
 			}
 		}
-		return "good";
+		return "shit";
 	}
 
 	public static function CalculateRanking(score:Int, scoreDef:Int, nps:Int, maxNPS:Int, accuracy:Float):String

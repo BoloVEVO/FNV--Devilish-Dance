@@ -124,7 +124,8 @@ class SMFile
 		// init a fnf song
 
 		var song = {
-			song: header.TITLE,
+			songId: header.TITLE,
+			songName: header.TITLE,
 			notes: [],
 			eventObjects: [],
 			bpm: header.getBPM(0),
@@ -237,7 +238,7 @@ class SMFile
 					}
 
 					// get the lane and note type
-					var lane = index;
+					var lane = index + 4;
 					var numba = Std.parseInt(i);
 
 					// switch through the type and add the note

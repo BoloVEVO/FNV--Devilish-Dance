@@ -26,7 +26,6 @@ import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import openfl.Lib;
-import Shaders;
 import openfl.utils.Assets as OpenFlAssets;
 #if FEATURE_FILESYSTEM
 import sys.io.File;
@@ -258,53 +257,53 @@ class ModchartState
 		{
 			case 'boyfriend':
 				@:privateAccess
-				return PlayState.boyfriend;
+				return PlayState.instance.boyfriend;
 			case 'girlfriend':
 				@:privateAccess
-				return PlayState.gf;
+				return PlayState.instance.gf;
 			case 'dad':
 				@:privateAccess
-				return PlayState.dad;
+				return PlayState.instance.dad;
 		}
 		// lua objects or what ever
 		if (luaSprites.get(id) == null)
 		{
 			if (Std.parseInt(id) == null)
 				return Reflect.getProperty(PlayState.instance, id);
-			return PlayState.PlayState.strumLineNotes.members[Std.parseInt(id)];
+			return PlayState.PlayState.instance.strumLineNotes.members[Std.parseInt(id)];
 		}
 		return luaSprites.get(id);
 	}
 
-	function getPropertyByName(id:String)
+	function getPropertyByName(leClass:String, id:String)
 	{
-		return Reflect.field(PlayState.instance, id);
+		return Reflect.field(Type.resolveClass(leClass), id);
 	}
 
-	function setPropertyByName(id:String, value:Dynamic)
+	function setPropertyByName(leClass:String, id:String, value:Dynamic)
 	{
-		return Reflect.setProperty(PlayState.instance, id, value);
+		return Reflect.setProperty(Type.resolveClass(leClass), id, value);
 	}
 
 	public static var luaSprites:Map<String, FlxSprite> = [];
 
 	function changeDadCharacter(id:String)
 	{
-		var olddadx = PlayState.dad.x;
-		var olddady = PlayState.dad.y;
-		PlayState.instance.removeObject(PlayState.dad);
-		PlayState.dad = new Character(olddadx, olddady, id);
-		PlayState.instance.addObject(PlayState.dad);
+		var olddadx = PlayState.instance.dad.x;
+		var olddady = PlayState.instance.dad.y;
+		PlayState.instance.removeObject(PlayState.instance.dad);
+		PlayState.instance.dad = new Character(olddadx, olddady, id);
+		PlayState.instance.addObject(PlayState.instance.dad);
 		PlayState.instance.iconP2.changeIcon(id);
 	}
 
 	function changeBoyfriendCharacter(id:String)
 	{
-		var oldboyfriendx = PlayState.boyfriend.x;
-		var oldboyfriendy = PlayState.boyfriend.y;
-		PlayState.instance.removeObject(PlayState.boyfriend);
-		PlayState.boyfriend = new Boyfriend(oldboyfriendx, oldboyfriendy, id);
-		PlayState.instance.addObject(PlayState.boyfriend);
+		var oldboyfriendx = PlayState.instance.boyfriend.x;
+		var oldboyfriendy = PlayState.instance.boyfriend.y;
+		PlayState.instance.removeObject(PlayState.instance.boyfriend);
+		PlayState.instance.boyfriend = new Boyfriend(oldboyfriendx, oldboyfriendy, id);
+		PlayState.instance.addObject(PlayState.instance.boyfriend);
 		PlayState.instance.iconP1.changeIcon(id);
 	}
 
@@ -385,16 +384,16 @@ class ModchartState
 		{
 			if (drawBehind)
 			{
-				PlayState.instance.removeObject(PlayState.gf);
-				PlayState.instance.removeObject(PlayState.boyfriend);
-				PlayState.instance.removeObject(PlayState.dad);
+				PlayState.instance.removeObject(PlayState.instance.gf);
+				PlayState.instance.removeObject(PlayState.instance.boyfriend);
+				PlayState.instance.removeObject(PlayState.instance.dad);
 			}
 			PlayState.instance.addObject(sprite);
 			if (drawBehind)
 			{
-				PlayState.instance.addObject(PlayState.gf);
-				PlayState.instance.addObject(PlayState.boyfriend);
-				PlayState.instance.addObject(PlayState.dad);
+				PlayState.instance.addObject(PlayState.instance.gf);
+				PlayState.instance.addObject(PlayState.instance.boyfriend);
+				PlayState.instance.addObject(PlayState.instance.dad);
 			}
 		}
 		#end
@@ -449,8 +448,16 @@ class ModchartState
 			if (FlxG.fullscreen)
 				FlxG.fullscreen = !FlxG.fullscreen;
 			Application.current.window.alert("LUA COMPILE ERROR:\n" + Lua.tostring(lua, result), "Kade Engine Modcharts");
+			PlayState.instance.executeModchart = false;
+			@:privateAccess
+			PlayState.instance.canPause = false;
+			if (PlayState.instance.luaModchart != null)
+			{
+				PlayState.instance.luaModchart.die();
+				PlayState.instance.luaModchart = null;
+			}
+
 			MusicBeatState.switchState(new FreeplayState());
-			PlayState.instance.clean();
 			return;
 		}
 
@@ -588,62 +595,24 @@ class ModchartState
 			PlayState.instance.camHUD.zoom = zoomAmount;
 		});
 
-		/*Lua_helper.add_callback(lua, "setLaneUnderLayPos", function(value:Int)
-			{
-				PlayState.instance.laneunderlay.x = value;
-			});
-
-			Lua_helper.add_callback(lua, "setOpponentLaneUnderLayOpponentPos", function(value:Int)
-			{
-				PlayState.instance.laneunderlayOpponent.x = value;
-			});
-
-			Lua_helper.add_callback(lua, "setLaneUnderLayAlpha", function(value:Int)
-			{
-				PlayState.instance.laneunderlay.alpha = value;
-			});
-
-			Lua_helper.add_callback(lua, "setOpponentLaneUnderLayOpponentAlpha", function(value:Int)
-			{
-				PlayState.instance.laneunderlayOpponent.alpha = value;
-		});*/
-
 		// SHADER SHIT (Thanks old psych engine)
 
-		Lua_helper.add_callback(lua, "addChromaticAbberationEffect", function(camera:String, chromeOffset:Float = 0.005)
+		for (i in 0...PlayState.instance.strumLineNotes.length)
 		{
-			PlayState.instance.addShaderToCamera(camera, new ChromaticAberrationEffect(chromeOffset));
-		});
+			var member = PlayState.instance.strumLineNotes.members[i];
+			new LuaReceptor(member, "Global_receptor_" + i).Register(lua);
+		}
 
-		Lua_helper.add_callback(lua, "addVignetteEffect", function(camera:String, radius:Float = 0.5, smoothness:Float = 0.5)
+		for (i in 0...PlayState.instance.cpuStrums.length)
 		{
-			PlayState.instance.addShaderToCamera(camera, new VignetteEffect(radius, smoothness));
-		});
+			var member = PlayState.instance.cpuStrums.members[i];
+			new LuaReceptor(member, "CPU_receptor_" + i).Register(lua);
+		}
 
-		Lua_helper.add_callback(lua, "addGameboyEffect", function(camera:String, brightness:Float = 1.0)
+		for (i in 0...PlayState.instance.playerStrums.length)
 		{
-			PlayState.instance.addShaderToCamera(camera, new GameboyEffect(brightness));
-		});
-
-		Lua_helper.add_callback(lua, "addCRTEffect", function(camera:String, curved:Bool = true)
-		{
-			PlayState.instance.addShaderToCamera(camera, new CRTEffect(curved));
-		});
-
-		Lua_helper.add_callback(lua, "addGlitchEffect", function(camera:String, waveSpeed:Float = 0, waveFrq:Float = 0, waveAmp:Float = 0)
-		{
-			PlayState.instance.addShaderToCamera(camera, new GlitchEffect(waveSpeed, waveFrq, waveAmp));
-		});
-
-		Lua_helper.add_callback(lua, "clearEffects", function(camera:String)
-		{
-			PlayState.instance.clearShaderFromCamera(camera);
-		});
-
-		for (i in 0...PlayState.strumLineNotes.length)
-		{
-			var member = PlayState.strumLineNotes.members[i];
-			new LuaReceptor(member, "receptor_" + i).Register(lua);
+			var member = PlayState.instance.playerStrums.members[i];
+			new LuaReceptor(member, "Player_receptor_" + i).Register(lua);
 		}
 
 		new LuaGame().Register(lua);

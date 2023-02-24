@@ -45,7 +45,7 @@ class Waveform extends FlxSprite
 		makeGraphic(h, 720, FlxColor.TRANSPARENT);
 	}
 
-	public function drawWaveform()
+	public function drawWaveform(color:FlxColor)
 	{
 		var index:Int = 0;
 		var drawIndex:Int = 0;
@@ -81,8 +81,8 @@ class Waveform extends FlxSprite
 			var pixelsMax:Float = max * 300;
 
 			pixels.fillRect(new Rectangle(drawIndex, 0, 1, 720), 0xFF000000);
-			pixels.fillRect(new Rectangle(drawIndex, (FlxG.height / 2) - pixelsMin, 1, pixelsMin + pixelsMax), FlxColor.GRAY);
-			pixels.fillRect(new Rectangle(drawIndex, (FlxG.height / 2) - pixelsMin, 1, -(pixelsMin + pixelsMax)), FlxColor.GRAY);
+			pixels.fillRect(new Rectangle(drawIndex, (FlxG.height / 2) - pixelsMin, 1, pixelsMin + pixelsMax), color);
+			pixels.fillRect(new Rectangle(drawIndex, (FlxG.height / 2) - pixelsMin, 1, -(pixelsMin + pixelsMax)), color);
 			drawIndex += 1;
 
 			min = 0;

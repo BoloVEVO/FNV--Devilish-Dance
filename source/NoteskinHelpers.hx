@@ -9,12 +9,10 @@ using StringTools;
 class NoteskinHelpers
 {
 	public static var noteskinArray = [];
-	public static var xmlData = [];
 
 	public static function updateNoteskins()
 	{
 		noteskinArray = [];
-		xmlData = [];
 
 		noteskinArray = ["Arrows", "Circles", "Voltex-Arrows", "Voltex-Circles", "Voltex-Bars"];
 
@@ -31,15 +29,43 @@ class NoteskinHelpers
 		return noteskinArray[id];
 	}
 
-	static public function generateNoteskinSprite(id:Int)
+	static public function generateNoteskinSprite(id:Int, type:String, unique:Bool)
 	{
-		Debug.logTrace("bruh momento");
+		// Debug.logTrace("bruh momento");
 
-		return Paths.getSparrowAtlas('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}', 'shared');
+		if (type == null)
+			type = '';
+
+		var suffix = '_$type';
+
+		if (type == '')
+			suffix = '';
+
+		var atlas = null;
+
+		if (unique)
+			atlas = Paths.getSparrowAtlas('noteskins/NOTE$suffix', 'shared');
+		else
+			atlas = Paths.getSparrowAtlas('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}$suffix', 'shared');
+
+		return atlas;
 	}
 
-	static public function generatePixelSprite(id:Int, ends:Bool = false)
+	static public function generatePixelSprite(id:Int, type:String, unique:Bool, ends:Bool = false)
 	{
-		return Paths.image('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}-pixel${(ends ? '-ends' : '')}', "shared");
+		if (type == null)
+			type = '';
+
+		var suffix = '_$type';
+
+		if (type == '')
+			suffix = '';
+
+		var image = null;
+		if (unique)
+			image = Paths.image('noteskins/NOTE-pixel${(ends ? '-ends' : '')}$suffix', "shared");
+		else
+			image = Paths.image('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}-pixel${(ends ? '-ends' : '')}$suffix', "shared");
+		return image;
 	}
 }

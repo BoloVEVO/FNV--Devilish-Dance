@@ -12,7 +12,6 @@ import flash.text.TextFormatAlign;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
-import PlayState;
 
 /**
  * stolen from https://github.com/HaxeFlixel/flixel/blob/master/flixel/system/debug/stats/StatsGraph.hx
@@ -221,30 +220,14 @@ class HitGraph extends Sprite
 
 			switch (judge)
 			{
+				case "swag":
+					gfx.beginFill(0x00FFFF);
 				case "sick":
-					switch (PlayState.SONG.noteStyle)
-					{
-						case 'voltex':
-							gfx.beginFill(0x00CEF1);
-						default:
-							gfx.beginFill(0x00FFFF);
-					}
+					gfx.beginFill(0xFFF200);
 				case "good":
-					switch (PlayState.SONG.noteStyle)
-					{
-						case 'voltex':
-							gfx.beginFill(0xFFF700);
-						default:
-							gfx.beginFill(0x00FF00);
-					}
+					gfx.beginFill(0x00FF00);
 				case "bad":
-					switch (PlayState.SONG.noteStyle)
-					{
-						case 'voltex':
-							gfx.beginFill(0x9EFFF5);
-						default:
-							gfx.beginFill(0xFF0000);
-					}
+					gfx.beginFill(0xFF0000);
 				case "shit":
 					gfx.beginFill(0x8b0000);
 				case "miss":
@@ -268,7 +251,8 @@ class HitGraph extends Sprite
 
 	public function fitX(x:Float)
 	{
-		return ((x / (PlayState.instance.inst.length / PlayState.songMultiplier)) * width) * PlayState.songMultiplier;
+		return
+			((x / (#if cpp PlayState.instStream.length #else PlayState.instance.inst.length #end / PlayState.songMultiplier)) * width) * PlayState.songMultiplier;
 	}
 
 	public function addToHistory(diff:Float, judge:String, time:Float)

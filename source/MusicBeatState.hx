@@ -1,6 +1,6 @@
 package;
 
-import Conductor.BPMChangeEvent;
+import flixel.FlxSubState;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxState;
@@ -14,6 +14,8 @@ import flixel.addons.ui.FlxUIState;
 #if FEATURE_DISCORD
 import Discord.DiscordClient;
 #end
+import audio.AudioStreamThing;
+import flixel.input.keyboard.FlxKey;
 
 class MusicBeatState extends FlxUIState
 {
@@ -33,89 +35,40 @@ class MusicBeatState extends FlxUIState
 
 	public static var initSave:Bool = false;
 
-	private var assets:Array<FlxBasic> = [];
+	public static var songStream:AudioStreamThing;
+
+	var dumped:Bool = false;
+
+	public static var subStates:Array<FlxSubState> = [];
+
+	private var curTiming:TimingStruct = null;
+
+	var fullscreenBind:FlxKey;
 
 	override function destroy()
 	{
-		clean();
-
 		/*Application.current.window.onFocusIn.remove(onWindowFocusOut);
 			Application.current.window.onFocusIn.remove(onWindowFocusIn); */
+
+		curTiming = null;
+
+		for (substate in subStates)
+		{
+			if (substate != null)
+				substate.destroy();
+			subStates.remove(substate);
+		}
 
 		super.destroy();
 	}
 
-	public function destroyObject(Object:Dynamic):Void
-	{
-		if (Std.isOfType(Object, FlxSprite))
-		{
-			var spr:FlxSprite = cast(Object, FlxSprite);
-			spr.kill();
-			remove(spr, true);
-			spr.destroy();
-			spr = null;
-		}
-		else if (Std.isOfType(Object, FlxTypedGroup))
-		{
-			var grp:FlxTypedGroup<Dynamic> = cast(Object, FlxTypedGroup<Dynamic>);
-			for (ObjectGroup in grp.members)
-			{
-				if (Std.isOfType(ObjectGroup, FlxSprite))
-				{
-					var spr:FlxSprite = cast(ObjectGroup, FlxSprite);
-					spr.kill();
-					remove(spr, true);
-					spr.destroy();
-					spr = null;
-				}
-			}
-		}
-	}
-
-	override function add(Object:FlxBasic):FlxBasic
-	{
-		if (Std.isOfType(Object, FlxUI))
-			return null;
-
-		if (Std.isOfType(Object, FlxSprite))
-			var spr:FlxSprite = cast(Object, FlxSprite);
-
-		// Debug.logTrace(Object);
-		#if FEATURE_MULTITHREADING
-		MasterObjectLoader.addObject(Object);
-		#else
-		assets.push(Object);
-		#end
-		var result = super.add(Object);
-		return result;
-	}
-
-	override function remove(Object:FlxBasic, Splice:Bool = false):FlxBasic
-	{
-		#if FEATURE_MULTITHREADING
-		MasterObjectLoader.removeObject(Object);
-		#end
-		var result = super.remove(Object, Splice);
-		return result;
-	}
-
-	public function clean()
-	{
-		#if FEATURE_MULTITHREADING
-		for (i in MasterObjectLoader.Objects)
-		{
-			destroyObject(i);
-		}
-		#else
-		for (i in assets)
-		{
-			remove(i);
-		}
-		#end
-	}
-
 	override function create()
 	{
+		subStates = [];
+		destroySubStates = false;
+
+		Paths.runGC();
+
 		if (initSave)
 		{
 			if (FlxG.save.data.laneTransparency < 0)
@@ -144,10 +97,12 @@ class MusicBeatState extends FlxUIState
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 
+		super.create();
 		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
-
-		Paths.clearUnusedMemory();
 	}
+
+	var step = 0.0;
+	var startInMS = 0.0;
 
 	override function update(elapsed:Float)
 	{
@@ -174,23 +129,45 @@ class MusicBeatState extends FlxUIState
 				}
 		}*/
 
+		fullscreenBind = FlxKey.fromString(FlxG.save.data.fullscreenBind);
+
+		if (FlxG.keys.anyJustPressed([fullscreenBind]))
+		{
+			FlxG.fullscreen = !FlxG.fullscreen;
+		}
+
+		if (curDecimalBeat < 0)
+			curDecimalBeat = 0;
+
 		if (Conductor.songPosition < 0)
 			curDecimalBeat = 0;
 		else
 		{
-			var data = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
-
-			if (data != null)
+			if (curTiming == null)
 			{
-				FlxG.watch.addQuick("Current Conductor Timing Seg", data.bpm);
+				setFirstTiming();
+			}
 
-				Conductor.crochet = ((60 / data.bpm) * 1000) / PlayState.songMultiplier;
+			if (curTiming != null)
+			{
+				/* Not necessary to get a timing every frame if it's the same one. Instead if the current timing endBeat is equal or greater
+					than the current Beat meaning that the timing ended the game will check for a new timing (for bpm change events basically), 
+					and also to get a lil more of performance */
 
-				var step = ((60 / data.bpm) * 1000) / 4;
-				var startInMS = (data.startTime * 1000);
+				if (curTiming.endBeat < curDecimalBeat)
+				{
+					Debug.logTrace('Current Timing ended, checking for next Timing...');
+					curTiming = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
+					step = ((60 / curTiming.bpm) * 1000) / 4;
+					startInMS = (curTiming.startTime * 1000);
+				}
 
-				curDecimalBeat = data.startBeat + ((((Conductor.songPosition / 1000)) - data.startTime) * (data.bpm / 60));
-				var ste:Int = Math.floor(data.startStep + ((Conductor.songPosition) - startInMS) / step);
+				#if debug
+				FlxG.watch.addQuick("Current Conductor Timing Seg", curTiming.bpm);
+				#end
+
+				curDecimalBeat = curTiming.startBeat + ((((Conductor.songPosition / 1000)) - curTiming.startTime) * (curTiming.bpm / 60));
+				var ste:Int = Math.floor(curTiming.startStep + ((Conductor.songPosition) - startInMS) / step);
 				if (ste >= 0)
 				{
 					if (ste > curStep)
@@ -236,11 +213,10 @@ class MusicBeatState extends FlxUIState
 						stepHit();
 					}
 				}
-				Conductor.crochet = ((60 / Conductor.bpm) * 1000) / PlayState.songMultiplier;
 			}
 		}
 
-		// (cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 		super.update(elapsed);
 	}
 
@@ -288,22 +264,6 @@ class MusicBeatState extends FlxUIState
 		curBeat = Math.floor(curStep / 4);
 	}
 
-	private function updateCurStep():Int
-	{
-		var lastChange:BPMChangeEvent = {
-			stepTime: 0,
-			songTime: 0,
-			bpm: 0
-		}
-		for (i in 0...Conductor.bpmChangeMap.length)
-		{
-			if (Conductor.songPosition >= Conductor.bpmChangeMap[i].songTime)
-				lastChange = Conductor.bpmChangeMap[i];
-		}
-
-		return lastChange.stepTime + Math.floor((Conductor.songPosition - lastChange.songTime) / Conductor.stepCrochet);
-	}
-
 	public function stepHit():Void
 	{
 		if (curStep % 4 == 0)
@@ -322,6 +282,16 @@ class MusicBeatState extends FlxUIState
 		#else
 		FlxG.openURL(schmancy);
 		#end
+	}
+
+	private function setFirstTiming()
+	{
+		curTiming = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
+		if (curTiming != null)
+		{
+			step = ((60 / curTiming.bpm) * 1000) / 4;
+			startInMS = (curTiming.startTime * 1000);
+		}
 	}
 	/*function onWindowFocusOut():Void
 		{

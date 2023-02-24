@@ -13,6 +13,7 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.display3D.textures.Texture;
 import openfl.display.BitmapData;
+import flixel.graphics.frames.FlxBitmapFont;
 #if cpp
 import cpp.NativeGc;
 #elseif hl
@@ -163,6 +164,8 @@ class Paths
 		}
 		catch (e)
 		{
+			Debug.logError('Error parsing JSON or JSON does not exit');
+			Debug.logError(e);
 			rawJson = null;
 		}
 
@@ -230,9 +233,29 @@ class Paths
 		return getPath('$key.txt', TEXT, library);
 	}
 
+	inline static public function bitmapFont(key:String, ?library:String):FlxBitmapFont
+	{
+		return FlxBitmapFont.fromAngelCode(image(key, library), fontXML(key, library));
+	}
+
+	inline static public function fontXML(key:String, ?library:String):Xml
+	{
+		return Xml.parse(OpenFlAssets.getText(getPath('images/$key.fnt', TEXT, library)));
+	}
+
 	inline static public function xml(key:String, ?library:String)
 	{
 		return getPath('data/$key.xml', TEXT, library);
+	}
+
+	inline static public function shaderFragment(key:String, ?library:String)
+	{
+		return getPath('shaders/$key.frag', TEXT, library);
+	}
+
+	inline static public function shaderVertex(key:String, ?library:String)
+	{
+		return getPath('shaders/$key.vert', TEXT, library);
 	}
 
 	inline static public function animJson(key:String, ?library:String)
@@ -261,13 +284,17 @@ class Paths
 		return sound(key + FlxG.random.int(min, max), library);
 	}
 
-	inline static public function music(key:String, ?library:String):Any
+	inline static public function music(key:String, ?returnString:Bool = false, ?library:String):Any
 	{
-		var file:Sound = loadSound('music', key, library);
+		var file:Dynamic;
+		if (!returnString)
+			file = loadSound('music', key, library);
+		else
+			file = getPath('music/$key.$SOUND_EXT', SOUND, library);
 		return file;
 	}
 
-	inline static public function voices(song:String):Any
+	inline static public function voices(song:String, ?returnString:Bool = false):Any
 	{
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices';
 		switch (songLowercase)
@@ -280,16 +307,19 @@ class Paths
 				songLowercase = 'milf';
 		}
 
-		var file;
+		var file:Dynamic;
 		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
+		if (!returnString)
+			file = loadSound('songs', songLowercase);
+		else
+			file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
 		#else
 		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
 		#end
 		return file;
 	}
 
-	inline static public function inst(song:String):Any
+	inline static public function inst(song:String, ?returnString:Bool = false):Any
 	{
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Inst';
 		switch (songLowercase)
@@ -301,9 +331,12 @@ class Paths
 			case 'm.i.l.f':
 				songLowercase = 'milf';
 		}
-		var file;
+		var file:Dynamic;
 		#if PRELOAD_ALL
-		file = loadSound('songs', songLowercase);
+		if (!returnString)
+			file = loadSound('songs', songLowercase);
+		else
+			file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
 		#else
 		file = 'songs:assets/songs/$songLowercase.$SOUND_EXT';
 		#end
@@ -375,11 +408,7 @@ class Paths
 			dumpExclusions.push(key);
 	}
 
-	public static var dumpExclusions:Array<String> = [
-		'assets/music/freakyMenu.$SOUND_EXT',
-		'assets/shared/music/breakfast.$SOUND_EXT',
-		'assets/music/ke_freakyMenu.$SOUND_EXT'
-	];
+	public static var dumpExclusions:Array<String> = ['assets/music/freakyMenu.$SOUND_EXT', 'assets/music/ke_freakyMenu.$SOUND_EXT'];
 
 	/// haya I love you for the base cache dump I took to the max
 	public static function clearUnusedMemory()
@@ -411,12 +440,17 @@ class Paths
 					obj.destroy();
 					currentTrackedAssets.remove(key);
 					counter++;
+					Debug.logTrace('Cleared $key form RAM');
 					Debug.logTrace('Cleared and removed $counter assets.');
 				}
 			}
 		}
 		// run the garbage collector for good measure lmfao
+		runGC();
+	}
 
+	public static function runGC()
+	{
 		System.gc();
 
 		#if cpp
@@ -433,11 +467,6 @@ class Paths
 
 	public static function clearStoredMemory(?cleanUnused:Bool = false)
 	{
-		#if FEATURE_MULTITHREADING
-		// clear remaining objects
-		MasterObjectLoader.resetAssets();
-		#end
-
 		// clear anything not in the tracked assets list
 		var counterAssets:Int = 0;
 
@@ -453,6 +482,7 @@ class Paths
 				FlxG.bitmap._cache.remove(key);
 				obj.destroy();
 				counterAssets++;
+				Debug.logTrace('Cleared $key from RAM');
 				Debug.logTrace('Cleared and removed $counterAssets cached assets.');
 			}
 		}
@@ -469,6 +499,7 @@ class Paths
 				OpenFlAssets.cache.clearSounds(key);
 				currentTrackedSounds.remove(key);
 				counterSound++;
+				Debug.logTrace('Cleared $key from RAM');
 				Debug.logTrace('Cleared and removed $counterSound cached sounds.');
 			}
 		}
@@ -481,6 +512,7 @@ class Paths
 			{
 				OpenFlAssets.cache.clear(key);
 				counterLeft++;
+				Debug.logTrace('Cleared $key from RAM');
 				Debug.logTrace('Cleared and removed $counterLeft cached leftover assets.');
 			}
 		}

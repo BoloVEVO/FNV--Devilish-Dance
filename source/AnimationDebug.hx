@@ -46,7 +46,11 @@ class AnimationDebug extends MusicBeatState
 	var front:FlxSprite;
 
 	var UI_box:FlxUITabMenu;
+	var UI_note:FlxUITabMenu;
 	var UI_options:FlxUITabMenu;
+
+	var UI_noteSettings:FlxUITabMenu;
+
 	var offsetX:FlxUINumericStepper;
 	var offsetY:FlxUINumericStepper;
 

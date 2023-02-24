@@ -8,6 +8,7 @@ import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import LuaClass;
 import PlayState;
+import flixel.util.FlxDestroyUtil;
 
 using StringTools;
 
@@ -65,6 +66,8 @@ class Note extends FlxSprite
 	public var quantityColor:Array<Int> = [RED_NOTE, 2, BLUE_NOTE, 2, PURP_NOTE, 2, GREEN_NOTE, 2];
 	public var arrowAngles:Array<Int> = [180, 90, 270, 0];
 
+	public var noteType:String = 'normal';
+
 	public var isParent:Bool = false;
 	public var parent:Note = null;
 	public var spotInLine:Int = 0;
@@ -80,12 +83,25 @@ class Note extends FlxSprite
 
 	public var distance:Float = 2000;
 
+	public var lowPriority:Bool = false;
+
 	public var lateHitMult:Float = 0.5;
 	public var earlyHitMult:Float = 1.0;
 
 	public var insideCharter:Bool = false;
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inCharter:Bool = false, ?isAlt:Bool = false, ?bet:Float = 0)
+	public var noteLoaded:Bool = false;
+
+	public var uniqueSkinType:Bool = false; // If the note type will have a unique sprite for all skins.
+
+	public var followAngle:Bool = false;
+
+	public var overrideDistance:Bool = false; // Set this to true if you know what are you doing.
+
+	public var speedMultiplier:Float = 1.0;
+
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inCharter:Bool = false, ?isAlt:Bool = false,
+			?bet:Float = 0, ?noteType:String = 'normal', ?speedMultiplier:Float = 1.0)
 	{
 		super();
 
@@ -98,7 +114,24 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		this.isSustainNote = sustainNote;
-		this.insideCharter = inCharter;
+		insideCharter = inCharter;
+
+		if (noteType == null || noteType == '0')
+			noteType = 'normal';
+
+		this.noteType = noteType;
+		this.speedMultiplier = speedMultiplier;
+
+		// HERE ESTABLISH IF YOUR NOTE TYPE
+		switch (noteType)
+		{
+			case 'hurt':
+				lowPriority = true;
+				uniqueSkinType = false;
+			default:
+				lowPriority = false;
+				uniqueSkinType = false;
+		}
 
 		lateHitMult = isSustainNote ? 0.5 : 1;
 
@@ -137,18 +170,26 @@ class Note extends FlxSprite
 			noteData = Std.int(Math.abs(3 - noteData));
 		}
 
-		if (inCharter || !FlxG.save.data.postProcessNotes)
+		if (!FlxG.save.data.postProcessNotes)
 			loadNote();
 	}
 
 	public function loadNote():Void
 	{
 		// defaults if no noteStyle was found in chart
-		var noteTypeCheck:String = 'normal';
+		var noteStyleCheck:String = 'normal';
 
 		if (insideCharter)
 		{
-			frames = PlayState.noteskinSprite;
+			switch (noteStyleCheck)
+			{
+				case 'pixel':
+					loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, noteType, false), true, 17, 17);
+					if (isSustainNote)
+						loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, noteType, false, true), true, 7, 6);
+				default:
+					frames = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin, noteType, uniqueSkinType);
+			}
 
 			for (i in 0...4)
 			{
@@ -168,21 +209,21 @@ class Note extends FlxSprite
 				switch (PlayState.storyWeek)
 				{
 					case 6:
-						noteTypeCheck = 'pixel';
+						noteStyleCheck = 'pixel';
 				}
 			}
 			else
 			{
-				noteTypeCheck = PlayState.SONG.noteStyle;
+				noteStyleCheck = PlayState.SONG.noteStyle;
 			}
 		}
 
-		switch (noteTypeCheck)
+		switch (noteStyleCheck)
 		{
 			case 'pixel':
-				loadGraphic(PlayState.noteskinPixelSprite, true, 17, 17);
+				loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, noteType, uniqueSkinType), true, 17, 17);
 				if (isSustainNote)
-					loadGraphic(PlayState.noteskinPixelSpriteEnds, true, 7, 6);
+					loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, noteType, uniqueSkinType, true), true, 7, 6);
 
 				for (i in 0...4)
 				{
@@ -194,7 +235,7 @@ class Note extends FlxSprite
 				setGraphicSize(Std.int(width * CoolUtil.daPixelZoom));
 				updateHitbox();
 			default:
-				frames = PlayState.noteskinSprite;
+				frames = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin, noteType, uniqueSkinType);
 
 				for (i in 0...4)
 				{
@@ -209,7 +250,8 @@ class Note extends FlxSprite
 				antialiasing = FlxG.save.data.antialiasing;
 		}
 
-		x += swagWidth * (noteData % 4);
+		if (!insideCharter)
+			x += swagWidth * (noteData % 4);
 
 		animation.play(dataColor[noteData] + 'Scroll');
 		originColor = noteData; // The note's origin color will be checked by its sustain notes
@@ -245,8 +287,8 @@ class Note extends FlxSprite
 			originColor = col;
 		}
 
-		stepHeight = (((0.45 * PlayState.fakeNoteStepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
-			2)) * PlayState.songMultiplier;
+		stepHeight = (((0.45 * PlayState.instance.fakeNoteStepCrochet * PlayState.songMultiplier)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
+			2) * speedMultiplier);
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -268,7 +310,7 @@ class Note extends FlxSprite
 
 			x -= width / 2;
 
-			// if (noteTypeCheck == 'pixel')
+			// if (noteStyleCheck == 'pixel')
 			//	x += 30;
 
 			if (insideCharter)
@@ -287,10 +329,6 @@ class Note extends FlxSprite
 					{
 						case 0:
 							prevNote.scale.y *= 1.0064 + (1.0 / prevNote.frameHeight);
-						case 2, 4:
-							prevNote.scale.y *= 0.985 + (1.0 / prevNote.frameHeight);
-						case 3:
-							prevNote.scale.y *= 1.0075 + (1.0 / prevNote.frameHeight);
 						default:
 							prevNote.scale.y *= 0.995 + (1.0 / prevNote.frameHeight);
 					}
@@ -298,6 +336,8 @@ class Note extends FlxSprite
 				updateHitbox();
 			}
 		}
+
+		noteLoaded = true;
 	}
 
 	override function update(elapsed:Float)
@@ -305,8 +345,8 @@ class Note extends FlxSprite
 		// This updates hold notes height to current scroll Speed in case of scroll Speed changes.
 		super.update(elapsed);
 
-		var newStepHeight = (((0.45 * PlayState.fakeNoteStepCrochet)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
-			2)) * PlayState.songMultiplier;
+		var newStepHeight = (((0.45 * PlayState.instance.fakeNoteStepCrochet * PlayState.songMultiplier)) * FlxMath.roundDecimal(PlayState.instance.scrollSpeed == 1 ? PlayState.SONG.speed : PlayState.instance.scrollSpeed,
+			2) * speedMultiplier);
 
 		if (stepHeight != newStepHeight)
 		{
@@ -343,16 +383,31 @@ class Note extends FlxSprite
 		}
 		else
 		{
-			// PLAYER NOTES
-			if (strumTime
-				- Conductor.songPosition <= (((Ratings.timingWindows[0] * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1) * lateHitMult)) && strumTime
-				- Conductor.songPosition >= (((-Ratings.timingWindows[0] * Conductor.timeScale) / (PlayState.songMultiplier < 1 ? PlayState.songMultiplier : 1) * earlyHitMult)))
-				canBeHit = true;
-			else
-				canBeHit = false;
+			switch (noteType)
+			{
+				case 'hurt': // Really hard to hit
+					if (strumTime - Conductor.songPosition <= ((Ratings.timingWindows[0] * Conductor.timeScale) * 0.2)
+						&& strumTime - Conductor.songPosition >= (-Ratings.timingWindows[0] * Conductor.timeScale) * 0.4)
+					{
+						canBeHit = true;
+					}
+					else
+					{
+						canBeHit = false;
+					}
+					if (strumTime - Conductor.songPosition < -Ratings.timingWindows[0] && !wasGoodHit)
+						tooLate = true;
+				default:
+					// PLAYER NOTES
+					if (strumTime - Conductor.songPosition <= (((Ratings.timingWindows[0] * Conductor.timeScale) * lateHitMult))
+						&& strumTime - Conductor.songPosition >= (((-Ratings.timingWindows[0] * Conductor.timeScale) * earlyHitMult)))
+						canBeHit = true;
+					else
+						canBeHit = false;
 
-			if (strumTime - Conductor.songPosition < (-Ratings.timingWindows[0] * Conductor.timeScale) && !wasGoodHit)
-				tooLate = true;
+					if (strumTime - Conductor.songPosition < (-Ratings.timingWindows[0] * Conductor.timeScale) && !wasGoodHit)
+						tooLate = true;
+			}
 		}
 
 		if (isSustainNote)
@@ -363,5 +418,13 @@ class Note extends FlxSprite
 			if (alpha > 0.3)
 				alpha = 0.3;
 		}
+	}
+
+	override function destroy()
+	{
+		super.destroy();
+
+		if (noteCharterObject != null)
+			noteCharterObject.destroy();
 	}
 }

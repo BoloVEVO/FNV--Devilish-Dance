@@ -82,7 +82,9 @@ class Highscore
 		if (songScores.exists(daWeek))
 		{
 			if (songScores.get(daWeek) < score)
+			{
 				setScore(daWeek, score);
+			}
 		}
 		else
 			setScore(daWeek, score);
@@ -94,6 +96,7 @@ class Highscore
 	static function setScore(song:String, score:Int):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
+		songScores.remove(song);
 		songScores.set(song, score);
 		FlxG.save.data.songScores = songScores;
 		FlxG.save.flush();
@@ -101,6 +104,7 @@ class Highscore
 
 	static function setLetter(song:String, letter:String):Void
 	{
+		songScores.remove(song);
 		songLetter.set(song, letter);
 		FlxG.save.data.songLetter = songLetter;
 		FlxG.save.flush();
@@ -109,6 +113,7 @@ class Highscore
 	static function setCombo(song:String, combo:String):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
+		songScores.remove(song);
 		songCombos.set(song, combo);
 		FlxG.save.data.songCombos = songCombos;
 		FlxG.save.flush();
@@ -116,6 +121,7 @@ class Highscore
 
 	static function setAcc(song:String, accuracy:Float):Void
 	{
+		songScores.remove(song);
 		songAcc.set(song, accuracy);
 		FlxG.save.data.songAcc = songAcc;
 		FlxG.save.flush();
@@ -187,8 +193,10 @@ class Highscore
 				return 2;
 			case 'GFC':
 				return 3;
-			case 'MFC':
+			case 'PFC':
 				return 4;
+			case 'MFC':
+				return 5;
 			default:
 				return -1;
 		}

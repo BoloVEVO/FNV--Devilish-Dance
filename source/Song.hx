@@ -1,5 +1,6 @@
 package;
 
+import songsbackup.SongsBackup;
 import Section.SwagSection;
 import haxe.Json;
 import haxe.format.JsonParser;
@@ -62,7 +63,7 @@ typedef SongMeta =
 
 class Song
 {
-	public static var latestChart:String = "KE1";
+	public static var latestChart:String = "KE2";
 
 	public static function loadFromJsonRAW(rawJson:String)
 	{
@@ -71,18 +72,35 @@ class Song
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
 		}
+
 		var jsonData = Json.parse(rawJson);
 
-		return parseJSONshit("rawsong", jsonData, ["name" => jsonData.name]);
+		return parseJSONshit('rawsong', jsonData, 'rawname');
+	}
+
+	public static function loadFromString(songId:String, difficulty:Int):SongData
+	{
+		var compareJson = null;
+		try
+		{
+			compareJson = Json.parse(SongsBackup.getSongText(songId, difficulty));
+		}
+		catch (e)
+		{
+			Debug.logError(e);
+		}
+		return parseJSONshit(songId, compareJson, 'rawname');
 	}
 
 	public static function loadFromJson(songId:String, difficulty:String):SongData
 	{
 		var songFile = '$songId/$songId$difficulty';
 
-		Debug.logInfo('Loading song JSON: $songFile');
+		Debug.logTrace('Loading song JSON: $songFile');
 
 		var rawJson = Paths.loadJSON('songs/$songFile');
+		var compareJson = null;
+
 		var rawMetaJson = Paths.loadJSON('songs/$songId/_meta');
 
 		return parseJSONshit(songId, rawJson, rawMetaJson);
@@ -180,8 +198,29 @@ class Song
 			index++;
 		}
 
-		song.chartVersion = latestChart;
+		if (song.chartVersion != 'KE2')
+		{
+			for (section in song.notes)
+			{
+				for (notes in section.sectionNotes)
+				{
+					if (section.mustHitSection)
+					{
+						var bool = false;
+						if (notes[1] <= 3)
+						{
+							notes[1] += 4;
+							bool = true;
+						}
+						if (notes[1] > 3)
+							if (!bool)
+								notes[1] -= 4;
+					}
+				}
+			}
+		}
 
+		song.chartVersion = latestChart;
 		return song;
 	}
 
@@ -189,7 +228,11 @@ class Song
 	{
 		var songData:SongData = cast jsonData.song;
 
-		songData.songId = songId;
+		if (songData.songId == null)
+			songData.songId = songId;
+
+		if (songData.songName == null)
+			songData.songName = songId;
 
 		// Enforce default values for optional fields.
 		if (songData.validScore == null)
@@ -203,12 +246,10 @@ class Song
 		}
 		else
 		{
-			songData.songName = songId.split('-').join(' ');
+			songData.songName = songData.songName.split('-').join(' ');
 		}
 
 		songData.offset = songMetaData.offset != null ? songMetaData.offset : 0;
-		if (songMetaData.name != null)
-			songData.songName = songMetaData.name;
 
 		return Song.conversionChecks(songData);
 	}

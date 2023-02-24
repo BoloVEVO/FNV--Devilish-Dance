@@ -16,7 +16,7 @@ class FlxVideo extends FlxBasic
 
 	public var finishCallback:Dynamic;
 
-	override public function new(videoAsset:String)
+	override public function new()
 	{
 		super();
 
@@ -31,9 +31,16 @@ class FlxVideo extends FlxBasic
 		netStream.client = {onMetaData: client_onMetaData};
 		netStream.addEventListener('asyncError', netStream_onAsyncError);
 		netConnection.addEventListener('netStatus', netConnection_onNetStatus);
-		netStream.play(videoAsset);
+	}
 
+	override function update(elapsed:Float)
+	{
 		netStream.soundTransform = new SoundTransform(FlxG.sound.volume);
+	}
+
+	public function playVideo(videoAsset:String)
+	{
+		netStream.play(videoAsset);
 	}
 
 	public function finishVideo()

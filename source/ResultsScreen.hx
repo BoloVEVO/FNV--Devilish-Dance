@@ -61,6 +61,12 @@ class ResultsScreen extends FlxSubState
 
 	public var superMegaConditionShit:Bool;
 
+	public function new()
+	{
+		super();
+		openCallback = refresh;
+	}
+
 	override function create()
 	{
 		background = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
@@ -69,10 +75,12 @@ class ResultsScreen extends FlxSubState
 
 		if (!PlayState.inResults)
 		{
+			#if !cpp
 			music = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 			music.volume = 0;
 			music.play(false, FlxG.random.int(0, Std.int(music.length / 2)));
 			FlxG.sound.list.add(music);
+			#end
 		}
 
 		// I was gonna use Arrays to do this but I'm dumb. So, I had to chose the mortal way XP
@@ -99,8 +107,7 @@ class ResultsScreen extends FlxSubState
 
 		if (!PlayState.isStoryMode)
 		{
-			songText = new FlxText(20, -65, FlxG.width,
-				'Played on ${PlayState.SONG.songName} - ${CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase()}');
+			songText = new FlxText(20, -65, FlxG.width, 'Played on ${PlayState.SONG.songName} -	 ${PlayState.instance.storyDifficultyText.toUpperCase()}');
 			songText.size = 34;
 			songText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 			songText.color = FlxColor.WHITE;
@@ -114,17 +121,26 @@ class ResultsScreen extends FlxSubState
 		{
 			acc = PlayState.campaignAccuracy;
 			score = PlayState.campaignScore;
-			text.text = 'Week Cleared on ${CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase()}!';
+			text.text = 'Week Cleared on ${PlayState.instance.storyDifficultyText.toUpperCase()}!';
 		}
 
+		var swags = PlayState.isStoryMode ? PlayState.campaignSwags : PlayState.swags;
 		var sicks = PlayState.isStoryMode ? PlayState.campaignSicks : PlayState.sicks;
 		var goods = PlayState.isStoryMode ? PlayState.campaignGoods : PlayState.goods;
 		var bads = PlayState.isStoryMode ? PlayState.campaignBads : PlayState.bads;
 		var shits = PlayState.isStoryMode ? PlayState.campaignShits : PlayState.shits;
 
-		comboText = new FlxText(20, -75, 0,
-			'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\n\nCombo Breaks: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.songMultiplier, 2)}x\n\n${!PlayState.loadRep ? "\nF1 - Replay song" : ""}
-        ');
+		var judgeStats = '';
+
+		switch (PlayState.SONG.noteStyle)
+		{
+			case 'voltex':
+				judgeStats = 'Judgements:\nS-Criticals - ${sicks + swags}\nCriticals - ${goods}\nNears - ${bads}\n\nErrors: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.songMultiplier, 2)}x';
+			default:
+				judgeStats = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\n\nCombo Breaks: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.songMultiplier, 2)}x';
+		}
+
+		comboText = new FlxText(20, -75, 0, judgeStats);
 		comboText.size = 28;
 		comboText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 		comboText.color = FlxColor.WHITE;
@@ -197,7 +213,7 @@ class ResultsScreen extends FlxSubState
 			&& Ratings.timingWindows[2] == 90
 			&& Ratings.timingWindows[1] == 135
 			&& Ratings.timingWindows[0] == 160
-			&& (!PlayStateChangeables.botPlay && !PlayState.usedBot && !FlxG.save.data.botplay)
+			&& !PlayState.usedBot
 			&& !FlxG.save.data.practice
 			&& PlayStateChangeables.holds
 			&& !PlayState.wentToChartEditor
@@ -229,8 +245,18 @@ class ResultsScreen extends FlxSubState
 		if (PlayState.isStoryMode)
 			acceptShit = '';
 
-		settingsText = new FlxText(20, FlxG.height + 50, 0,
-			'Mean: ${mean}ms (SICK:${Ratings.timingWindows[3]}ms,GOOD:${Ratings.timingWindows[2]}ms,BAD:${Ratings.timingWindows[1]}ms,SHIT:${Ratings.timingWindows[0]}ms) $acceptShit');
+		var meanText = '';
+
+		switch (PlayState.SONG.noteStyle)
+		{
+			case 'voltex':
+				meanText = 'Mean: ${mean}ms\nSettings: (S-CRIT:${Ratings.timingWindows[3]}ms,CRIT:${Ratings.timingWindows[2]}ms,NEAR:${Ratings.timingWindows[1]}ms,ERROR:${Ratings.timingWindows[0]}ms) $acceptShit';
+			default:
+				meanText = 'Mean: ${mean}ms\nSettings: (SICK:${Ratings.timingWindows[3]}ms,GOOD:${Ratings.timingWindows[2]}ms,BAD:${Ratings.timingWindows[1]}ms,SHIT:${Ratings.timingWindows[0]}ms) $acceptShit';
+		}
+
+		settingsText = new FlxText(20, FlxG.height + 50, 0, meanText);
+
 		settingsText.size = 16;
 		settingsText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 2, 1);
 		settingsText.color = FlxColor.WHITE;
@@ -246,7 +272,7 @@ class ResultsScreen extends FlxSubState
 		FlxTween.tween(text, {y: 20}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(comboText, {y: 145}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(contText, {y: FlxG.height - 45}, 0.5, {ease: FlxEase.expoInOut});
-		FlxTween.tween(settingsText, {y: FlxG.height - 35}, 0.5, {ease: FlxEase.expoInOut});
+		FlxTween.tween(settingsText, {y: FlxG.height - 55}, 0.5, {ease: FlxEase.expoInOut});
 
 		FlxTween.tween(anotherBackground, {alpha: 0.6}, 0.5, {
 			onUpdate: function(tween:FlxTween)
@@ -265,41 +291,44 @@ class ResultsScreen extends FlxSubState
 
 	override function update(elapsed:Float)
 	{
+		#if !cpp
 		if (music != null)
 			if (music.volume < 0.5)
 				music.volume += 0.01 * elapsed;
+		#end
 
 		// keybinds
 
 		if ((PlayerSettings.player1.controls.ACCEPT && !FlxG.keys.pressed.ALT) || FlxG.mouse.pressed)
 		{
+			#if !cpp
 			if (music != null)
 				music.fadeOut(0.3);
+			#end
 
 			PlayState.loadRep = false;
-			PlayState.rep = null;
 
 			if (PlayState.isStoryMode)
 			{
 				FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
-				Conductor.changeBPM(102);
+				Conductor.changeBPM(140);
 				MusicBeatState.switchState(new MainMenuState());
 			}
 			else
 			{
-				Conductor.changeBPM(102);
+				Conductor.changeBPM(140);
 				MusicBeatState.switchState(new FreeplayState());
 			}
 		}
 
 		if (FlxG.keys.justPressed.F1 && !PlayState.loadRep)
 		{
-			PlayState.rep = null;
-
 			PlayState.loadRep = false;
 
+			#if !cpp
 			if (music != null)
 				music.fadeOut(0.3);
+			#end
 
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = PlayState.storyDifficulty;
@@ -307,5 +336,9 @@ class ResultsScreen extends FlxSubState
 		}
 
 		super.update(elapsed);
+	}
+
+	private function refresh()
+	{
 	}
 }

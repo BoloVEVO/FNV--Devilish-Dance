@@ -25,13 +25,16 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.plugin.FlxMouseControl;
 import flixel.addons.display.FlxExtendedSprite;
 import flixel.math.FlxRect;
+import flixel.graphics.FlxGraphic;
+import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.util.FlxTimer;
 
 using StringTools;
 
 class GameplayCustomizeState extends MusicBeatState
 {
-	var defaultX:Float = FlxG.width * 0.55 - 135;
-	var defaultY:Float = FlxG.height / 2 - 50;
+	var defaultX:Float = 534.5;
+	var defaultY:Float = 218;
 
 	var sick:FlxExtendedSprite;
 
@@ -40,14 +43,23 @@ class GameplayCustomizeState extends MusicBeatState
 	var text:FlxText;
 	var blackBorder:FlxSprite;
 
-	// var laneunderlay:FlxSprite;
-	// var laneunderlayOpponent:FlxSprite;
 	var strumLine:FlxSprite;
 	var strumLineNotes:FlxTypedGroup<StaticArrow>;
 	var playerStrums:FlxTypedGroup<StaticArrow>;
 	var cpuStrums:FlxTypedGroup<StaticArrow>;
 
+	var arrowLanes:FlxTypedGroup<FlxSprite>;
+
+	public static var instance:GameplayCustomizeState;
+
+	public var arrowsGenerated:Bool = false;
+
+	public var arrowsAppeared:Bool = false;
+
 	var camPos:FlxPoint;
+
+	public var tweenManager:FlxTweenManager;
+	public var timerManager:FlxTimerManager;
 
 	var pixelShitPart1:String = '';
 	var pixelShitPart2:String = '';
@@ -68,10 +80,11 @@ class GameplayCustomizeState extends MusicBeatState
 	private var dataSuffix:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
 	private var dataColor:Array<String> = ['purple', 'blue', 'green', 'red'];
 
-	public static var dad:Character;
-	public static var gf:Character;
-	public static var boyfriend:Boyfriend;
-	public static var Stage:Stage;
+	public var dad:Character;
+	public var gf:Character;
+	public var boyfriend:Boyfriend;
+	public var Stage:Stage;
+
 	public static var freeplayNoteStyle:String = 'normal';
 	public static var freeplayWeek:Int = 1;
 
@@ -89,9 +102,15 @@ class GameplayCustomizeState extends MusicBeatState
 
 	var strumYBounds:FlxSprite;
 
+	var noteskinSprite:FlxAtlasFrames;
+	var noteskinPixelSprite:FlxGraphic;
+	var noteskinPixelSpriteEnds:FlxGraphic;
+
 	public override function create()
 	{
 		Paths.clearStoredMemory();
+
+		instance = this;
 
 		#if FEATURE_DISCORD
 		// Updating Discord Rich Presence
@@ -124,6 +143,9 @@ class GameplayCustomizeState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
+		tweenManager = new FlxTweenManager();
+		timerManager = new FlxTimerManager();
+
 		var opt_tabs = [
 			{name: "Appeareance", label: 'Appeareance'},
 			{name: "Gameplay Modules", label: 'Gameplay Modules'}
@@ -144,30 +166,38 @@ class GameplayCustomizeState extends MusicBeatState
 
 		addOptionsUI();
 
-		gf = new Character(400, 130, 'gf');
+		Stage = new Stage('stage');
+
+		Stage.initStageProperties();
+
+		if (Stage.loadGF)
+			gf = new Character(400, 130, 'gf');
 
 		boyfriend = new Boyfriend(770, 450, 'bf');
 
 		dad = new Character(100, 100, 'dad');
 
-		Stage = new Stage('stage');
+		Stage.initCamPos();
 
-		if (FlxG.save.data.background)
+		var positions = Stage.positions[Stage.curStage];
+		if (positions != null)
 		{
-			var positions = Stage.positions[Stage.curStage];
-			if (positions != null)
-			{
-				for (char => pos in positions)
-					for (person in [boyfriend, gf, dad])
+			for (char => pos in positions)
+				for (person in [boyfriend, gf, dad])
+					if (person != null)
 						if (person.curCharacter == char)
 							person.setPosition(pos[0], pos[1]);
-			}
+		}
 
-			for (person in [boyfriend, gf, dad])
-			{
+		for (person in [boyfriend, gf, dad])
+		{
+			if (person != null)
 				person.animation.curAnim.frameRate = Math.round(person.animation.curAnim.frameRate / PlayState.songMultiplier);
-			}
+		}
 
+		Stage.initStageSprites();
+		if (FlxG.save.data.background)
+		{
 			for (i in Stage.toAdd)
 			{
 				add(i);
@@ -177,10 +207,13 @@ class GameplayCustomizeState extends MusicBeatState
 				switch (index)
 				{
 					case 0:
-						add(gf);
-						gf.scrollFactor.set(0.95, 0.95);
-						for (bg in array)
-							add(bg);
+						if (gf != null)
+						{
+							add(gf);
+							gf.scrollFactor.set(0.95, 0.95);
+							for (bg in array)
+								add(bg);
+						}
 					case 1:
 						add(dad);
 						for (bg in array)
@@ -192,24 +225,31 @@ class GameplayCustomizeState extends MusicBeatState
 				}
 			}
 
-			switch (dad.curCharacter)
+			if (gf != null)
 			{
-				case 'gf':
-					dad.setPosition(gf.x, gf.y);
-					gf.visible = false;
+				switch (dad.curCharacter)
+				{
+					case 'gf':
+						dad.setPosition(gf.x, gf.y);
+						gf.visible = false;
+				}
 			}
 		}
 		else
 		{
-			gf.scrollFactor.set(0.95, 0.95);
-			add(gf);
+			if (gf != null)
+			{
+				gf.scrollFactor.set(0.95, 0.95);
+				add(gf);
+			}
 			add(dad);
 			add(boyfriend);
 		}
 
 		if (!FlxG.save.data.characters)
 		{
-			gf.alpha = 0;
+			if (gf != null)
+				gf.alpha = 0;
 			dad.alpha = 0;
 			boyfriend.alpha = 0;
 		}
@@ -254,32 +294,7 @@ class GameplayCustomizeState extends MusicBeatState
 			strumLine.y = FlxG.height - 670;
 		}
 
-		/*laneunderlayOpponent = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
-			laneunderlayOpponent.alpha = FlxG.save.data.laneTransparency;
-			laneunderlayOpponent.color = FlxColor.BLACK;
-			laneunderlayOpponent.scrollFactor.set();
-			laneunderlayOpponent.cameras = [camHUD];
-
-			laneunderlay = new FlxSprite(0, 0).makeGraphic(110 * 4 + 50, FlxG.height * 2);
-			laneunderlay.alpha = FlxG.save.data.laneTransparency;
-			laneunderlay.color = FlxColor.BLACK;
-			laneunderlay.scrollFactor.set();
-			laneunderlay.cameras = [camHUD];
-
-			if (FlxG.save.data.laneUnderlay)
-			{
-				if (!FlxG.save.data.middleScroll)
-				{
-					add(laneunderlayOpponent);
-				}
-				add(laneunderlay);
-		}*/
-
 		strumLineNotes = new FlxTypedGroup<StaticArrow>();
-
-		generateStaticArrows(0);
-		generateStaticArrows(1);
-
 		add(strumLineNotes);
 
 		playerStrums = new FlxTypedGroup<StaticArrow>();
@@ -312,9 +327,27 @@ class GameplayCustomizeState extends MusicBeatState
 		sick.updateHitbox();
 		add(sick);
 
-		strumLine.cameras = [camHUD];
-		strumLineNotes.cameras = [camHUD];
+		strumLine.cameras = [camStrums];
+		strumLineNotes.cameras = [camStrums];
 		sick.cameras = [camRatings];
+
+		switch (freeplayNoteStyle)
+		{
+			case 'pixel':
+				noteskinPixelSprite = NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, 'normal', false);
+				noteskinPixelSpriteEnds = NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, 'normal', false, true);
+			default:
+				noteskinSprite = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin, 'normal', false);
+		}
+
+		arrowLanes = new FlxTypedGroup<FlxSprite>();
+		arrowLanes.camera = camHUD;
+		add(arrowLanes);
+
+		setupStaticArrows(0);
+		setupStaticArrows(1);
+
+		appearStaticArrows(true);
 
 		strumYRef = new FlxExtendedSprite(0, strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
 
@@ -329,12 +362,6 @@ class GameplayCustomizeState extends MusicBeatState
 		add(strumYBounds);
 
 		add(strumYRef);
-
-		/*laneunderlay.x = playerStrums.members[0].x - 25;
-			laneunderlayOpponent.x = cpuStrums.members[0].x - 25;
-
-			laneunderlay.screenCenter(Y);
-			laneunderlayOpponent.screenCenter(Y); */
 
 		text = new FlxText(5, FlxG.height + 40, 0,
 			"  Use Arrows or Mouse to move your combo Rate around. Press R to reset. Q/E to change zoom. C to show combo. Escape to exit.", 12);
@@ -353,12 +380,13 @@ class GameplayCustomizeState extends MusicBeatState
 		FlxTween.tween(text, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
 		FlxTween.tween(blackBorder, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
 
-		sick.x = FlxG.save.data.changedHitX;
-		sick.y = FlxG.save.data.changedHitY;
+		sick.x = FlxG.save.data.leChangedHitX;
+		sick.y = FlxG.save.data.leChangedHitY;
 
 		FlxG.mouse.visible = true;
 
 		super.create();
+
 		Paths.clearUnusedMemory();
 	}
 
@@ -400,29 +428,23 @@ class GameplayCustomizeState extends MusicBeatState
 		{
 			sick.x -= 2;
 			sick.y -= 0;
-			changedPos = true;
 		}
 		if (FlxG.keys.justPressed.RIGHT || FlxG.keys.pressed.RIGHT)
 		{
 			sick.x += 2;
 			sick.y -= 0;
-			changedPos = true;
 		}
 		if (FlxG.keys.justPressed.UP || FlxG.keys.pressed.UP)
 		{
 			sick.y -= 2;
 			sick.x += 0;
-			changedPos = true;
 		}
 		if (FlxG.keys.justPressed.DOWN || FlxG.keys.pressed.DOWN)
 		{
 			sick.y += 2;
 			sick.x += 0;
-			changedPos = true;
 		}
 
-		for (i in playerStrums)
-			i.y = strumYRef.y;
 		for (i in strumLineNotes)
 			i.y = strumYRef.y;
 
@@ -442,11 +464,8 @@ class GameplayCustomizeState extends MusicBeatState
 			camRatings.zoom = FlxG.save.data.zoom;
 		}
 
-		if (changedPos)
-		{
-			FlxG.save.data.changedHitX = sick.x;
-			FlxG.save.data.changedHitY = sick.y;
-		}
+		FlxG.save.data.leChangedHitX = sick.x;
+		FlxG.save.data.leChangedHitY = sick.y;
 
 		if (FlxG.keys.justPressed.C)
 		{
@@ -604,9 +623,8 @@ class GameplayCustomizeState extends MusicBeatState
 			FlxG.save.data.zoom = 1;
 			camHUD.zoom = FlxG.save.data.zoom;
 			camRatings.zoom = camHUD.zoom;
-			FlxG.save.data.changedHitX = sick.x;
-			FlxG.save.data.changedHitY = sick.y;
-			FlxG.save.data.changedHit = false;
+			FlxG.save.data.leChangedHitX = sick.x;
+			FlxG.save.data.leChangedHitY = sick.y;
 
 			FlxG.save.data.strumOffset.set(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll', 0);
 
@@ -634,54 +652,59 @@ class GameplayCustomizeState extends MusicBeatState
 
 		gf.dance();
 
-		if (!FlxG.keys.pressed.SPACE)
-		{
-			if (curBeat % 4 == 0)
+		/*if (!FlxG.keys.pressed.SPACE)
 			{
-				FlxG.camera.zoom += 0.015;
-				camHUD.zoom += 0.03;
-			}
-		}
+				if (curBeat % 4 == 0)
+				{
+					FlxG.camera.zoom += 0.015;
+					camHUD.zoom += 0.03;
+				}
+		}*/
 
 		trace('beat');
 	}
 
 	// ripped from playstate cuz lol
-	private function generateStaticArrows(player:Int):Void
+	private function setupStaticArrows(player:Int):Void
 	{
 		for (i in 0...4)
 		{
-			var babyArrow:StaticArrow = new StaticArrow(-10,
+			// FlxG.log.add(i);
+			var babyArrow:StaticArrow = new StaticArrow(43,
 				strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
 
 			// defaults if no noteStyle was found in chart
-			var noteTypeCheck:String = 'normal';
+			var noteStyleCheck:String = 'normal';
+
+			/*if (FlxG.save.data.optimize && player == 0)
+				continue; */
+
+			babyArrow.downScroll = FlxG.save.data.downscroll;
 
 			if (freeplayNoteStyle == null && FlxG.save.data.overrideNoteskins)
 			{
 				switch (freeplayWeek)
 				{
 					case 6:
-						noteTypeCheck = 'pixel';
+						noteStyleCheck = 'pixel';
+					default:
+						noteStyleCheck = 'normal';
 				}
 			}
 			else
-				noteTypeCheck = freeplayNoteStyle;
+			{
+				noteStyleCheck = freeplayNoteStyle;
+			}
 
-			switch (noteTypeCheck)
+			switch (noteStyleCheck)
 			{
 				case 'pixel':
-					babyArrow.loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels', 'week6'), true, 17, 17);
+					babyArrow.loadGraphic(noteskinPixelSprite, true, 17, 17);
 					babyArrow.animation.add('green', [6]);
 					babyArrow.animation.add('red', [7]);
 					babyArrow.animation.add('blue', [5]);
 					babyArrow.animation.add('purplel', [4]);
 
-					babyArrow.setGraphicSize(Std.int(babyArrow.width * CoolUtil.daPixelZoom));
-					babyArrow.updateHitbox();
-					babyArrow.antialiasing = false;
-
-					babyArrow.x += Note.swagWidth * i;
 					babyArrow.animation.add('static', [i]);
 					babyArrow.animation.add('pressed', [4 + i, 8 + i], 12, false);
 					babyArrow.animation.add('confirm', [12 + i, 16 + i], 24, false);
@@ -691,8 +714,17 @@ class GameplayCustomizeState extends MusicBeatState
 						babyArrow.animation.add('dirCon' + j, [12 + j, 16 + j], 24, false);
 					}
 
+					babyArrow.setGraphicSize(Std.int(babyArrow.width * CoolUtil.daPixelZoom));
+
+					babyArrow.updateHitbox();
+
+					babyArrow.antialiasing = false;
+
+					babyArrow.x += Note.swagWidth * i;
+
 				default:
-					babyArrow.frames = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin);
+					babyArrow.frames = noteskinSprite;
+					Debug.logTrace(babyArrow.frames);
 					for (j in 0...4)
 					{
 						babyArrow.animation.addByPrefix(dataColor[j], 'arrow' + dataSuffix[j]);
@@ -711,37 +743,74 @@ class GameplayCustomizeState extends MusicBeatState
 					babyArrow.setGraphicSize(Std.int(babyArrow.width * 0.7));
 			}
 
+			babyArrow.loadLane();
+
+			babyArrow.bgLane.updateHitbox();
+			babyArrow.bgLane.scrollFactor.set();
 			babyArrow.updateHitbox();
 			babyArrow.scrollFactor.set();
+			babyArrow.camera = camStrums;
+
+			babyArrow.alpha = 0;
+			arrowHeight = babyArrow.height;
 
 			babyArrow.ID = i;
 
 			switch (player)
 			{
 				case 0:
-					babyArrow.visible = !FlxG.save.data.middleScroll;
-					babyArrow.x += 20;
-					cpuStrums.add(babyArrow);
+					if (!PlayStateChangeables.opponentMode)
+						cpuStrums.add(babyArrow);
+					else
+						playerStrums.add(babyArrow);
+					babyArrow.x += 20.5;
+
 				case 1:
-					playerStrums.add(babyArrow);
+					if (!PlayStateChangeables.opponentMode)
+						playerStrums.add(babyArrow);
+					else
+						cpuStrums.add(babyArrow);
 			}
 
-			arrowHeight = babyArrow.height;
 			babyArrow.playAnim('static');
-			babyArrow.x += 110;
 			babyArrow.x += ((FlxG.width / 2) * player);
-			babyArrow.cameras = [camStrums];
+			babyArrow.x += 48.5;
 
 			if (FlxG.save.data.middleScroll)
-				babyArrow.x -= 320;
-
-			cpuStrums.forEach(function(spr:FlxSprite)
 			{
-				spr.centerOffsets(); // CPU arrows start out slightly off-center
-			});
+				if (!PlayStateChangeables.opponentMode)
+				{
+					babyArrow.x -= 310;
+					if (player == 0)
+						babyArrow.x -= 410;
+				}
+				else
+				{
+					babyArrow.x += 310;
+					if (player == 1)
+						babyArrow.x += 410;
+				}
+			}
+
+			/*cpuStrums.forEach(function(spr:FlxSprite)
+				{
+					spr.centerOffsets(); // CPU arrows start out slightly off-center
+			});*/
 
 			strumLineNotes.add(babyArrow);
 		}
+		arrowsGenerated = true;
+	}
+
+	private function appearStaticArrows(?tween:Bool = true):Void
+	{
+		strumLineNotes.forEach(function(babyArrow:StaticArrow)
+		{
+			babyArrow.alpha = 1;
+
+			arrowLanes.add(babyArrow.bgLane);
+		});
+		arrowsAppeared = true;
 	}
 
 	function addOptionsUI()
@@ -777,7 +846,7 @@ class GameplayCustomizeState extends MusicBeatState
 		var tab_modules = new FlxUI(null, UI_options);
 		tab_modules.name = "Gameplay Modules";
 
-		var gameplayModules = ['Rating', 'Receptors', 'Health Bar'];
+		var gameplayModules = ['Rating', 'Receptors'];
 		var modulesDropDown = new FlxUIDropDownMenu(10, 15, FlxUIDropDownMenu.makeStrIdLabelArray(gameplayModules, true), function(gameplayModule:String)
 		{
 			sick.disableMouseDrag();
@@ -791,6 +860,7 @@ class GameplayCustomizeState extends MusicBeatState
 					sick.enableMouseDrag();
 				case 'Receptors':
 					strumYBounds.alpha = 0.5;
+
 					strumYRef.enableMouseDrag(false, false, 255, null, strumYBounds);
 					strumYRef.setDragLock(false, true);
 			}

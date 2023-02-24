@@ -29,17 +29,12 @@ class Stage extends MusicBeatState
 	public var slowBacks:Map<Int,
 		Array<FlxSprite>> = []; // Change/add/remove backgrounds mid song! Format: "slowBacks[StepToBeActivated] = [Sprites,To,Be,Changed,Or,Added];"
 
-	public var staticCam:Bool = false; // To not toggle camera movements in opponent/bf turn
-
-	public var loadGF:Bool = true; // To load GF into the Stage (If you're not gonna use gf for the entire song).
-
-	public var hideGF:Bool = false; // To hide GF (for future appeareance or smth)
+	public var staticCam:Bool = false;
 
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// BGs still must be added by using toAdd Array for them to show in game after slowBacks take effect!!
 	// All of the above must be set or used in your stage case code block!!
 	public var positions:Map<String, Map<String, Array<Int>>> = [
-		// Assign your characters positions on stage here!
 		'voltexStage' => [
 			// The full Voltex Gang!
 			// lmao I forgot how painful is to correctly positionate characters in Kade Engine lol. +respect for Psych lol
@@ -51,6 +46,7 @@ class Stage extends MusicBeatState
 			'Bi' => [-275, -50],
 			'bf' => [1150, 300]
 		],
+		// Assign your characters positions on stage here!
 		'halloween' => ['spooky' => [100, 300], 'monster' => [100, 200]],
 		'philly' => ['pico' => [100, 400]],
 		'limo' => ['bf-car' => [1030, 230]],
@@ -72,44 +68,56 @@ class Stage extends MusicBeatState
 		]
 	];
 
-	public var camOffsets:Map<String, Array<Float>> = ['halloween' => [350, -50], 'voltexStage' => [650, 350]];
-	public var stageCamZooms:Map<String, Float> = [
-		'limo' => 0.90,
-		'mall' => 0.80,
-		'tank' => 0.90,
-		'void' => 0.9,
-		'stage' => 0.90,
-		'voltexStage' => 0.65
-	];
+	public var camPosition:Array<Float> = [];
 
-	public function new(daStage:String, ?forceLoad:Bool = false)
+	public var loadGF:Bool = true;
+
+	public function new(daStage:String)
 	{
 		super();
 
 		this.curStage = daStage;
+	}
 
-		// camZoom = 1.05; // Don't change zoom here, unless you want to change zoom of every stage that doesn't have custom one
-
-		// SWITCH STATEMENT FOR STAGE DEFINITIONS
-		switch (daStage)
+	// STAGE SETTINGS BEFORE LOADING ANY SPRITE
+	public function initStageProperties()
+	{
+		switch (curStage)
 		{
+			default:
+				camZoom = 0.9;
+			case 'tank':
+				camZoom = 0.9;
 			case 'voltexStage':
-				curStage = 'voltexStage';
 				staticCam = true;
 				loadGF = false;
-				hideGF = true;
-			default:
-				curStage = 'stage';
-				staticCam = false;
-				loadGF = true;
-				hideGF = false;
+				camPosition = [650, 350];
+				camZoom = 0.65;
 		}
+	}
 
+	// Initial and default Camera position, needs to be called after initStageProperties because of loading GF property.
+	public function initCamPos()
+	{
+		if (camPosition.length == 0)
+		{
+			if (PlayState.instance.gf != null)
+				camPosition = [
+					PlayState.instance.gf.getGraphicMidpoint().x + PlayState.instance.gf.camPos[0],
+					PlayState.instance.gf.getGraphicMidpoint().y + PlayState.instance.gf.camPos[1]
+				];
+			else
+				camPosition = [0, 0];
+		}
+	}
+
+	// LOADS STAGE SPRITES (SHOULD BE LOADED AFTER DEFINING STAGE PROPERTIES)
+	public function initStageSprites(?forceLoad:Bool = false)
+	{
 		if (!FlxG.save.data.background && !forceLoad)
 			return;
 
-		// SWITCH STATEMENT FOR SPRITES
-		switch (daStage)
+		switch (curStage)
 		{
 			case 'voltexStage':
 				var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image(PlayState.SONG.songId.toLowerCase(), 'voltex'));
@@ -150,6 +158,7 @@ class Stage extends MusicBeatState
 				}
 			case 'philly':
 				{
+					camZoom = 0.9;
 					var bg:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image('philly/sky', 'week3'));
 					bg.scrollFactor.set(0.1, 0.1);
 					bg.antialiasing = FlxG.save.data.antialiasing;
@@ -207,6 +216,7 @@ class Stage extends MusicBeatState
 				}
 			case 'limo':
 				{
+					camZoom = 0.9;
 					var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic(Paths.image('limo/limoSunset', 'week4'));
 					skyBG.scrollFactor.set(0.1, 0.1);
 					skyBG.antialiasing = FlxG.save.data.antialiasing;
@@ -276,6 +286,7 @@ class Stage extends MusicBeatState
 				}
 			case 'mall':
 				{
+					camZoom = 0.9;
 					var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic(Paths.image('christmas/bgWalls', 'week5'));
 					bg.antialiasing = FlxG.save.data.antialiasing;
 					bg.scrollFactor.set(0.2, 0.2);
@@ -354,6 +365,7 @@ class Stage extends MusicBeatState
 				}
 			case 'mallEvil':
 				{
+					camZoom = 0.9;
 					var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic(Paths.image('christmas/evilBG', 'week5'));
 					bg.antialiasing = FlxG.save.data.antialiasing;
 					bg.scrollFactor.set(0.2, 0.2);
@@ -377,7 +389,7 @@ class Stage extends MusicBeatState
 			case 'school':
 				{
 					// defaultCamZoom = 0.9;
-
+					camZoom = 0.9;
 					var bgSky = new FlxSprite().loadGraphic(Paths.image('weeb/weebSky', 'week6'));
 					bgSky.scrollFactor.set(0.1, 0.1);
 					swagBacks['bgSky'] = bgSky;
@@ -448,6 +460,7 @@ class Stage extends MusicBeatState
 				}
 			case 'schoolEvil':
 				{
+					camZoom = 0.9;
 					var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
 					var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
 
@@ -637,7 +650,7 @@ class Stage extends MusicBeatState
 					switch (PlayState.SONG.songId)
 					{
 						case 'ugh':
-							tankman.setPosition(-12, -PlayState.dad.y + 425);
+							tankman.setPosition(-12, -PlayState.instance.dad.y + 425);
 						case 'guns':
 							tankman.setPosition(18, 333);
 						case 'stress':
@@ -713,14 +726,14 @@ class Stage extends MusicBeatState
 					layInFront[2].push(foreGround5);
 				}
 			case 'void': // In case you want to do chart with videos.
-				curStage = 'void';
+
 				var black:FlxSprite = new FlxSprite().makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
 				black.scrollFactor.set(0, 0);
 				toAdd.push(black);
 
 			default:
 				{
-					curStage = 'stage';
+					camZoom = 0.9;
 					var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback', 'shared'));
 					bg.antialiasing = FlxG.save.data.antialiasing;
 					bg.scrollFactor.set(0.9, 0.9);
@@ -900,15 +913,15 @@ class Stage extends MusicBeatState
 		lightningStrikeBeat = curBeat;
 		lightningOffset = FlxG.random.int(8, 24);
 
-		if (PlayState.boyfriend != null)
+		if (PlayState.instance.boyfriend != null)
 		{
-			PlayState.boyfriend.playAnim('scared', true);
-			PlayState.gf.playAnim('scared', true);
+			PlayState.instance.boyfriend.playAnim('scared', true);
+			PlayState.instance.gf.playAnim('scared', true);
 		}
 		else
 		{
-			GameplayCustomizeState.boyfriend.playAnim('scared', true);
-			GameplayCustomizeState.gf.playAnim('scared', true);
+			GameplayCustomizeState.instance.boyfriend.playAnim('scared', true);
+			GameplayCustomizeState.instance.gf.playAnim('scared', true);
 		}
 	}
 
@@ -939,10 +952,10 @@ class Stage extends MusicBeatState
 			{
 				startedMoving = true;
 
-				if (PlayState.gf != null)
-					PlayState.gf.playAnim('hairBlow');
+				if (PlayState.instance.gf != null)
+					PlayState.instance.gf.playAnim('hairBlow');
 				else
-					GameplayCustomizeState.gf.playAnim('hairBlow');
+					GameplayCustomizeState.instance.gf.playAnim('hairBlow');
 			}
 
 			if (startedMoving)
@@ -969,10 +982,10 @@ class Stage extends MusicBeatState
 	{
 		if (FlxG.save.data.distractions && FlxG.save.data.background)
 		{
-			if (PlayState.gf != null)
-				PlayState.gf.playAnim('hairFall');
+			if (PlayState.instance.gf != null)
+				PlayState.instance.gf.playAnim('hairFall');
 			else
-				GameplayCustomizeState.gf.playAnim('hairFall');
+				GameplayCustomizeState.instance.gf.playAnim('hairFall');
 
 			swagBacks['phillyTrain'].x = FlxG.width + 200;
 			trainMoving = false;
@@ -1023,9 +1036,71 @@ class Stage extends MusicBeatState
 	{
 		tankAngle += FlxG.elapsed * tankSpeed * PlayState.songMultiplier;
 		// Worst fix I've ever done in my life. I hope this doesn't make lag stutters.
-		if (!PlayState.instance.endingSong)
-			PlayState.instance.createTween(swagBacks['tankGround'], {angle: tankAngle - 90 + 15}, 0.01, {type: FlxTweenType.ONESHOT});
+		if (!PlayState.instance.endingSong) // Why does it need to cast? I don't know. -Awoofle
+			cast(swagBacks['tankGround'], FlxSprite).angle = (tankAngle - 90 + 15);
+		// PlayState.instance.createTween(swagBacks['tankGround'], {angle: tankAngle - 90 + 15}, 0.01, {type: FlxTweenType.ONESHOT});
 		swagBacks['tankGround'].x = tankX + 1500 * FlxMath.fastCos(FlxAngle.asRadians(tankAngle + 180));
 		swagBacks['tankGround'].y = 1300 + 1100 * FlxMath.fastSin(FlxAngle.asRadians(tankAngle + 180));
+	}
+
+	override function destroy()
+	{
+		super.destroy();
+		for (sprite in swagBacks.keys())
+		{
+			if (swagBacks[sprite] != null)
+				swagBacks[sprite].destroy();
+		}
+
+		swagBacks.clear();
+
+		while (toAdd.length > 0)
+		{
+			if (toAdd[0] != null)
+				toAdd[0].destroy();
+			toAdd.remove(toAdd[0]);
+		}
+
+		while (animatedBacks.length > 0)
+		{
+			if (animatedBacks[0] != null)
+				animatedBacks[0].destroy();
+			animatedBacks.remove(animatedBacks[0]);
+		}
+
+		for (array in layInFront)
+		{
+			for (sprite in array)
+			{
+				if (sprite != null)
+					sprite.destroy();
+				array.remove(sprite);
+			}
+		}
+
+		for (slow in slowBacks.keys())
+		{
+			if (slowBacks[slow] != null)
+				for (sprite in slowBacks[slow])
+					if (sprite != null)
+					{
+						sprite.destroy();
+						slowBacks[slow].remove(sprite);
+					}
+		}
+
+		slowBacks.clear();
+
+		for (swag in swagGroup.keys())
+		{
+			if (swagGroup[swag] != null)
+				for (member in swagGroup[swag].members)
+				{
+					member.destroy();
+					swagGroup[swag].members.remove(member);
+				}
+		}
+
+		swagGroup.clear();
 	}
 }

@@ -1,5 +1,6 @@
 package;
 
+import CoolUtil.CoolText;
 import flixel.util.FlxTimer;
 import flixel.FlxCamera;
 import flixel.FlxSubState;
@@ -34,21 +35,21 @@ class ModMenu extends FlxSubState
 
 	public var modifiers:Array<Modifier>;
 
-	public var shownStuff:FlxTypedGroup<FlxText>;
+	public var shownStuff:FlxTypedGroup<CoolText>;
 
 	public static var visibleRange = [114, 640];
 
 	public var menu:FlxTypedGroup<FlxSprite>;
 
-	public var descText:FlxText;
+	public var descText:CoolText;
 	public var descBack:FlxSprite;
 	public var descTop:FlxSprite;
 
-	public var modObjects:FlxTypedGroup<FlxText>;
+	public var modObjects:FlxTypedGroup<CoolText>;
 
 	public var titleObject:FlxText;
 
-	public var text:FlxText;
+	public var text:CoolText;
 
 	var changedMod = false;
 
@@ -75,13 +76,16 @@ class ModMenu extends FlxSubState
 		for (i in 0...modifiers.length)
 		{
 			var mod = modifiers[i];
-			text = new FlxText(72, titleObject.y + 72 + (46 * i), 0, mod.getValue());
-			text.setFormat(Paths.font("vcr.ttf"), 35, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-			text.borderSize = 3;
+			text = new CoolText(72, titleObject.y + 72 + (46 * i), 35, 35, Paths.bitmapFont('fonts/vcr'));
+			text.autoSize = true;
+			text.borderStyle = FlxTextBorderStyle.OUTLINE;
+			text.borderSize = 2;
 			text.borderQuality = 1;
 			text.scrollFactor.set();
+			text.text = mod.getValue();
 			text.alpha = 0.4;
-			text.visible = true;
+			text.antialiasing = FlxG.save.data.antialiasing;
+			text.updateHitbox();
 			modObjects.add(text);
 		}
 
@@ -89,7 +93,7 @@ class ModMenu extends FlxSubState
 
 		menu = new FlxTypedGroup<FlxSprite>();
 
-		shownStuff = new FlxTypedGroup<FlxText>();
+		shownStuff = new FlxTypedGroup<CoolText>();
 
 		selectedModifier = modifiers[0];
 
@@ -111,8 +115,11 @@ class ModMenu extends FlxSubState
 		add(menu);
 		add(shownStuff);
 
-		descText = new FlxText(62, 648);
-		descText.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		descText = new CoolText(62, 650, 20, 20, Paths.bitmapFont('fonts/vcr'));
+		descText.autoSize = true;
+		descText.borderStyle = FlxTextBorderStyle.OUTLINE;
+		descText.antialiasing = FlxG.save.data.antialiasing;
+
 		descText.borderSize = 2;
 
 		add(descBack);
@@ -124,60 +131,45 @@ class ModMenu extends FlxSubState
 
 		selectModifier(selectedModifier);
 
+		for (i in modObjects)
+			shownStuff.add(i);
+
+		openCallback = refresh;
+
 		super.create();
+	}
+
+	private function refresh()
+	{
+		selectedModifierIndex = 0;
+
+		selectedModifier = modifiers[0];
+
+		selectModifier(selectedModifier);
 	}
 
 	public function selectModifier(mod:Modifier)
 	{
 		var object = modObjects.members[selectedModifierIndex];
 
-		try
-		{
-			visibleRange = [114, 640];
-
-			for (i in 0...modifiers.length)
-			{
-				var opt = modObjects.members[i];
-				opt.y = titleObject.y + 54 + (46 * i);
-			}
-
-			while (shownStuff.members.length != 0)
-			{
-				shownStuff.members.remove(shownStuff.members[0]);
-			}
-
-			for (i in modObjects)
-				shownStuff.add(i);
-
-			for (i in modObjects.members)
-			{
-				if (i.y < visibleRange[0] - 24)
-					i.alpha = 0;
-				else if (i.y > visibleRange[1] - 24)
-					i.alpha = 0;
-				else
-				{
-					i.alpha = 0.4;
-				}
-			}
-		}
-		catch (e)
-		{
-			Debug.logError("oops\n" + e);
-			selectedModifierIndex = 0;
-		}
-
 		selectedModifier = mod;
-
-		object.alpha = 1;
 
 		object.text = "> " + mod.getValue();
 
 		descText.text = mod.getDescription();
+		descText.updateHitbox();
+
+		object.updateHitbox();
 
 		Debug.logTrace("Changed mod: " + selectedModifierIndex);
 
 		Debug.logTrace("Bounds: " + visibleRange[0] + "," + visibleRange[1]);
+	}
+
+	override function close()
+	{
+		FlxG.save.flush();
+		super.close();
 	}
 
 	override function update(elapsed:Float)
@@ -215,6 +207,17 @@ class ModMenu extends FlxSubState
 		}
 		#end
 
+		for (i in modObjects.members)
+		{
+			if (i != null)
+			{
+				if (modObjects.members[selectedModifierIndex].text != i.text)
+					i.alpha = 0.4;
+				else
+					i.alpha = 1;
+			}
+		}
+
 		if (selectedModifier != null)
 			if (selectedModifier.acceptType)
 			{
@@ -225,6 +228,7 @@ class ModMenu extends FlxSubState
 					var object = modObjects.members[selectedModifierIndex];
 					object.text = "> " + selectedModifier.getValue();
 					Debug.logTrace("New text: " + object.text);
+					object.updateHitbox();
 					return;
 				}
 				else if (any)
@@ -232,159 +236,93 @@ class ModMenu extends FlxSubState
 					var object = modObjects.members[selectedModifierIndex];
 					selectedModifier.onType(gamepad == null ? FlxG.keys.getIsDown()[0].ID.toString() : gamepad.firstJustPressedID());
 					object.text = "> " + selectedModifier.getValue();
+					object.updateHitbox();
 					Debug.logTrace("New text: " + object.text);
 				}
 			}
 
-		if (selectedModifier.acceptType || !selectedModifier.acceptType)
+		if (accept)
 		{
-			if (accept)
+			var prev = selectedModifierIndex;
+			var object = modObjects.members[selectedModifierIndex];
+			selectedModifier.press();
+
+			if (selectedModifierIndex == prev)
 			{
-				var prev = selectedModifierIndex;
-				var object = modObjects.members[selectedModifierIndex];
-				selectedModifier.press();
-
-				if (selectedModifierIndex == prev)
-				{
-					FlxG.save.flush();
-
-					object.text = "> " + selectedModifier.getValue();
-				}
-			}
-
-			if (down)
-			{
-				if (selectedModifier.acceptType)
-					selectedModifier.waitingType = false;
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
-				selectedModifierIndex++;
-
-				// just kinda ignore this math lol
-
-				if (selectedModifierIndex > modifiers.length - 1)
-				{
-					for (i in 0...modifiers.length)
-					{
-						var opt = modObjects.members[i];
-						opt.y = titleObject.y + 54 + (46 * i);
-					}
-					selectedModifierIndex = 0;
-				}
-
-				if (selectedModifierIndex != 0 && selectedModifierIndex != modifiers.length - 1 && modifiers.length > 6)
-				{
-					if (selectedModifierIndex >= (modifiers.length - 1) / 2)
-						for (i in modObjects.members)
-						{
-							i.y -= 46;
-						}
-				}
-
-				selectModifier(modifiers[selectedModifierIndex]);
-			}
-			else if (up)
-			{
-				if (selectedModifier.acceptType)
-					selectedModifier.waitingType = false;
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
-				selectedModifierIndex--;
-
-				// just kinda ignore this math lol
-
-				if (selectedModifierIndex < 0)
-				{
-					selectedModifierIndex = modifiers.length - 1;
-
-					if (modifiers.length > 6)
-						for (i in modObjects.members)
-						{
-							i.y -= (46 * ((modifiers.length - 1) / 2));
-						}
-				}
-
-				if (selectedModifierIndex != 0 && modifiers.length > 6)
-				{
-					if (selectedModifierIndex >= (modifiers.length - 1) / 2)
-						for (i in modObjects.members)
-						{
-							i.y += 46;
-						}
-				}
-
-				if (selectedModifierIndex < (modifiers.length - 1) / 2)
-				{
-					for (i in 0...modifiers.length)
-					{
-						var opt = modObjects.members[i];
-						opt.y = titleObject.y + 54 + (46 * i);
-					}
-				}
-
-				selectModifier(modifiers[selectedModifierIndex]);
-			}
-
-			if (right)
-			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				var object = modObjects.members[selectedModifierIndex];
-				selectedModifier.right();
-
-				FlxG.save.flush();
-				changedMod = true;
 				object.text = "> " + selectedModifier.getValue();
-				Debug.logTrace("New text: " + object.text);
 			}
-			else if (left)
-			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				var object = modObjects.members[selectedModifierIndex];
-				selectedModifier.left();
-				changedMod = true;
-				FlxG.save.flush();
-
-				object.text = "> " + selectedModifier.getValue();
-				Debug.logTrace("New text: " + object.text);
-			}
-			if (escape)
-			{
-				FlxG.sound.play(Paths.sound('cancelMenu'));
-
-				PlayerSettings.player1.controls.loadKeyBinds();
-
-				FlxG.state.closeSubState();
-
-				FreeplayState.openMod = false;
-
-				FreeplayState.instance.changeSelection();
-
-				for (i in 0...modifiers.length)
-				{
-					var opt = modObjects.members[i];
-					opt.y = titleObject.y + 54 + (46 * i);
-				}
-				modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
-				if (modObjects != null)
-					for (i in modObjects.members)
-					{
-						if (i != null)
-						{
-							if (i.y < visibleRange[0] - 24)
-								i.alpha = 0;
-							else if (i.y > visibleRange[1] - 24)
-								i.alpha = 0;
-							else
-							{
-								i.alpha = 0.4;
-							}
-						}
-					}
-			}
-			#if !html5
-			if (changedMod)
-				FreeplayState.instance.updateDiffCalc();
-			#end
 		}
+
+		if (down)
+		{
+			if (selectedModifier.acceptType)
+				selectedModifier.waitingType = false;
+			FlxG.sound.play(Paths.sound('scrollMenu'));
+			modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
+			selectedModifierIndex++;
+
+			// just kinda ignore this math lol
+
+			if (selectedModifierIndex > modifiers.length - 1)
+				selectedModifierIndex = 0;
+			selectModifier(modifiers[selectedModifierIndex]);
+		}
+		else if (up)
+		{
+			if (selectedModifier.acceptType)
+				selectedModifier.waitingType = false;
+			FlxG.sound.play(Paths.sound('scrollMenu'));
+			modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
+			selectedModifierIndex--;
+
+			// just kinda ignore this math lol
+
+			if (selectedModifierIndex < 0)
+				selectedModifierIndex = modifiers.length - 1;
+
+			selectModifier(modifiers[selectedModifierIndex]);
+		}
+
+		if (right)
+		{
+			FlxG.sound.play(Paths.sound('scrollMenu'));
+			var object = modObjects.members[selectedModifierIndex];
+			selectedModifier.right();
+
+			changedMod = true;
+			object.text = "> " + selectedModifier.getValue();
+			object.updateHitbox();
+			Debug.logTrace("New text: " + object.text);
+		}
+		else if (left)
+		{
+			FlxG.sound.play(Paths.sound('scrollMenu'));
+			var object = modObjects.members[selectedModifierIndex];
+			selectedModifier.left();
+			changedMod = true;
+
+			object.text = "> " + selectedModifier.getValue();
+			object.updateHitbox();
+			Debug.logTrace("New text: " + object.text);
+		}
+		if (escape)
+		{
+			FlxG.sound.play(Paths.sound('cancelMenu'));
+
+			PlayerSettings.player1.controls.loadKeyBinds();
+
+			FlxG.state.closeSubState();
+
+			FreeplayState.openMod = false;
+
+			FreeplayState.instance.changeSelection();
+
+			modObjects.members[selectedModifierIndex].text = selectedModifier.getValue();
+		}
+		#if !html5
+		if (changedMod)
+			if (selectedModifierIndex == 0)
+				FreeplayState.instance.updateDiffCalc();
+		#end
 	}
 }

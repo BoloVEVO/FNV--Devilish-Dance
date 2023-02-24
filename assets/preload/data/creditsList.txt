@@ -1,0 +1,35 @@
+Mod Devs:category: :1:
+Faid:twitter.com/Faiding_:Mod Director & Charter:0
+Aleon:twitter.com/aleonepic:Mod Artist
+Tomato Sauce:twitter.com/ToamtoSauce:Vocal Covers and Main Menu Remix:0
+Bolo:twitter.com/BoloVEVO:Mod Programmer:0:#A5004D
+Jaldabo:twitter.com/jaldabopls:Logo Artist:0
+Mod Shoutouts:category: :1:
+FullCombro:twitter.com/FullCombruh:Director of OG Friday Night Voltex:
+YoshiBobby:steamcommunity.com/id/YoshiBobby:Some FNV Art Assets:
+Sadistic::Some FNV Art Assets:
+Engine Devs:category: :1
+Bolo:twitter.com/BoloVEVO:Main Programmer of this KE fork:0:#A5004D
+TOP Contributors:category: :1
+Awoo2u:twitter.com/Awoofle:Tween Manager and Optimization Tweaks:0
+MAJigsaw77:github.com/MAJigsaw77:Code optimization and fixes:0
+Glowsoony:github.com/glowsoony:Future Hscript Support:0
+Special Thanks:category: :1
+KadeDeveloper:twitter.com/kade0912:Creator of OG Kade Engine:0:#64A250
+ShadowMario:twitter.com/Shadow_Mario_:Psych Engine Features:0:#444444
+RiverOaken:twitter.com/RiverOaken:Pyshc Engine Art Assets:#B42F71
+Shubs:twitter.com/yoshubs:Forever Engine Features:0:#5E99DF
+EliteMasterEric:twitter.com/EliteMasterEric:Runtime Shaders:0:#FFBD40
+nebulazorua:twitter.com/Nebula_Zorua:LUA JIT:0:#7D40B2
+SqirraRNG:twitter.com/gedehari:Crash Handler:0:#E1843A
+PolybiusProxy: :MP4 Videos support (hxCodec):0:#DCD294
+Foxeru:twitter.com/FoxeruKun:Circle Noteskin:0
+Orbyy:twitter.com/orbyynew:Pixel Circle Noteskin:0
+Smokey:twitter.com/Smokey_5_:Sprite Atlas Support:0:#483D92
+BombasticTom:twitter.com/BombasticTom:Suggested adding my project to funkin engine list:0
+BeastlyGhost:twitter.com/BeastlyGabi:Forever Engine Underscore:0
+Funkin Crew:category: :1
+ninjamuffin99:twitter.com/ninja_muffin99:Programmer of Friday Night Funkin':0
+PhantomArcade:twitter.com/PhantomArcade3K:Animator of FNF:0
+evilsk8r:twitter.com/evilsk8r:Artist of FNF:0
+kawaisprite:twitter.com/kawaisprite:Composer of FNF:0

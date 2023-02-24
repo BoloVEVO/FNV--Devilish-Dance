@@ -195,6 +195,30 @@ class LuaNote extends LuaClass
 				setter: SetNumProperty
 			},
 
+			"speedMultiplier" => {
+				defaultValue: 1.0,
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushnumber(l, connectedNote.speedMultiplier);
+					return 1;
+				},
+				setter: SetNumProperty
+			},
+
+			"noteType" => {
+				defaultValue: 'normal',
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushstring(l, connectedNote.noteType);
+					return 1;
+				},
+				setter: function(l:State):Int
+				{
+					LuaL.error(l, "noteType is read-only.");
+					return 0;
+				}
+			},
+
 			"angle" => {
 				defaultValue: 1,
 				getter: function(l:State, data:Any):Int
@@ -236,6 +260,7 @@ class LuaNote extends LuaClass
 					// 3 = value
 					// 4 = metatable
 					// mf you can't modify this shit
+					LuaL.error(l, "strumTime is read-only.");
 					return 0;
 				}
 			},
@@ -249,6 +274,7 @@ class LuaNote extends LuaClass
 				},
 				setter: SetNumProperty
 			},
+
 			"isDead" => {
 				defaultValue: 0,
 				getter: function(l:State, data:Any):Int
@@ -284,6 +310,16 @@ class LuaNote extends LuaClass
 				getter: function(l:State, data:Any):Int
 				{
 					Lua.pushboolean(l, connectedNote.isSustainNote);
+					return 1;
+				},
+				setter: SetNumProperty
+			},
+
+			"followAngle" => {
+				defaultValue: 0,
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushboolean(l, connectedNote.followAngle);
 					return 1;
 				},
 				setter: SetNumProperty
@@ -420,6 +456,28 @@ class LuaNote extends LuaClass
 				getter: function(l:State, data:Any):Int
 				{
 					Lua.pushnumber(l, connectedNote.y);
+					return 1;
+				},
+				setter: function(l:State)
+				{
+					LuaL.error(l, "y is read-only.");
+					return 0;
+				}
+			},
+			"distance" => {
+				defaultValue: connectedNote.distance,
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushnumber(l, connectedNote.distance);
+					return 1;
+				},
+				setter: SetNumProperty
+			},
+			"overrideDistance" => {
+				defaultValue: 0,
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushboolean(l, connectedNote.overrideDistance);
 					return 1;
 				},
 				setter: SetNumProperty
@@ -669,6 +727,16 @@ class LuaReceptor extends LuaClass
 				setter: SetNumProperty
 			},
 
+			"laneFollowsReceptor" => {
+				defaultValue: 1,
+				getter: function(l:State, data:Any):Int
+				{
+					Lua.pushboolean(l, connectedSprite.laneFollowsReceptor);
+					return 1;
+				},
+				setter: SetNumProperty
+			},
+
 			"downScroll" => {
 				defaultValue: 0,
 				getter: function(l:State, data:Any):Int
@@ -829,15 +897,36 @@ class LuaReceptor extends LuaClass
 		];
 	}
 
-	private static function findReceptor(index:Int)
+	private static function findReceptor(target:String, index:Int)
 	{
-		for (i in 0...PlayState.strumLineNotes.length)
+		switch (target)
 		{
-			if (index == i)
-			{
-				return PlayState.strumLineNotes.members[i];
-			}
+			case 'Player':
+				for (i in 0...PlayState.instance.playerStrums.length)
+				{
+					if (index == i)
+					{
+						return PlayState.instance.playerStrums.members[i];
+					}
+				}
+			case 'CPU':
+				for (i in 0...PlayState.instance.cpuStrums.length)
+				{
+					if (index == i)
+					{
+						return PlayState.instance.cpuStrums.members[i];
+					}
+				}
+			default:
+				for (i in 0...PlayState.instance.strumLineNotes.length)
+				{
+					if (index == i)
+					{
+						return PlayState.instance.strumLineNotes.members[i];
+					}
+				}
 		}
+
 		return null;
 	}
 
@@ -853,9 +942,11 @@ class LuaReceptor extends LuaClass
 		var ease = LuaL.checkstring(state, 5);
 
 		Lua.getfield(state, 1, "id");
-		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[1]);
 
-		var receptor = findReceptor(index);
+		var target = Std.string(Lua.tostring(state, -1).split('_')[0]);
+		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[2]);
+
+		var receptor = findReceptor(target, index);
 
 		var luaObject = receptor.luaObject;
 
@@ -868,10 +959,6 @@ class LuaReceptor extends LuaClass
 		{
 			receptorTween = PlayState.instance.createTween(receptor, {x: xp}, time, {
 				ease: ModchartState.getFlxEaseByString(ease),
-				onUpdate: function(tw)
-				{
-					luaObject.defaultX = receptor.x;
-				},
 				onComplete: function(twn:FlxTween)
 				{
 					receptorTween = null;
@@ -881,11 +968,7 @@ class LuaReceptor extends LuaClass
 		else
 			receptorTween = PlayState.instance.createTween(receptor, {x: xp, y: yp}, time, {
 				ease: ModchartState.getFlxEaseByString(ease),
-				onUpdate: function(tw)
-				{
-					luaObject.defaultX = receptor.x;
-					luaObject.defaultY = receptor.y;
-				},
+
 				onComplete: function(twn:FlxTween)
 				{
 					receptorTween = null;
@@ -905,9 +988,10 @@ class LuaReceptor extends LuaClass
 		var ease = LuaL.checkstring(state, 4);
 
 		Lua.getfield(state, 1, "id");
-		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[1]);
+		var target = Std.string(Lua.tostring(state, -1).split('_')[0]);
+		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[2]);
 
-		var receptor = findReceptor(index);
+		var receptor = findReceptor(target, index);
 
 		if (receptor == null)
 		{
@@ -930,9 +1014,10 @@ class LuaReceptor extends LuaClass
 		var ease = LuaL.checkstring(state, 4);
 
 		Lua.getfield(state, 1, "id");
-		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[1]);
+		var target = Std.string(Lua.tostring(state, -1).split('_')[0]);
+		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[2]);
 
-		var receptor = findReceptor(index);
+		var receptor = findReceptor(target, index);
 
 		var luaObject = receptor.luaObject;
 
@@ -963,9 +1048,10 @@ class LuaReceptor extends LuaClass
 		var ease = LuaL.checkstring(state, 4);
 
 		Lua.getfield(state, 1, "id");
-		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[1]);
+		var target = Std.string(Lua.tostring(state, -1).split('_')[0]);
+		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[2]);
 
-		var receptor = findReceptor(index);
+		var receptor = findReceptor(target, index);
 
 		if (receptor == null)
 		{
@@ -986,9 +1072,10 @@ class LuaReceptor extends LuaClass
 		var ease = LuaL.checkstring(state, 5);
 
 		Lua.getfield(state, 1, "id");
-		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[1]);
+		var target = Std.string(Lua.tostring(state, -1).split('_')[0]);
+		var index = Std.parseInt(Lua.tostring(state, -1).split('_')[2]);
 
-		var receptor = findReceptor(index);
+		var receptor = findReceptor(target, index);
 
 		var luaObject = receptor.luaObject;
 
@@ -1346,6 +1433,8 @@ class LuaCamera extends LuaClass
 
 		var camera:FlxCamera = null;
 
+		Debug.logInfo('hello');
+
 		for (i in LuaStorage.ListOfCameras)
 		{
 			if (i.className == index)
@@ -1679,11 +1768,11 @@ class LuaCharacter extends LuaClass
 
 		PlayState.instance.remove(char);
 
-		PlayState.dad = new Character(x, y, newName, char.isPlayer);
+		PlayState.instance.dad = new Character(x, y, newName, char.isPlayer);
 
-		property.char = PlayState.dad;
+		property.char = PlayState.instance.dad;
 
-		PlayState.instance.add(PlayState.dad);
+		PlayState.instance.add(PlayState.instance.dad);
 
 		return 0;
 	}
@@ -2240,14 +2329,14 @@ class LuaGame extends LuaClass
 		// 2 = stage
 		var stageName = LuaL.checkstring(state, 2);
 
-		for (i in PlayState.Stage.toAdd)
+		for (i in PlayState.instance.Stage.toAdd)
 		{
 			PlayState.instance.remove(i);
 		}
 
-		PlayState.Stage = new Stage(stageName);
+		PlayState.instance.Stage = new Stage(stageName);
 
-		for (i in PlayState.Stage.toAdd)
+		for (i in PlayState.instance.Stage.toAdd)
 		{
 			PlayState.instance.add(i);
 		}

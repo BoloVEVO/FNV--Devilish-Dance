@@ -1,6 +1,7 @@
 import flixel.input.gamepad.FlxGamepad;
 import openfl.Lib;
 import flixel.FlxG;
+import lime.app.Application;
 
 class KadeEngineData
 {
@@ -50,17 +51,20 @@ class KadeEngineData
 		if (FlxG.save.data.lerpScore == null)
 			FlxG.save.data.lerpScore = false;
 
+		if (FlxG.save.data.noteCamera == null)
+			FlxG.save.data.noteCamera = true;
+
 		if (FlxG.save.data.rotateSprites == null)
 			FlxG.save.data.rotateSprites = true;
 
 		if (FlxG.save.data.fpsRain == null)
 			FlxG.save.data.fpsRain = false;
 
-		if (FlxG.save.data.fpsCap == null)
-			FlxG.save.data.fpsCap = 120;
+		if (FlxG.save.data.fpsCap == null || FlxG.save.data.fpsCap < 60)
+			FlxG.save.data.fpsCap = Application.current.window.displayMode.refreshRate;
 
-		if (FlxG.save.data.fpsCap < 60)
-			FlxG.save.data.fpsCap = 120; // baby proof so you can't hard lock ur copy of kade engine
+		/*if (FlxG.save.data.fpsCap < 60)
+			FlxG.save.data.fpsCap = 60; */
 
 		if (FlxG.save.data.scrollSpeed == null)
 			FlxG.save.data.scrollSpeed = 1;
@@ -71,8 +75,11 @@ class KadeEngineData
 		if (FlxG.save.data.frames == null)
 			FlxG.save.data.frames = 10;
 
+		if (FlxG.save.data.scoreMod == null)
+			FlxG.save.data.scoreMod = 1;
+
 		if (FlxG.save.data.accuracyMod == null)
-			FlxG.save.data.accuracyMod = 1;
+			FlxG.save.data.accuracyMod = 0;
 
 		if (FlxG.save.data.watermark == null)
 			FlxG.save.data.watermark = true;
@@ -133,9 +140,6 @@ class KadeEngineData
 		if (FlxG.save.data.middleScroll == null)
 			FlxG.save.data.middleScroll = false;
 
-		if (FlxG.save.data.editorBG == null)
-			FlxG.save.data.editor = false;
-
 		if (FlxG.save.data.zoom == null)
 			FlxG.save.data.zoom = 1;
 
@@ -163,11 +167,15 @@ class KadeEngineData
 		if (FlxG.save.data.sickMs == null)
 			FlxG.save.data.sickMs = 45.0;
 
+		if (FlxG.save.data.swagMs == null)
+			FlxG.save.data.swagMs = 16.0;
+
 		Ratings.timingWindows = [
 			FlxG.save.data.shitMs,
 			FlxG.save.data.badMs,
 			FlxG.save.data.goodMs,
-			FlxG.save.data.sickMs
+			FlxG.save.data.sickMs,
+			FlxG.save.data.swagMs
 		];
 
 		if (FlxG.save.data.background == null)
@@ -222,12 +230,6 @@ class KadeEngineData
 		if (FlxG.save.data.overrideNoteskins == null)
 			FlxG.save.data.overrideNoteskins = false;
 
-		if (FlxG.save.data.characters == null)
-			FlxG.save.data.characters = true;
-
-		if (FlxG.save.data.strumOffset == null)
-			FlxG.save.data.strumOffset = ['downscroll' => 0, 'upscroll' => 0];
-
 		if (FlxG.save.data.gpuRender == null)
 		{
 			#if html5
@@ -237,13 +239,19 @@ class KadeEngineData
 			#end
 		}
 
-		if (FlxG.save.data.noteCamera == null)
-			FlxG.save.data.noteCamera = true;
+		if (FlxG.save.data.characters == null)
+			FlxG.save.data.characters = true;
 
 		if (FlxG.save.data.postProcessNotes == null)
 		{
 			FlxG.save.data.postProcessNotes = true;
 		}
+
+		if (FlxG.save.data.shaders == null)
+			FlxG.save.data.shaders = true;
+
+		if (FlxG.save.data.strumOffset == null)
+			FlxG.save.data.strumOffset = ['downscroll' => 0, 'upscroll' => 0];
 
 		if (FlxG.save.data.volume == null)
 			FlxG.save.data.volume = 1;
@@ -251,11 +259,11 @@ class KadeEngineData
 		if (FlxG.save.data.mute == null)
 			FlxG.save.data.mute = false;
 
-		if (FlxG.save.data.changedHitX == null)
-			FlxG.save.data.changedHitX = FlxG.width * 0.55 - 135;
+		if (FlxG.save.data.leChangedHitX == null)
+			FlxG.save.data.leChangedHitX = 530.5;
 
-		if (FlxG.save.data.changedHitY == null)
-			FlxG.save.data.changedHitY = FlxG.height / 2 - 50;
+		if (FlxG.save.data.leChangedHitY == null)
+			FlxG.save.data.leChangedHitY = 218;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 

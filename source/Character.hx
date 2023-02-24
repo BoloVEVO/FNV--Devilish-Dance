@@ -31,7 +31,7 @@ class Character extends FlxSprite
 	public var camPos:Array<Int>;
 	public var camFollow:Array<Int>;
 
-	public static var animationNotes:Array<Note> = [];
+	public var animationNotes:Array<Note> = [];
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -72,7 +72,7 @@ class Character extends FlxSprite
 
 	function parseDataFile()
 	{
-		Debug.logInfo('Generating character (${curCharacter}) from JSON data...');
+		Debug.logTrace('Generating character (${curCharacter}) from JSON data...');
 
 		// Load the data from JSON and cast it to a struct we can easily read.
 		var jsonData = Paths.loadJSON('characters/${curCharacter}');
@@ -244,7 +244,7 @@ class Character extends FlxSprite
 		{
 			if (FlxG.save.data.characters)
 			{
-				if (this != null && exists && alive && animation.curAnim != null)
+				if (animation.curAnim != null)
 				{
 					var canInterrupt = animInterrupt.get(animation.curAnim.name);
 
@@ -273,7 +273,7 @@ class Character extends FlxSprite
 						{
 							if (altAnim && animation.getByName('idle-alt') != null)
 								playAnim('idle-alt', forced);
-							else
+							else if (animOffsets.exists('idle'))
 								playAnim('idle', forced);
 						}
 					}
@@ -284,7 +284,7 @@ class Character extends FlxSprite
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
-		if (this != null && exists && alive && FlxG.save.data.characters)
+		if (FlxG.save.data.characters)
 		{
 			if (AnimName.endsWith('alt') && animation.getByName(AnimName) == null)
 			{
@@ -323,7 +323,7 @@ class Character extends FlxSprite
 		}
 	}
 
-	public static function loadMappedAnims():Void
+	public function loadMappedAnims():Void
 	{
 		var noteData:Array<SwagSection> = Song.loadFromJson(PlayState.SONG.songId, 'picospeaker').notes;
 		for (section in noteData)

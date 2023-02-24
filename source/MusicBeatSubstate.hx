@@ -83,6 +83,17 @@ class MusicBeatSubstate extends FlxSubState
 		curBeat = Math.floor(curStep / 4);
 	}
 
+	public function stepHit():Void
+	{
+		if (curStep % 4 == 0)
+			beatHit();
+	}
+
+	public function beatHit():Void
+	{
+		// do literally nothing dumbass
+	}
+
 	private function updateCurStep():Int
 	{
 		var lastChange:BPMChangeEvent = {
@@ -98,43 +109,4 @@ class MusicBeatSubstate extends FlxSubState
 
 		return lastChange.stepTime + Math.floor((Conductor.songPosition - lastChange.songTime) / Conductor.stepCrochet);
 	}
-
-	public function stepHit():Void
-	{
-		if (curStep % 4 == 0)
-			beatHit();
-	}
-
-	public function beatHit():Void
-	{
-		// do literally nothing dumbass
-	}
-	/*function onWindowFocusOut():Void
-		{
-			if (PlayState.inDaPlay)
-			{
-				PlayState.instance.vocals.pause();
-				FlxG.sound.music.pause();
-				if (!PlayState.instance.paused && !PlayState.instance.endingSong && PlayState.instance.songStarted)
-				{
-					Debug.logTrace("Lost Focus");
-					PlayState.instance.openSubState(new PauseSubState());
-					PlayState.boyfriend.stunned = true;
-
-					PlayState.instance.persistentUpdate = false;
-					PlayState.instance.persistentDraw = true;
-					PlayState.instance.paused = true;
-				}
-			}
-	}*/
-	/*function onWindowFocusIn():Void
-		{
-			Debug.logTrace("IM BACK!!!");
-			(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
-			if (PlayState.inDaPlay)
-			{
-				if (PlayState.boyfriend.stunned)
-					PlayState.boyfriend.stunned = false;
-			}
-	}*/
 }

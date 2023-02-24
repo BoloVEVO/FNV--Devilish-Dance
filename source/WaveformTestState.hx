@@ -10,10 +10,13 @@ import lime.media.AudioBuffer;
 import lime.media.vorbis.VorbisFile;
 import openfl.geom.Rectangle;
 import openfl.media.Sound;
+import openfl.utils.Assets as OpenFlAssets;
 
 class WaveformTestState extends MusicBeatState
 {
-	var waveform:Waveform;
+	var waveformInst:Waveform;
+
+	var waveformVoices:Waveform;
 
 	override public function create()
 	{
@@ -23,18 +26,19 @@ class WaveformTestState extends MusicBeatState
 		if (PlayState.isSM)
 		{
 			#if FEATURE_FILESYSTEM
-			waveform = new Waveform(0, 0, PlayState.pathToSm + "/" + PlayState.sm.header.MUSIC, 720);
+			waveformInst = new Waveform(0, 0, PlayState.pathToSm + "/" + PlayState.sm.header.MUSIC, 720);
 			#end
 		}
 		else
 		{
+			waveformInst = new Waveform(0, 0, OpenFlAssets.getPath(Paths.inst(PlayState.SONG.songId, true)), 720);
 			if (PlayState.SONG.needsVoices)
-				waveform = new Waveform(0, 0, Paths.voices(PlayState.SONG.songId), 720);
-			else
-				waveform = new Waveform(0, 0, Paths.inst(PlayState.SONG.songId), 720);
+				waveformVoices = new Waveform(0, 0, OpenFlAssets.getPath(Paths.voices(PlayState.SONG.songId, true)), 720);
 		}
-		waveform.drawWaveform();
-		add(waveform);
+		waveformInst.drawWaveform(FlxColor.CYAN);
+		waveformVoices.drawWaveform(FlxColor.YELLOW);
+		add(waveformInst);
+		add(waveformVoices);
 	}
 
 	override public function update(elapsed:Float)

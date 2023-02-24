@@ -1,2 +1,1 @@
-test:bf:0:#A5004D
 666:Tamaneko:0:#00fff2
