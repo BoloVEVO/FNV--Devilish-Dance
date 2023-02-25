@@ -597,6 +597,13 @@ class ModchartState
 
 		// SHADER SHIT (Thanks old psych engine)
 
+		new LuaGame().Register(lua);
+
+		new LuaWindow().Register(lua);
+	}
+
+	public function initLuaReceptors()
+	{
 		for (i in 0...PlayState.instance.strumLineNotes.length)
 		{
 			var member = PlayState.instance.strumLineNotes.members[i];
@@ -614,10 +621,6 @@ class ModchartState
 			var member = PlayState.instance.playerStrums.members[i];
 			new LuaReceptor(member, "Player_receptor_" + i).Register(lua);
 		}
-
-		new LuaGame().Register(lua);
-
-		new LuaWindow().Register(lua);
 	}
 
 	public function executeState(name, args:Array<Dynamic>)

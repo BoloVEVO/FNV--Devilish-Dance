@@ -968,6 +968,14 @@ class PlayState extends MusicBeatState
 		setupStaticArrows(0);
 		setupStaticArrows(1);
 
+		#if FEATURE_LUAMODCHART
+		if (executeModchart)
+		{
+			if (luaModchart != null)
+				luaModchart.initLuaReceptors();
+		}
+		#end
+
 		add(arrowLanes);
 
 		appearStaticArrows(tweenBoolshit);
@@ -1352,7 +1360,6 @@ class PlayState extends MusicBeatState
 		#if FEATURE_LUAMODCHART
 		if (executeModchart)
 		{
-			luaModchart = ModchartState.createModchartState();
 			luaModchart.executeState('postStart', []);
 		}
 		#end
@@ -2019,6 +2026,11 @@ class PlayState extends MusicBeatState
 			createTween(skipText, {alpha: 1}, 0.2);
 			add(skipText);
 		}
+	}
+
+	private function shaderTween(shader:FNFShader, value:Float)
+	{
+		shader.setFloat('iStrength', value);
 	}
 
 	var debugNum:Int = 0;
@@ -5920,6 +5932,24 @@ class PlayState extends MusicBeatState
 				notes.sort(FlxSort.byY, (PlayStateChangeables.useDownscroll ? FlxSort.ASCENDING : FlxSort.DESCENDING));
 		}*/
 
+		if (SONG.songId == '666')
+		{
+			if (curBeat == 480)
+			{
+				var coolShader = new FNFShader('invertedCamShader', OpenFlAssets.getText(Paths.shaderFragment('invert')), null);
+				coolShader.setFloat('iStrength', 0.0);
+				setShaders(camGame, [coolShader]);
+				tweenManager.num(0.0, 1.0, 1, {}, shaderTween.bind(coolShader));
+			}
+
+			if (curBeat == 494)
+			{
+				for (shader in currentShaders)
+					if (shader.name == 'invertedCamShader')
+						tweenManager.num(1.0, -1.0, 0.5, {}, shaderTween.bind(shader));
+			}
+		}
+
 		#if FEATURE_LUAMODCHART
 		if (executeModchart && luaModchart != null)
 		{
@@ -6872,75 +6902,25 @@ class PlayState extends MusicBeatState
 		return sec;
 	}
 
-	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
-	public var currentShaders:Map<String, FlxRuntimeShader> = new Map<String, FlxRuntimeShader>();
+	public var currentShaders:Array<FNFShader> = [];
 
-	public function applyShader(obj:Dynamic, shaders:Array<String>)
-	{
-		initShaders(shaders);
-		setShaders(obj, shaders);
-	}
-
-	private function initShaders(shaderName:Array<String>)
-	{
-		var frag = null;
-		var vertex = null;
-
-		for (shaders in shaderName)
-		{
-			try
-			{
-				frag = OpenFlAssets.getText(Paths.shaderFragment(shaders));
-			}
-			catch (e)
-			{
-				Debug.logError('NO FRAG FOUND');
-			}
-
-			try
-			{
-				vertex = OpenFlAssets.getText(Paths.shaderVertex(shaders));
-			}
-			catch (e)
-			{
-				Debug.logError('NO VERTEX FOUND');
-			}
-
-			if (vertex == null && frag == null)
-			{
-				Debug.logError("Frag and vertex shader codes doesn't exist. Aborting...");
-				return;
-			}
-			runtimeShaders.set(shaders, [frag, vertex]);
-		}
-	}
-
-	private function setShaders(obj:Dynamic, shaderName:Array<String>)
+	private function setShaders(obj:Dynamic, shaders:Array<FNFShader>)
 	{
 		#if (!flash && sys)
 		var filters = [];
 
-		for (shaders in shaderName)
+		for (shader in shaders)
 		{
-			if (runtimeShaders.exists(shaders))
+			filters.push(new ShaderFilter(shader));
+
+			if (!Std.isOfType(obj, FlxCamera))
 			{
-				var shaderArgs = runtimeShaders.get(shaders);
+				obj.shader = shader;
 
-				var shader = new FlxRuntimeShader(shaderArgs[0], shaderArgs[1]);
-				if (shaders == 'invert')
-					shader.setFloat('iStrength', 0.5);
-
-				filters.push(new ShaderFilter(shader));
-
-				if (!Std.isOfType(obj, FlxCamera))
-				{
-					obj.shader = shader;
-
-					return true;
-				}
-
-				currentShaders.set(shaders, shader);
+				return true;
 			}
+
+			currentShaders.push(shader);
 		}
 		if (Std.isOfType(obj, FlxCamera))
 			obj.setFilters(filters);
@@ -6949,80 +6929,29 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public function getPropertyfromShader(obj:String, type:String, prop:String):Dynamic
+	private function removeShaders(obj:Dynamic)
 	{
 		#if (!flash && sys)
-		var shader:FlxRuntimeShader = getShader(obj);
-		Debug.logInfo('Getting shader prop');
-		if (shader == null)
+		var filters = [];
+
+		for (shader in currentShaders)
 		{
-			Debug.logInfo('fuckoff');
-			return null;
+			currentShaders.remove(shader);
 		}
-		switch (type)
+
+		if (!Std.isOfType(obj, FlxCamera))
 		{
-			case 'bool':
-				return shader.getBool(prop);
-			case 'boolArray':
-				return shader.getBoolArray(prop);
-			case 'int':
-				return shader.getInt(prop);
-			case 'intArray':
-				return shader.getIntArray(prop);
-			case 'float':
-				return shader.getFloat(prop);
-			case 'floatArray':
-				return shader.getFloatArray(prop);
+			obj.shader = null;
+
+			return true;
 		}
-		return null;
-		Debug.logInfo('rip');
-		#else
-		return null;
+
+		if (Std.isOfType(obj, FlxCamera))
+			obj.setFilters(filters);
+
+		return true;
 		#end
 	}
-
-	public function setPropertyfromShader(obj:String, type:String, prop:String, value:Dynamic)
-	{
-		#if (!flash && sys)
-		var shader:FlxRuntimeShader = getShader(obj);
-		if (shader == null)
-		{
-			return null;
-		}
-		switch (type)
-		{
-			case 'bool':
-				return shader.setBool(prop, value);
-			case 'boolArray':
-				return shader.setBoolArray(prop, value);
-			case 'int':
-				return shader.setInt(prop, value);
-			case 'intArray':
-				return shader.setIntArray(prop, value);
-			case 'float':
-				return shader.setFloat(prop, value);
-			case 'floatArray':
-				return shader.setFloatArray(prop, value);
-		}
-		#else
-		return null;
-		#end
-	}
-
-	#if (!flash && sys)
-	public function getShader(obj:String):FlxRuntimeShader
-	{
-		Debug.logInfo('Getting shader: $obj.frag');
-		var leObj = currentShaders.get(obj);
-
-		if (leObj != null)
-		{
-			Debug.logInfo('Shader gotten!');
-			return leObj;
-		}
-		return null;
-	}
-	#end
 
 	var stageFollow:FlxPoint;
 

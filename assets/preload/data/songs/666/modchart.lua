@@ -4,7 +4,7 @@ swingVal = 0;
 reset = false;
 function start(song)
     setProperty('PlayStateChangeables','middleScroll',true);
-    
+
 end
 
 function postStart(song)
@@ -12,8 +12,7 @@ function postStart(song)
 end
 
 function update(elapsed)
-
-    currentBeat = (songPos / 1000)*(bpm/60);
+    currentBeat = (songPos / 1000)*(bpm*rate/60);
 
     for i = 0,3 do 
         local PlayerReceptor = _G['Player_receptor_'..i];
@@ -29,7 +28,7 @@ function update(elapsed)
         end
 
         if startRotating then 
-            PlayerReceptor.angle = PlayerReceptor.angle + elapsed*6;
+            PlayerReceptor.angle = PlayerReceptor.angle + elapsed*6*rate;
         end
     end
 
@@ -46,25 +45,28 @@ function update(elapsed)
 end
 
 local function strumSplit()
+
     for i = 0,1 do 
         local rec = _G['Player_receptor_'..i];
         rec.laneFollowsReceptor = 1;
-        rec:tweenPos(rec.defaultX-300,rec.y,3,'expoout');
-        rec:tweenAngle(rec.angle-360,3,'expoout');
+        rec:tweenPos(rec.defaultX-150,rec.y,3/rate,'expoout');
+        rec:tweenAngle(rec.angle-360,3/rate,'expoout');
     end
 
     for k = 2,3 do 
         local TwiceReceptors = _G['Player_receptor_'..k];
         TwiceReceptors.laneFollowsReceptor = 1;
-        TwiceReceptors:tweenPos(TwiceReceptors.defaultX+300,TwiceReceptors.y,3,'expoout');
-        TwiceReceptors:tweenAngle(TwiceReceptors.angle+360,3,'expoout');
+        TwiceReceptors:tweenPos(TwiceReceptors.defaultX+150,TwiceReceptors.y,3/rate,'expoout');
+        TwiceReceptors:tweenAngle(TwiceReceptors.angle+360,3/rate,'expoout');
    end
 end 
 
 local function spin()
+    camGame.zoom = camGame.zoom + 0.03;
+    camHUD.zoom = camHUD.zoom + 0.06;
     for i = 0,3 do 
         local CoolReceptor = _G['Player_receptor_'..i];
-        CoolReceptor:tweenAngle(CoolReceptor.angle+360,0.35,'smoothstepout');
+        CoolReceptor:tweenAngle(CoolReceptor.angle+360,0.35/rate,'smoothstepout');
     end
 end
 
@@ -72,8 +74,8 @@ local function resetStrumPos()
     if not reset then
         for i = 0,3 do 
             local CoolReceptor = _G['Player_receptor_'..i];
-            CoolReceptor:tweenPos(CoolReceptor.defaultX,CoolReceptor.y,0.25,'smoothstepout');
-            CoolReceptor:tweenAngle(CoolReceptor.defaultAngle,0.5,'smoothstepout');
+            CoolReceptor:tweenPos(CoolReceptor.defaultX,CoolReceptor.y,0.25/rate,'smoothstepout');
+            CoolReceptor:tweenAngle(CoolReceptor.defaultAngle,0.5/rate,'smoothstepout');
         end
         reset = true
     end
