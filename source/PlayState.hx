@@ -489,9 +489,12 @@ class PlayState extends MusicBeatState
 			PlayStateChangeables.skillIssue = false;
 		}
 
+		usedBot = false;
+
 		// FlxG.save.data.optimize = FlxG.save.data.optimize;
 		PlayStateChangeables.zoom = FlxG.save.data.zoom;
 		PlayStateChangeables.middleScroll = FlxG.save.data.middleScroll;
+		PlayStateChangeables.currentSkin = FlxG.save.data.noteskin;
 
 		removedVideo = false;
 
@@ -1482,7 +1485,7 @@ class PlayState extends MusicBeatState
 		{
 			tweenManager.cancelTweensOf(babyArrow);
 			babyArrow.alpha = 0;
-			babyArrow.y = strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll');
+			babyArrow.y = strumLine.y + FlxG.save.data.strumOffset.get(PlayStateChangeables.useDownscroll ? 'downscroll' : 'upscroll');
 		});
 		arrowsAppeared = false;
 	}
@@ -2351,7 +2354,7 @@ class PlayState extends MusicBeatState
 		{
 			// FlxG.log.add(i);
 			var babyArrow:StaticArrow = new StaticArrow(43,
-				strumLine.y + FlxG.save.data.strumOffset.get(FlxG.save.data.downscroll ? 'downscroll' : 'upscroll'));
+				strumLine.y + FlxG.save.data.strumOffset.get(PlayStateChangeables.useDownscroll ? 'downscroll' : 'upscroll'));
 
 			// defaults if no noteStyle was found in chart
 			var noteStyleCheck:String = 'normal';
@@ -2359,7 +2362,7 @@ class PlayState extends MusicBeatState
 			/*if (FlxG.save.data.optimize && player == 0)
 				continue; */
 
-			babyArrow.downScroll = FlxG.save.data.downscroll;
+			babyArrow.downScroll = PlayStateChangeables.useDownscroll;
 
 			if (SONG.noteStyle == null && FlxG.save.data.overrideNoteskins)
 			{
@@ -2890,7 +2893,7 @@ class PlayState extends MusicBeatState
 			var defNote:NoteDef = unspawnNotes.shift();
 
 			// Idk if doing note pooling make creating instances safe or not.
-			var dunceNote:NoteSpr = Type.createInstance(NoteSpr, []);
+			var dunceNote:NoteSpr = new NoteSpr();
 			dunceNote.setupNote(defNote);
 			dunceNote.scrollFactor.set(0, 0);
 
@@ -4054,27 +4057,6 @@ class PlayState extends MusicBeatState
 
 	var offsetTest:Float = 0;
 
-	public function getRatesScore(rate:Float, score:Float):Float
-	{
-		var rateX:Float = 1;
-		var lastScore:Float = score;
-		var pr = rate - 0.05;
-		if (pr < 1.00)
-			pr = 1;
-
-		while (rateX <= pr)
-		{
-			if (rateX > pr)
-				break;
-			lastScore = score + ((lastScore * rateX) * 0.022);
-			rateX += 0.05;
-		}
-
-		var actualScore = Math.round(score + (Math.floor((lastScore * pr)) * 0.022));
-
-		return actualScore;
-	}
-
 	var timeShown = 0;
 	var currentTimingShown:CoolText;
 
@@ -4226,9 +4208,6 @@ class PlayState extends MusicBeatState
 			combo = 0;
 		}
 
-		if (FlxG.save.data.scoreMod == 0)
-			score = daRating.scoreBonus;
-
 		health += daRating.healthBonus > 0 ? daRating.healthBonus * PlayStateChangeables.healthGain : daRating.healthBonus * PlayStateChangeables.healthLoss;
 
 		daRating.count++;
@@ -4248,8 +4227,8 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.save.data.scoreMod == 1)
 			score = EtternaFunctions.getMSScore(noteDiffAbs);
-		else if (songMultiplier >= 1.05)
-			score = getRatesScore(songMultiplier, score);
+		else
+			score = daRating.scoreBonus;
 
 		songScore += Math.round(score);
 
@@ -4497,8 +4476,6 @@ class PlayState extends MusicBeatState
 
 			if (FlxG.save.data.scoreMod == 1)
 				score = EtternaFunctions.getMSScore(noteDiffAbs);
-			else if (songMultiplier >= 1.05)
-				score = getRatesScore(songMultiplier, score);
 			else
 				score = daRating.scoreBonus;
 
@@ -6310,7 +6287,8 @@ class PlayState extends MusicBeatState
 		#end
 
 		noteskinSprite = null;
-		hitErrorBar.hitNotesGroup = null;
+		if (FlxG.save.data.hitErrorBar)
+			hitErrorBar.hitNotesGroup = null;
 
 		cleanPlayObjects();
 

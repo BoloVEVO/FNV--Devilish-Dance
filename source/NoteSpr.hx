@@ -110,9 +110,9 @@ class NoteSpr extends FlxSprite
 		{
 			if (PlayState.isPixelStage)
 			{
-				loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, false, 'normal'), true, 17, 17);
+				loadGraphic(NoteskinHelpers.generatePixelSprite(PlayStateChangeables.currentSkin, false, 'normal'), true, 17, 17);
 				if (_def.isSustainNote)
-					loadGraphic(NoteskinHelpers.generatePixelSprite(FlxG.save.data.noteskin, true, 'normal'), true, 7, 6);
+					loadGraphic(NoteskinHelpers.generatePixelSprite(PlayStateChangeables.currentSkin, true, 'normal'), true, 7, 6);
 
 				for (i in 0...4)
 				{
@@ -126,7 +126,7 @@ class NoteSpr extends FlxSprite
 			}
 			else
 			{
-				frames = NoteskinHelpers.generateNoteskinSprite(FlxG.save.data.noteskin, _def.noteType, _def.noteStyle);
+				frames = NoteskinHelpers.generateNoteskinSprite(PlayStateChangeables.currentSkin, _def.noteType, _def.noteStyle);
 
 				for (i in 0...4)
 				{
@@ -186,7 +186,7 @@ class NoteSpr extends FlxSprite
 
 				alpha = !_def.sustainActive && _def.parent.wasGoodHit ? 0.3 : 0.6;
 
-				if (FlxG.save.data.downscroll)
+				if (PlayStateChangeables.useDownscroll)
 					flipY = true;
 
 				originColor = _def.prevNote.connectedNote.originColor;

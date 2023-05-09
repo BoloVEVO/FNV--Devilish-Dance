@@ -411,7 +411,7 @@ class Song
 		{
 			for (sortedNote in newNotes)
 			{
-				if (sortedNote[0] >= section.startTime && sortedNote[0] < section.endTime)
+				if (sortedNote[0] / PlayState.rate >= section.startTime && sortedNote[0] / PlayState.rate < section.endTime)
 					section.sectionNotes.push(sortedNote);
 			}
 		}

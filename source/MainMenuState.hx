@@ -48,7 +48,7 @@ class MainMenuState extends MusicBeatState
 
 	public static var kadeEngineVer:String = '1.8.1 (v$buildVer)' + nightly;
 
-	public static var modVer:String = '1.0';
+	public static var modVer:String = '1.0.1';
 
 	public static var modContext:String = 'FNV: Devilish Dance v' + modVer;
 
