@@ -22,13 +22,13 @@
 	* `sudo apt-get -y install libidn12`
 	
      <b>All platforms (Windows, Mac, HTML5, Linux):</b> 
-	 - `haxelib install lime 7.9.0`
+	 - `haxelib install lime`
 	 - `haxelib install openfl`
 	 - `haxelib install flixel`
 	 - `haxelib install flixel-tools`
 	 - `haxelib install flixel-ui`
 	 - `haxelib install hscript`
-	 - `haxelib git hxCodec https://github.com/polybiusproxy/hxCodec`
+	 - `haxelib install hxCodec`
 	 - `haxelib install hxcpp-debug-server`
 	 - `haxelib install flixel-addons`
 	 - `haxelib install actuate`
@@ -38,7 +38,7 @@
 	 - `haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit.git`
 	 - `haxelib git hxvm-luajit https://github.com/nebulazorua/hxvm-luajit`
 	 - `haxelib git faxe https://github.com/uhrobots/faxe`
-	 - `haxelib install polymod`
+	 - `haxelib git polymod https://github.com/BoloVEVO/polymod.git`
 	 - `haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc`
 	 - `haxelib git extension-webm https://github.com/KadeDev/extension-webm`
 	 - `lime rebuild extension-webm <ie. windows, macos, linux>`

@@ -2,6 +2,11 @@ startSwing = false;
 startRotating = false;
 swingVal = 0;
 reset = false;
+notes = nil;
+
+-- Wacky modchart I did (-Bolo)
+-- BTW IF YOUR RAM IS RAISING WHILE PLAYING IS BECAUSE OF THIS FUCKING BORKEN LUA 
+
 function start(song)
     setProperty('PlayStateChangeables','middleScroll',true);
 
@@ -13,6 +18,8 @@ end
 
 function update(elapsed)
     currentBeat = (songPos / 1000)*(bpm*rate/60);
+
+    notes = getNotes()
 
     for i = 0,3 do 
         local PlayerReceptor = _G['Player_receptor_'..i];
@@ -30,18 +37,22 @@ function update(elapsed)
         if startRotating then 
             PlayerReceptor.angle = PlayerReceptor.angle + elapsed*6*rate;
         end
+
+        for k,v in ipairs(notes) do
+            local note = _G[v];
+            
+
+            if not note.isSustain and note.data == i then 
+                note.angle = PlayerReceptor.angle;
+            end
+        end
+
     end
 
+    
+  
 
 
-    notes = getNotes();
-    for i,v in ipairs(getNotes()) do
-       local note = _G[v];
-
-       if not note.isSustain then
-            note.followAngle = 1;
-       end
-    end
 end
 
 local function strumSplit()
@@ -68,6 +79,9 @@ local function spin()
         local CoolReceptor = _G['Player_receptor_'..i];
         CoolReceptor:tweenAngle(CoolReceptor.angle+360,0.35/rate,'smoothstepout');
     end
+
+
+
 end
 
 local function resetStrumPos()
@@ -77,6 +91,9 @@ local function resetStrumPos()
             CoolReceptor:tweenPos(CoolReceptor.defaultX,CoolReceptor.y,0.25/rate,'smoothstepout');
             CoolReceptor:tweenAngle(CoolReceptor.defaultAngle,0.5/rate,'smoothstepout');
         end
+
+
+
         reset = true
     end
 end 

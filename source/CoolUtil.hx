@@ -1,42 +1,29 @@
 package;
 
 import Song.SongData;
-import flixel.FlxG;
-import flixel.util.FlxAxes;
 import flixel.graphics.frames.FlxBitmapFont;
 import flixel.text.FlxBitmapText;
 import flixel.addons.ui.FlxUIText;
-import flixel.addons.ui.FlxUINumericStepper;
 import flixel.addons.ui.FlxUIButton;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.group.FlxSpriteGroup;
 import Options.AccuracyDOption;
 import flixel.FlxSprite;
 import openfl.utils.Assets as OpenFlAssets;
+import lime.utils.Assets as LimeAssets;
 import flixel.text.FlxText; #if FEATURE_FILESYSTEM import sys.io.File; #end
 
 using StringTools;
 
 class CoolUtil
 {
-	public static var difficultyArray:Array<String> = ['Easy', "Normal", "Hard", "Novice", "Advanced", "Exhaust", "Maximum", "Heavenly"];
+	public static var defaultDifficulties:Array<String> = ['Easy', "Normal", "Hard"];
 
-	public static var suffixDiffsArray:Array<String> = [
-		'-easy',
-		"",
-		"-hard",
-		"-novice",
-		"-advanced",
-		"-exhaust",
-		"-maximum",
-		"-heavenly"
-	];
+	public static var customDifficulties:Array<String> = ['Novice', 'Advanced', 'Exhaust', 'Maximum', 'Heavenly'];
+
+	public static var difficultyArray:Array<String> = getGlobalDiffs();
 
 	public static var pauseMenuItems:Array<String> = ['Resume', 'Restart Song', 'Options', 'Exit to menu'];
-
-	public static var daPixelZoom:Float = 6;
-
-	public static var noteTypes = ['normal', 'hurt'];
 
 	public static function difficultyFromInt(difficulty:Int):String
 	{
@@ -112,87 +99,247 @@ class CoolUtil
 		for (section in daSong.notes)
 			for (songNotes in section.sectionNotes)
 			{
-				songNotes = [];
+				songNotes.resize(0);
 				songNotes = null;
 			}
 
-		daSong.notes = [];
+		daSong.notes.resize(0);
+
 		daSong.notes = null;
 
-		daSong.eventObjects = [];
+		daSong.eventObjects.resize(0);
+
 		daSong.eventObjects = null;
 
 		daSong = null;
 	}
 
-	public static function getVariableName(v:Dynamic):String
+	// alphabet sort (ascending) for string arrays
+	public static function sortByAlphabet(arr:Array<String>):Array<String>
 	{
-		for (fieldName in Reflect.fields(v))
+		var sort = function(a:String, b:String):Int
 		{
-			if (Reflect.field(v, fieldName) == v)
+			a = a.toUpperCase();
+			b = b.toUpperCase();
+
+			if (a < b)
+				return -1;
+			else if (a > b)
+				return 1;
+			else
+				return 0;
+		};
+
+		arr.sort(sort);
+		return arr;
+	}
+
+	/**
+		* Similar to FileSystem.readDirectory() using OpenFLAssets (manifest.json)
+		** WARNING: This function doesn't replace FileSystem.readDirectory(), this only lists the assets that came with the build, 
+		* if you drag new files to the assets folder it won't be detected!
+		** NOTE: Newer files dragged via ModCore/Polymod are detected!
+		* @param path The specific directory you want to read.
+		* @param library The library you want to scan. Ex: shared.
+	 */
+	public static function readAssetsDirectoryFromLibrary(path:String, type:String, library:String = 'default'):Array<String>
+	{
+		var lib = LimeAssets.getLibrary(library);
+		var list:Array<String> = lib.list(type);
+		var stringList = [];
+		for (hmm in list)
+		{
+			if (hmm.startsWith(path))
 			{
-				return fieldName;
+				stringList.push(hmm);
 			}
 		}
-		return null;
+
+		return stringList;
+	}
+
+	/**
+	 * Convert a Dynamic value to a Defined Class Type Value.
+	 		* @param value The value you want to be converted
+	 		* @param type The type you want the input value to be converted
+	 */
+	public static function parseType(value:Dynamic, type:String)
+	{
+		switch (type.toLowerCase())
+		{
+			case "float":
+				value = Std.parseFloat(value);
+			case "string":
+				value = Std.string(value);
+			case "int":
+				value = Std.parseInt(value);
+			case "bool":
+				if (value.toLowerCase() == "true")
+					value = true;
+				else
+					value = false;
+			case "array":
+				// Split the string at commas
+				var stringValue = Std.string(value);
+
+				if (stringValue.indexOf('[') == -1 && stringValue.indexOf(']') == -1)
+				{
+					var a:Array<String> = stringValue.split(",");
+					Debug.logTrace(a);
+					value = a;
+				}
+				else
+				{
+					// If the string has array structure directly parse it to convert it to a haxe array.
+
+					try
+					{
+						var a:Array<String> = haxe.Json.parse(stringValue);
+
+						value = a;
+					}
+					catch (e)
+					{
+						Debug.logError(e);
+						// Debug.logError('Fucking dumbass fag piece of shit your array is broken kill yourself');
+					}
+				}
+		}
+		return value;
+	}
+
+	public static function getSuffixFromDiff(diff:String):String
+	{
+		var suffix = '';
+		if (diff != 'Normal')
+			suffix = '-${diff.toLowerCase()}';
+
+		return suffix;
+	}
+
+	static function getGlobalDiffs():Array<String>
+	{
+		var returnArray:Array<String> = [];
+		if (defaultDifficulties.length > 0)
+			for (el in defaultDifficulties)
+				returnArray.push(el);
+
+		if (customDifficulties.length > 0)
+			for (el2 in customDifficulties)
+				returnArray.push(el2);
+
+		return returnArray;
 	}
 }
 
 /*
-	For some reason Flixel doesn't like FlxUINumericSteppers in multiple FlxUI boxes. So I have to replicate a new one.
+	For some reason Flixel doesn't like FlxUINumericSteppers in multiple FlxUI boxes and memory starts ramping up asf.
  */
 class CoolNumericStepper extends FlxSpriteGroup
 {
-	var currentValue:Float;
+	public var currentValue:Float;
 
 	public var stepperValue:Float;
 
+	public var stepperAddValue:Float;
+
+	public var stepperSubstractValue:Float;
+
 	public var inputText:FlxUIInputText;
 
-	public function new(x:Float, y:Float, width:Int, currentValue:String, stepperValue:Float, textSize:Int, name:String)
+	public var callback:Float->Void = null;
+
+	public var canInput:Bool = true;
+
+	public function new(x:Float, y:Float, width:Int, currentValue:String, stepperValue:Float, textSize:Int, name:String, Callback:Float->Void)
 	{
 		super(x, y);
 		this.currentValue = Std.parseFloat(currentValue);
 		this.stepperValue = stepperValue;
+		this.stepperAddValue = stepperValue;
+		this.stepperSubstractValue = stepperValue;
 
 		var inputText:FlxUIInputText = new FlxUIInputText(0, 0, width, currentValue, textSize);
+
+		inputText.customFilterPattern = ~/[^0-9.]*/g;
+		inputText.filterMode = 4;
 		this.inputText = inputText;
 		add(inputText);
+
+		callback = Callback;
+
 		var plusButton:FlxUIButton = new FlxUIButton(width, -3, "+", function()
 		{
-			this.currentValue += stepperValue;
+			this.currentValue += this.stepperAddValue;
 			currentValue = Std.string(this.currentValue);
 			inputText.text = Std.string(this.currentValue);
+
+			if (this.currentValue <= 0 || inputText.text == '' || inputText.text == 'nan' || this.currentValue == Math.NaN)
+			{
+				this.currentValue = 0.1;
+				inputText.text = '0.1';
+			}
+
+			if (callback != null)
+				callback(this.currentValue);
 		});
 
 		add(plusButton);
 		plusButton.resize(20, plusButton.height);
-		var minusButton:FlxUIButton = new FlxUIButton(plusButton.x + (plusButton.width / 2) - 1, -3, "-", function()
+		var minusButton:FlxUIButton = new FlxUIButton(plusButton.x + (plusButton.width / 2) - 4, -3, "-", function()
 		{
-			this.currentValue -= stepperValue;
+			this.currentValue -= this.stepperSubstractValue;
 			currentValue = Std.string(this.currentValue);
 			inputText.text = Std.string(this.currentValue);
+
+			if (this.currentValue <= 0 || inputText.text == '' || inputText.text == 'nan' || this.currentValue == Math.NaN)
+			{
+				this.currentValue = 0.1;
+				inputText.text = '0.1';
+			}
+
+			if (callback != null)
+				callback(this.currentValue);
 		});
 		minusButton.resize(20, plusButton.height);
 
 		add(minusButton);
 
-		var nameText:FlxUIText = new FlxUIText(0, -17, name);
+		var nameText:FlxUIText = new FlxUIText(-2, -17, name);
 		add(nameText);
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		currentValue = Std.parseFloat(inputText.text);
+
+		if (inputText.hasFocus)
+		{
+			inputText.hasFocus = canInput;
+		}
+
+		if (currentValue != Std.parseFloat(inputText.text))
+		{
+			currentValue = Std.parseFloat(inputText.text);
+
+			callback(currentValue);
+		}
+
+		if (currentValue <= 0 || inputText.text == '' || currentValue == Math.NaN)
+		{
+			currentValue = 0.1;
+			inputText.text = '0.1';
+		}
 	}
 }
 
 /**
- * Edited of an Enhanced Bitmap Text class that doesn't consume memory because of modified properties.
- * WARNING: NON-LEFT ALIGNMENT might break some position properties such as X,Y and functions like screenCenter()
- * @param 	size	Be aware that this size property can could be not equal to FlxText size.
- * @param 	bitmapFont	Optional parameter for component's font prop
+	* Helper Class of FlxBitmapText
+	** WARNING: NON-LEFT ALIGNMENT might break some position properties such as X,Y and functions like screenCenter()
+	** NOTE: IF YOU WANT TO USE YOUR CUSTOM FONT MAKE SURE THEY ARE SET TO SIZE = 32
+	* @param 	sizeX	Be aware that this size property can could be not equal to FlxText size.
+	* @param 	sizeY	Be aware that this size property can could be not equal to FlxText size.
+	* @param 	bitmapFont	Optional parameter for component's font prop
  */
 class CoolText extends FlxBitmapText
 {
@@ -201,7 +348,8 @@ class CoolText extends FlxBitmapText
 		super(bitmapFont);
 		x = xPos;
 		y = yPos;
-		scale.set(sizeX / 29.35, sizeY / 29.35);
+		scale.set(sizeX / (font.size - 2), sizeY / (font.size - 2));
+		updateHitbox();
 	}
 
 	override function destroy()

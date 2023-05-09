@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.0.2 https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="pussy_destroyer.png" width="1395" height="1561">
+	<SubTexture name="slice0025" x="3" y="3" width="993" height="263" frameX="-225" frameY="-405" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0026" x="3" y="272" width="464" height="129" frameX="-754" frameY="-498" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0027" x="473" y="272" width="464" height="129" frameX="-753" frameY="-490" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0029" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0038" x="473" y="407" width="464" height="129" frameX="-752" frameY="-487" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0040" x="3" y="542" width="464" height="129" frameX="-752" frameY="-497" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0042" x="473" y="542" width="464" height="129" frameX="-752" frameY="-519" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0044" x="3" y="677" width="464" height="129" frameX="-752" frameY="-588" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0046" x="473" y="677" width="464" height="129" frameX="-752" frameY="-657" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0048" x="3" y="812" width="464" height="129" frameX="-752" frameY="-679" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0050" x="473" y="812" width="464" height="129" frameX="-752" frameY="-689" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0011" x="3" y="947" width="457" height="165" rotated="true" frameX="-269" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0003" x="466" y="947" width="456" height="145" frameX="-4" frameY="-813" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0013" x="1002" y="3" width="169" height="456" frameX="-265" frameY="-1" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0005" x="943" y="465" width="174" height="450" rotated="true" frameX="-12" frameY="-750" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0015" x="3" y="1118" width="448" height="191" rotated="true" frameX="-244" frameY="-8" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0017" x="466" y="1098" width="438" height="211" rotated="true" frameX="-224" frameY="-17" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0019" x="1177" y="3" width="215" height="436" frameX="-220" frameY="-19" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0021" x="943" y="921" width="432" height="221" rotated="true" frameX="-208" frameY="-24" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0007" x="1123" y="465" width="220" height="428" rotated="true" frameX="-34" frameY="-639" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0023" x="3" y="1315" width="418" height="243" rotated="true" frameX="-167" frameY="-41" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0009" x="910" y="1148" width="295" height="374" rotated="true" frameX="-83" frameY="-456" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0001" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0002" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0052" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0053" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0054" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0055" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0056" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0057" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0058" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0059" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0060" x="457" y="1118" width="1" height="1" frameX="-0" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0004" x="466" y="947" width="456" height="145" frameX="-4" frameY="-813" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0006" x="943" y="465" width="174" height="450" rotated="true" frameX="-12" frameY="-750" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0008" x="1123" y="465" width="220" height="428" rotated="true" frameX="-34" frameY="-639" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0010" x="910" y="1148" width="295" height="374" rotated="true" frameX="-83" frameY="-456" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0012" x="3" y="947" width="457" height="165" rotated="true" frameX="-269" frameY="-0" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0014" x="1002" y="3" width="169" height="456" frameX="-265" frameY="-1" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0016" x="3" y="1118" width="448" height="191" rotated="true" frameX="-244" frameY="-8" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0018" x="466" y="1098" width="438" height="211" rotated="true" frameX="-224" frameY="-17" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0020" x="1177" y="3" width="215" height="436" frameX="-220" frameY="-19" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0022" x="943" y="921" width="432" height="221" rotated="true" frameX="-208" frameY="-24" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0024" x="3" y="1315" width="418" height="243" rotated="true" frameX="-167" frameY="-41" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0028" x="473" y="272" width="464" height="129" frameX="-753" frameY="-490" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0030" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0031" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0032" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0033" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0034" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0035" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0036" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0037" x="3" y="407" width="464" height="129" frameX="-752" frameY="-483" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0039" x="473" y="407" width="464" height="129" frameX="-752" frameY="-487" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0041" x="3" y="542" width="464" height="129" frameX="-752" frameY="-497" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0043" x="473" y="542" width="464" height="129" frameX="-752" frameY="-519" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0045" x="3" y="677" width="464" height="129" frameX="-752" frameY="-588" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0047" x="473" y="677" width="464" height="129" frameX="-752" frameY="-657" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0049" x="3" y="812" width="464" height="129" frameX="-752" frameY="-679" frameWidth="1218" frameHeight="974"/>
+	<SubTexture name="slice0051" x="473" y="812" width="464" height="129" frameX="-752" frameY="-689" frameWidth="1218" frameHeight="974"/>
+</TextureAtlas>

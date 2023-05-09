@@ -1,0 +1,28 @@
+{
+    "staticCam": false,
+    "loadGF": true,
+    "charPositions": {
+        "bf": [
+            770,
+            450
+        ],
+        "dad": [
+            100,
+            100
+        ]
+    },
+    "spritesPositions": {
+        "bg": [
+            0,
+            -200
+        ],
+        "stageFront": [
+            -650,
+            600
+        ],
+        "stageCurtains": [
+            -500,
+            -300
+        ]
+    }
+}

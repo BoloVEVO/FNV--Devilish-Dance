@@ -1,0 +1,10 @@
+{
+    "styleName": "voltex",
+    "replaceNoteTextures": false,
+    "replaceSplashTextures": false,
+    "replaceHUDAssets": true,
+    "replaceSounds": false,
+    "replaceMusic": false,
+    "scaleFactor": 1,
+    "antialiasing": true
+}

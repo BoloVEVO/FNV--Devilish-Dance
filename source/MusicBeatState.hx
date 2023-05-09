@@ -14,17 +14,24 @@ import flixel.addons.ui.FlxUIState;
 #if FEATURE_DISCORD
 import Discord.DiscordClient;
 #end
-import audio.AudioStreamThing;
+import audio.AudioStream;
 import flixel.input.keyboard.FlxKey;
+import flixel.util.FlxDestroyUtil;
+import Song.SongData;
+import Section.SwagSection;
 
 class MusicBeatState extends FlxUIState
 {
-	private var lastBeat:Float = 0;
-	private var lastStep:Float = 0;
-
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
+
+	private var curSection:Int = 0;
+
+	private var currentSection:SwagSection = null;
+
 	private var curDecimalBeat:Float = 0;
+
+	private var oldSection:Int = -1;
 
 	public static var switchingState:Bool = false;
 
@@ -35,28 +42,62 @@ class MusicBeatState extends FlxUIState
 
 	public static var initSave:Bool = false;
 
-	public static var songStream:AudioStreamThing;
+	public var songStream:AudioStream;
 
 	var dumped:Bool = false;
 
-	public static var subStates:Array<FlxSubState> = [];
+	public static var subStates:Array<MusicBeatSubstate> = [];
+
+	public static var transSubstate:PsychTransition;
 
 	private var curTiming:TimingStruct = null;
 
 	var fullscreenBind:FlxKey;
+
+	var activeSong:SongData = null;
 
 	override function destroy()
 	{
 		/*Application.current.window.onFocusIn.remove(onWindowFocusOut);
 			Application.current.window.onFocusIn.remove(onWindowFocusIn); */
 
+		if (!PlayState.inDaPlay)
+		{
+			for (rateData in FreeplayState.songRating.keys())
+				rateData = null;
+
+			for (opRateData in FreeplayState.songRatingOp.keys())
+				opRateData = null;
+
+			FreeplayState.songRating.clear();
+			FreeplayState.songRatingOp.clear();
+
+			FreeplayState.loadedSongData = false;
+		}
+
 		curTiming = null;
 
-		for (substate in subStates)
+		if (subStates != null)
 		{
-			if (substate != null)
-				substate.destroy();
-			subStates.remove(substate);
+			while (subStates.length > 5)
+			{
+				var subState:MusicBeatSubstate = subStates[0];
+				if (subState != null)
+				{
+					Debug.logTrace('Destroying Substates!');
+					subStates.remove(subState);
+					subState.destroy();
+				}
+				subState = null;
+			}
+
+			subStates.resize(0);
+		}
+
+		if (transSubstate != null)
+		{
+			transSubstate.destroy();
+			transSubstate = null;
 		}
 
 		super.destroy();
@@ -64,10 +105,12 @@ class MusicBeatState extends FlxUIState
 
 	override function create()
 	{
-		subStates = [];
+		transSubstate = new PsychTransition(0.85);
+
 		destroySubStates = false;
 
-		Paths.runGC();
+		FlxG.mouse.enabled = true;
+		FlxG.mouse.visible = true;
 
 		if (initSave)
 		{
@@ -93,16 +136,19 @@ class MusicBeatState extends FlxUIState
 
 		if (!skip)
 		{
-			openSubState(new PsychTransition(0.85, true));
+			transSubstate.isTransIn = true;
+			openSubState(transSubstate);
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 
 		super.create();
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+		Main.gameContainer.setFPSCap(FlxG.save.data.fpsCap);
 	}
 
 	var step = 0.0;
 	var startInMS = 0.0;
+
+	var oldStep:Int = -1;
 
 	override function update(elapsed:Float)
 	{
@@ -154,7 +200,7 @@ class MusicBeatState extends FlxUIState
 					than the current Beat meaning that the timing ended the game will check for a new timing (for bpm change events basically), 
 					and also to get a lil more of performance */
 
-				if (curTiming.endBeat < curDecimalBeat)
+				if (curDecimalBeat > curTiming.endBeat)
 				{
 					Debug.logTrace('Current Timing ended, checking for next Timing...');
 					curTiming = TimingStruct.getTimingAtTimestamp(Conductor.songPosition);
@@ -166,57 +212,94 @@ class MusicBeatState extends FlxUIState
 				FlxG.watch.addQuick("Current Conductor Timing Seg", curTiming.bpm);
 				#end
 
-				curDecimalBeat = curTiming.startBeat + ((((Conductor.songPosition / 1000)) - curTiming.startTime) * (curTiming.bpm / 60));
-				var ste:Int = Math.floor(curTiming.startStep + ((Conductor.songPosition) - startInMS) / step);
-				if (ste >= 0)
+				curDecimalBeat = TimingStruct.getBeatFromTime(Conductor.songPosition);
+
+				curBeat = Math.floor(curDecimalBeat);
+				curStep = Math.floor(curDecimalBeat * 4);
+
+				// Bromita uwu
+				try
 				{
-					if (ste > curStep)
+					if (currentSection == null)
 					{
-						for (i in curStep...ste)
+						currentSection = getSectionByTime(Conductor.songPosition);
+						if (activeSong != null)
+							curSection = activeSong.notes.indexOf(currentSection);
+					}
+
+					if (currentSection != null)
+					{
+						if (Conductor.songPosition >= currentSection.endTime || Conductor.songPosition < currentSection.startTime)
 						{
-							curStep++;
-							updateBeat();
-							stepHit();
+							currentSection = getSectionByTime(Conductor.songPosition);
+							if (activeSong != null)
+								curSection = activeSong.notes.indexOf(currentSection);
 						}
 					}
-					else if (ste < curStep)
-					{
-						trace("reset steps for some reason?? at " + Conductor.songPosition);
-						// Song reset?
-						curStep = ste;
-						updateBeat();
-						stepHit();
-					}
+				}
+				catch (e)
+				{
+					// Debug.logError('Section is null you fucking dumbass uninstall Flixel and kys');
+				}
+
+				if (oldSection != curSection)
+				{
+					sectionHit();
+					oldSection = curSection;
+				}
+
+				if (oldStep != curStep)
+				{
+					stepHit();
+					oldStep = curStep;
 				}
 			}
 			else
 			{
 				curDecimalBeat = (((Conductor.songPosition / 1000))) * (Conductor.bpm / 60);
-				var nextStep:Int = Math.floor((Conductor.songPosition) / Conductor.stepCrochet);
-				if (nextStep >= 0)
+
+				curBeat = Math.floor(curDecimalBeat);
+				curStep = Math.floor(curDecimalBeat * 4);
+
+				// Bromita uwu
+				try
 				{
-					if (nextStep > curStep)
+					if (currentSection == null)
 					{
-						for (i in curStep...nextStep)
+						currentSection = getSectionByTime(0);
+						curSection = 0;
+					}
+
+					if (currentSection != null)
+					{
+						if (Conductor.songPosition >= currentSection.endTime || Conductor.songPosition < currentSection.startTime)
 						{
-							curStep++;
-							updateBeat();
-							stepHit();
+							currentSection = getSectionByTime(Conductor.songPosition);
+
+							curSection = activeSong.notes.indexOf(currentSection);
 						}
 					}
-					else if (nextStep < curStep)
-					{
-						// Song reset?
-						trace("(no bpm change) reset steps for some reason?? at " + Conductor.songPosition);
-						curStep = nextStep;
-						updateBeat();
-						stepHit();
-					}
+				}
+				catch (e)
+				{
+					// Debug.logError('Section is null you fucking dumbass uninstall Flixel and kys');
+				}
+
+				if (oldSection != curSection)
+				{
+					sectionHit();
+					oldSection = curSection;
+				}
+
+				if (oldStep != curStep)
+				{
+					stepHit();
+					oldStep = curStep;
 				}
 			}
 		}
 
-		(cast(Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
+		Main.gameContainer.setFPSCap(FlxG.save.data.fpsCap);
 		super.update(elapsed);
 	}
 
@@ -228,10 +311,12 @@ class MusicBeatState extends FlxUIState
 		var leState:MusicBeatState = curState;
 		if (!FlxTransitionableState.skipNextTransIn)
 		{
-			leState.openSubState(new PsychTransition(0.75, false));
+			transSubstate.isTransIn = false;
+			leState.openSubState(transSubstate);
+
 			if (nextState == FlxG.state)
 			{
-				PsychTransition.finishCallback = function()
+				transSubstate.finishCallback = function()
 				{
 					MusicBeatState.switchingState = false;
 					FlxG.resetState();
@@ -240,7 +325,7 @@ class MusicBeatState extends FlxUIState
 			}
 			else
 			{
-				PsychTransition.finishCallback = function()
+				transSubstate.finishCallback = function()
 				{
 					MusicBeatState.switchingState = false;
 					FlxG.switchState(nextState);
@@ -258,12 +343,6 @@ class MusicBeatState extends FlxUIState
 		MusicBeatState.switchState(FlxG.state);
 	}
 
-	private function updateBeat():Void
-	{
-		lastBeat = curBeat;
-		curBeat = Math.floor(curStep / 4);
-	}
-
 	public function stepHit():Void
 	{
 		if (curStep % 4 == 0)
@@ -271,6 +350,11 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public function beatHit():Void
+	{
+		// do literally nothing dumbass
+	}
+
+	public function sectionHit():Void
 	{
 		// do literally nothing dumbass
 	}
@@ -293,6 +377,7 @@ class MusicBeatState extends FlxUIState
 			startInMS = (curTiming.startTime * 1000);
 		}
 	}
+
 	/*function onWindowFocusOut():Void
 		{
 			if (PlayState.inDaPlay)
@@ -324,4 +409,59 @@ class MusicBeatState extends FlxUIState
 					PlayState.boyfriend.stunned = false;
 			}
 	}*/
+	function getSectionLength()
+	{
+		var val:Null<Int> = 16;
+		if (activeSong != null && activeSong.notes[curSection] != null)
+			val = activeSong.notes[curSection].lengthInSteps;
+
+		return val == null ? 16 : val;
+	}
+
+	function getSectionByTime(ms:Float):SwagSection
+	{
+		if (activeSong == null)
+			return null;
+
+		if (activeSong.notes == null)
+			return null;
+
+		for (i in activeSong.notes)
+		{
+			if (ms >= i.startTime && ms < i.endTime)
+			{
+				return i;
+			}
+		}
+		return null;
+	}
+
+	function recalculateAllSectionTimes(startIndex:Int = 0)
+	{
+		trace("RECALCULATING SECTION TIMES");
+
+		if (activeSong == null)
+			return;
+
+		for (i in startIndex...activeSong.notes.length) // loops through sections
+		{
+			var section:SwagSection = activeSong.notes[i];
+
+			var currentBeat:Float = 0.0;
+
+			currentBeat = (section.lengthInSteps / 4) * (i + 1);
+
+			for (k in 0...i)
+				currentBeat -= ((section.lengthInSteps / 4) - (activeSong.notes[k].lengthInSteps / 4));
+
+			section.endTime = TimingStruct.getTimeFromBeat(currentBeat);
+
+			if (i != 0)
+				section.startTime = activeSong.notes[i - 1].endTime;
+			else
+				section.startTime = 0;
+
+			Debug.logTrace('Section #$i StartTime: ${section.startTime} | EndTime: ${section.endTime}');
+		}
+	}
 }

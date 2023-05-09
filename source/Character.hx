@@ -21,6 +21,8 @@ class Character extends FlxSprite
 	public var curCharacter:String = 'bf';
 	public var barColor:FlxColor;
 
+	public var deadChar:String = 'bf-dead';
+
 	public var holdTimer:Float = 0;
 
 	public var replacesGF:Bool;
@@ -31,7 +33,11 @@ class Character extends FlxSprite
 	public var camPos:Array<Int>;
 	public var camFollow:Array<Int>;
 
-	public var animationNotes:Array<Note> = [];
+	public var healthicon:String;
+
+	public var animationNotes:Array<NoteDef> = [];
+
+	var tex:FlxFramesCollection = null;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -72,15 +78,14 @@ class Character extends FlxSprite
 
 	function parseDataFile()
 	{
-		Debug.logTrace('Generating character (${curCharacter}) from JSON data...');
+		Debug.logInfo('Generating character (${curCharacter}) from JSON data...');
 
 		// Load the data from JSON and cast it to a struct we can easily read.
 		var jsonData = Paths.loadJSON('characters/${curCharacter}');
 		if (jsonData == null)
 		{
 			Debug.logError('Failed to parse JSON data for character ${curCharacter}. Loading default characters...');
-			if (FlxG.fullscreen)
-				FlxG.fullscreen = !FlxG.fullscreen;
+
 			if (isPlayer)
 			{
 				Debug.logError('Failed to parse JSON data for character  ${curCharacter}. Loading default boyfriend...');
@@ -95,6 +100,7 @@ class Character extends FlxSprite
 			{
 				Debug.logError('Failed to parse JSON data for character  ${curCharacter}. Loading default opponent...');
 				jsonData = Paths.loadJSON('characters/dad');
+				curCharacter = 'dad';
 			}
 		}
 
@@ -102,8 +108,6 @@ class Character extends FlxSprite
 
 		if (FlxG.save.data.characters)
 		{
-			var tex:FlxFramesCollection;
-
 			if (data.AtlasType == 'PackerAtlas')
 				tex = Paths.getPackerAtlas(data.asset, 'shared');
 			else if (data.AtlasType == 'TextureAtlas')
@@ -124,12 +128,11 @@ class Character extends FlxSprite
 
 					if (anim.frameIndices != null)
 					{
-						animation.addByIndices(anim.name, anim.prefix, anim.frameIndices, "", Std.int(frameRate * PlayState.songMultiplier), looped, flipX,
-							flipY);
+						animation.addByIndices(anim.name, anim.prefix, anim.frameIndices, "", Std.int(frameRate), looped, flipX, flipY);
 					}
 					else
 					{
-						animation.addByPrefix(anim.name, anim.prefix, Std.int(frameRate * PlayState.songMultiplier), looped, flipX, flipY);
+						animation.addByPrefix(anim.name, anim.prefix, Std.int(frameRate), looped, flipX, flipY);
 					}
 
 					animOffsets[anim.name] = anim.offsets == null ? [0, 0] : anim.offsets;
@@ -158,6 +161,8 @@ class Character extends FlxSprite
 		this.camPos = data.camPos == null ? [0, 0] : data.camPos;
 		this.camFollow = data.camFollow == null ? [0, 0] : data.camFollow;
 		this.holdLength = data.holdLength == null ? 4 : data.holdLength;
+		this.healthicon = data.healthicon == null ? curCharacter : data.healthicon;
+		this.deadChar = data.deadChar == null ? curCharacter + '-dead' : data.deadChar;
 
 		flipX = data.flipX == null ? false : data.flipX;
 
@@ -179,7 +184,7 @@ class Character extends FlxSprite
 						holdTimer += elapsed;
 					}
 
-					if (holdTimer >= Conductor.stepCrochet * 0.0011 * holdLength * PlayState.songMultiplier)
+					if (holdTimer >= Conductor.stepCrochet * 0.0011 * holdLength * PlayState.rate)
 					{
 						dance();
 
@@ -292,6 +297,8 @@ class Character extends FlxSprite
 				FlxG.log.warn(['Such alt animation doesnt exist: ' + AnimName]);
 				#end
 				AnimName = AnimName.split('-')[0];
+
+				return;
 			}
 
 			animation.play(AnimName, Force, Reversed, Frame);
@@ -330,19 +337,19 @@ class Character extends FlxSprite
 		{
 			for (songNotes in section.sectionNotes)
 			{
-				var daStrumTime:Float = (songNotes[0] - FlxG.save.data.offset - PlayState.SONG.offset) / PlayState.songMultiplier;
+				var daStrumTime:Float = (songNotes[0] - FlxG.save.data.offset - PlayState.SONG.offset) / PlayState.rate;
 				if (daStrumTime < 0)
 					daStrumTime = 0;
 
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
 
-				var oldNote:Note;
+				var oldNote:NoteDef;
 
 				if (PlayState.instance.unspawnNotes.length > 0)
 					oldNote = PlayState.instance.unspawnNotes[Std.int(PlayState.instance.unspawnNotes.length - 1)];
 				else
 					oldNote = null;
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, false, false, songNotes[4]);
+				var swagNote:NoteDef = new NoteDef(daStrumTime, daNoteData, oldNote, false, false, 0);
 
 				animationNotes.push(swagNote);
 			}
@@ -351,7 +358,7 @@ class Character extends FlxSprite
 		animationNotes.sort(sortAnims);
 	}
 
-	static function sortAnims(Obj1:Note, Obj2:Note):Int
+	static function sortAnims(Obj1:NoteDef, Obj2:NoteDef):Int
 	{
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
 	}
@@ -359,6 +366,19 @@ class Character extends FlxSprite
 	public function addOffset(name:String, x:Float = 0, y:Float = 0)
 	{
 		animOffsets[name] = [x, y];
+	}
+
+	override function destroy()
+	{
+		animOffsets.clear();
+		animInterrupt.clear();
+		animNext.clear();
+		animDanced.clear();
+
+		tex = null;
+		animationNotes.resize(0);
+
+		super.destroy();
 	}
 }
 
@@ -378,6 +398,7 @@ typedef CharacterData =
 	 */
 	var barColor:String;
 
+	var ?healthicon:String;
 	var animations:Array<AnimationData>;
 
 	/**
@@ -385,6 +406,8 @@ typedef CharacterData =
 	 * @default false
 	 */
 	var ?flipX:Bool;
+
+	var ?deadChar:String;
 
 	/**
 	 * The scale of this character.

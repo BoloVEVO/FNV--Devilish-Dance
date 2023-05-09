@@ -10,6 +10,7 @@ import webm.*;
 	Use Wondershare Uniconverter to convert your videos to webm (1280x720)
 **/
 // Separated class instead of making this shit every time you want to put a video mid-song (-Bolo)
+@:deprecated
 class WebmSprite extends FlxSprite
 {
 	#if FEATURE_WEBM

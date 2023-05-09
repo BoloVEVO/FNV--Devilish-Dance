@@ -1,0 +1,10 @@
+{
+    "styleName": "default",
+    "replaceNoteTextures": true,
+    "replaceSplashTextures": true,
+    "replaceHUDAssets": true,
+    "replaceSounds": true,
+    "replaceMusic": true,
+    "scaleFactor": 1,
+    "antialiasing": true
+}

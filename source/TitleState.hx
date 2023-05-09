@@ -55,7 +55,7 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		(cast(Lib.current.getChildAt(0), Main)).checkInternetConnection();
+		Main.gameContainer.checkInternetConnection();
 
 		/*if (Main.internetConnection)
 			getBuildVer(); */
@@ -67,8 +67,6 @@ class TitleState extends MusicBeatState
 		{
 			Debug.logTrace("We loaded " + openfl.Assets.getLibrary("default").assetsLoaded + " assets into the default library");
 		}
-
-		FlxG.fixedTimestep = false;
 
 		FlxG.autoPause = false;
 
@@ -85,10 +83,6 @@ class TitleState extends MusicBeatState
 		#end
 
 		KeyBinds.keyCheck();
-
-		// It doesn't reupdate the list before u restart rn lmao
-
-		NoteskinHelpers.updateNoteskins();
 
 		if (FlxG.save.data.volDownBind == null)
 			FlxG.save.data.volDownBind = "NUMPADMINUS";

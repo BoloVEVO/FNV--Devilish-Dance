@@ -1,27 +1,71 @@
 package;
 
-import songsbackup.SongsBackup;
 import Section.SwagSection;
 import haxe.Json;
-import haxe.format.JsonParser;
-import openfl.utils.Assets as OpenFlAssets;
+import ChartEventHandler;
 
 using StringTools;
 
+@:deprecated
 class Event
 {
 	public var name:String;
 	public var position:Float;
-	public var value:Float;
+
+	public var value:String;
 	public var type:String;
 
-	public function new(name:String, pos:Float, value:Any, type:String)
+	public var args:Array<Dynamic> = [];
+
+	public var active:Bool = true;
+
+	public function new(name:String, pos:Float, value:Dynamic, type:String)
 	{
 		this.name = name;
 		this.position = pos;
-		this.value = value;
+
+		this.value = Std.string(value);
+
+		if (this.value.indexOf(',') == -1)
+			args[0] = this.value;
+		else
+			args = this.value.split(',');
+
 		this.type = type;
 	}
+}
+
+typedef StyleData =
+{
+	var styleName:String;
+	var replaceNoteTextures:Bool;
+	var replaceSplashTextures:Bool;
+	var replaceHUDAssets:Bool;
+	var replaceSounds:Bool;
+	var replaceMusic:Bool;
+	var antialiasing:Bool;
+	var scaleFactor:Float;
+}
+
+class Style
+{
+	public static function loadJSONFile(style:String):StyleData
+	{
+		var rawJson = Paths.loadJSON('styles/$style');
+		return parseWeek(rawJson);
+	}
+
+	public static function parseWeek(json:Dynamic):StyleData
+	{
+		var styleData:StyleData = cast json;
+
+		return styleData;
+	}
+}
+
+typedef EventData =
+{
+	var events:Array<ChartEvent>;
 }
 
 typedef SongData =
@@ -42,15 +86,20 @@ typedef SongData =
 
 	var chartVersion:String;
 	var notes:Array<SwagSection>;
-	var eventObjects:Array<Event>;
+	var events:Array<ChartEvent>;
 	var bpm:Float;
+	var ?judgeStyle:Null<String>;
 	var needsVoices:Bool;
+	@:deprecated
+	var ?eventObjects:Array<Event>;
 	var speed:Float;
 	var player1:String;
 	var player2:String;
 	var gfVersion:String;
+	@:deprecated
 	var noteStyle:String;
 	var stage:String;
+	var songStyle:String;
 	var ?validScore:Bool;
 	var ?offset:Int;
 }
@@ -78,29 +127,13 @@ class Song
 		return parseJSONshit('rawsong', jsonData, 'rawname');
 	}
 
-	public static function loadFromString(songId:String, difficulty:Int):SongData
-	{
-		var compareJson = null;
-		try
-		{
-			compareJson = Json.parse(SongsBackup.getSongText(songId, difficulty));
-		}
-		catch (e)
-		{
-			Debug.logError(e);
-		}
-		return parseJSONshit(songId, compareJson, 'rawname');
-	}
-
 	public static function loadFromJson(songId:String, difficulty:String):SongData
 	{
 		var songFile = '$songId/$songId$difficulty';
 
-		Debug.logTrace('Loading song JSON: $songFile');
+		Debug.logInfo('Loading song JSON: $songFile');
 
 		var rawJson = Paths.loadJSON('songs/$songFile');
-		var compareJson = null;
-
 		var rawMetaJson = Paths.loadJSON('songs/$songId/_meta');
 
 		return parseJSONshit(songId, rawJson, rawMetaJson);
@@ -112,22 +145,53 @@ class Song
 
 		var index = 0;
 		trace("conversion stuff " + song.songId + " " + song.notes.length);
-		var convertedStuff:Array<Song.Event> = [];
 
-		if (song.eventObjects == null)
-			song.eventObjects = [new Song.Event("Init BPM", 0, song.bpm, "BPM Change")];
-
-		for (i in song.eventObjects)
+		if (song.eventObjects != null)
 		{
-			var name = Reflect.field(i, "name");
-			var type = Reflect.field(i, "type");
-			var pos = Reflect.field(i, "position");
-			var value = Reflect.field(i, "value");
+			var convertedStuff:Array<Song.Event> = [];
 
-			convertedStuff.push(new Song.Event(name, pos, value, type));
+			for (i in song.eventObjects)
+			{
+				var name = Reflect.field(i, "name");
+				var type = Reflect.field(i, "type");
+				var pos = Reflect.field(i, "position");
+				var value = Reflect.field(i, "value");
+
+				convertedStuff.push(new Song.Event(name, pos, value, type));
+			}
+
+			song.eventObjects = convertedStuff;
+
+			if (song.eventObjects.length > 0)
+			{
+				if (song.events == null)
+					song.events = [];
+				for (i in song.eventObjects)
+				{
+					if (i.type == "BPM Change")
+					{
+						var newEvent:ChartEvent = {name: "changeBPM", beat: i.position, args: [CoolUtil.parseType(i.args[0], 'Float')]};
+						Debug.logTrace(newEvent);
+						song.events.push(newEvent);
+					}
+				}
+			}
 		}
 
-		song.eventObjects = convertedStuff;
+		if (song.events == null)
+		{
+			var initBPM:ChartEvent = {name: "changeBPM", beat: 0, args: [song.bpm]};
+			song.events = [initBPM];
+		}
+
+		if (song.events.filter(function(e:ChartEvent)
+		{
+			return e.name == 'changeBPM' && e.beat == 0;
+		}).length == 0)
+		{
+			var initBPM:ChartEvent = {name: "changeBPM", beat: 0, args: [song.bpm]};
+			song.events.push(initBPM);
+		}
 
 		if (song.noteStyle == null)
 			song.noteStyle = "normal";
@@ -138,29 +202,39 @@ class Song
 		TimingStruct.clearTimings();
 
 		var currentIndex = 0;
-		for (i in song.eventObjects)
+
+		for (event in song.events)
 		{
-			if (i.type == "BPM Change")
+			if (event.name == "changeBPM")
 			{
-				var beat:Float = i.position * PlayState.songMultiplier;
-
+				var beat:Float = event.beat;
 				var endBeat:Float = Math.POSITIVE_INFINITY;
+				var bpm = event.args[0];
 
-				TimingStruct.addTiming(beat, i.value * PlayState.songMultiplier, endBeat, 0); // offset in this case = start time since we don't have a offset
-
+				TimingStruct.addTiming(beat, bpm, endBeat, 0);
 				if (currentIndex != 0)
 				{
 					var data = TimingStruct.AllTimings[currentIndex - 1];
 					data.endBeat = beat;
-					data.length = (data.endBeat - data.startBeat) / (data.bpm / 60);
+					data.length = ((data.endBeat - data.startBeat) / (data.bpm / 60));
 					var step = ((60 / data.bpm) * 1000) / 4;
-					TimingStruct.AllTimings[currentIndex].startStep = Math.floor(((data.endBeat / (data.bpm / 60)) * 1000) / step);
+					TimingStruct.AllTimings[currentIndex].startStep = Math.floor((((data.endBeat / (data.bpm / 60)) * 1000) / step));
 					TimingStruct.AllTimings[currentIndex].startTime = data.startTime + data.length;
 				}
-
 				currentIndex++;
 			}
 		}
+
+		// If the song has null sections.
+		if (song.notes == null)
+		{
+			song.notes = [];
+
+			song.notes.push(newSection(song));
+		}
+
+		if (song.notes.length == 0)
+			song.notes.push(newSection(song));
 
 		for (i in song.notes)
 		{
@@ -180,44 +254,82 @@ class Song
 			{
 				trace("converting changebpm for section " + index);
 				ba = i.bpm;
-				song.eventObjects.push(new Song.Event("FNF BPM Change " + index, beat, i.bpm, "BPM Change"));
-			}
-
-			for (ii in i.sectionNotes)
-			{
-				if (song.chartVersion == null)
-				{
-					ii[3] = false;
-					ii[4] = TimingStruct.getBeatFromTime(ii[0]);
-				}
-
-				if (ii[3] == 0)
-					ii[3] == false;
+				var bpmChangeEvent:ChartEvent = {name: "changeBPM", beat: beat, args: [i.bpm]};
+				song.events.push(bpmChangeEvent);
 			}
 
 			index++;
 		}
 
-		if (song.chartVersion != 'KE2')
+		// Convert old charts to new KE2 chart version
+		/*if (song.chartVersion != 'KE2')
+			{ */
+		for (section in song.notes)
 		{
-			for (section in song.notes)
+			for (notes in section.sectionNotes)
 			{
-				for (notes in section.sectionNotes)
+				if (section.mustHitSection)
 				{
-					if (section.mustHitSection)
+					var bool = false;
+					if (notes[1] <= 3)
 					{
-						var bool = false;
-						if (notes[1] <= 3)
-						{
-							notes[1] += 4;
-							bool = true;
-						}
-						if (notes[1] > 3)
-							if (!bool)
-								notes[1] -= 4;
+						notes[1] += 4;
+						bool = true;
 					}
+					if (notes[1] > 3)
+						if (!bool)
+							notes[1] -= 4;
+				}
+
+				if (notes[2] == -1) // REMOVE EVENT NOTES FROM OTHER ENGINES
+					section.sectionNotes.remove(notes);
+
+				if (notes[3] == null
+					|| notes[3] == 'true'
+					|| notes[3] == 'false'
+					|| Std.isOfType(Std.parseInt(notes[3]), Int)
+					|| Std.isOfType(Std.parseFloat(notes[3]), Float)
+					|| Math.isNaN(notes[3]))
+					notes[3] = 'normal';
+
+				if (notes[4] == null
+					|| notes[4] == 0
+					|| notes[4] == 0.0
+					|| Std.isOfType(Std.parseInt(notes[4]), Int)
+					|| Std.isOfType(Std.parseFloat(notes[4]), Float)
+					|| Math.isNaN(notes[4]))
+					notes[4] = 1.0;
+
+				if (song.chartVersion != 'KE2')
+				{
+					notes[3] = 'normal';
+					notes[4] = 1.0;
 				}
 			}
+
+			if (section.lengthInSteps == null)
+				section.lengthInSteps = 16;
+		}
+
+		if (song.noteStyle == null || song.noteStyle == 'normal')
+			song.songStyle = 'default';
+		else
+			song.songStyle = song.noteStyle;
+
+		// }
+
+		// sort events by beat
+		if (song.events != null)
+		{
+			song.events.sort(function(a, b)
+			{
+				if (a.beat < b.beat)
+					return -1
+				else if (a.beat > b.beat)
+					return 1;
+				else
+					return 0;
+			});
 		}
 
 		song.chartVersion = latestChart;
@@ -240,17 +352,68 @@ class Song
 
 		// Inject info from _meta.json.
 		var songMetaData:SongMeta = cast jsonMetaData;
-		if (songMetaData.name != null)
+		if (songMetaData != null)
 		{
-			songData.songName = songMetaData.name;
+			if (songMetaData.name != null)
+			{
+				songData.songName = songMetaData.name;
+			}
+			else
+			{
+				songData.songName = songData.songName.split('-').join(' ');
+			}
+
+			songData.offset = songMetaData.offset != null ? songMetaData.offset : 0;
 		}
 		else
 		{
 			songData.songName = songData.songName.split('-').join(' ');
 		}
 
-		songData.offset = songMetaData.offset != null ? songMetaData.offset : 0;
-
 		return Song.conversionChecks(songData);
+	}
+
+	private static function newSection(song:SongData, lengthInSteps:Int = 16, mustHitSection:Bool = false, CPUAltAnim:Bool = true,
+			playerAltAnim:Bool = true):SwagSection
+	{
+		var sec:SwagSection = {
+			lengthInSteps: lengthInSteps,
+			bpm: song.bpm,
+			changeBPM: false,
+			mustHitSection: mustHitSection,
+			sectionNotes: [],
+			typeOfSection: 0,
+			altAnim: false,
+			CPUAltAnim: CPUAltAnim,
+			playerAltAnim: playerAltAnim
+		};
+
+		return sec;
+	}
+
+	public static function sortSectionNotes(song:SongData)
+	{
+		var newNotes:Array<Array<Dynamic>> = [];
+
+		for (section in song.notes)
+		{
+			if (section.sectionNotes != null)
+			{
+				for (songNotes in section.sectionNotes)
+				{
+					newNotes.push(songNotes);
+				}
+			}
+			section.sectionNotes.resize(0);
+		}
+
+		for (section in song.notes)
+		{
+			for (sortedNote in newNotes)
+			{
+				if (sortedNote[0] >= section.startTime && sortedNote[0] < section.endTime)
+					section.sectionNotes.push(sortedNote);
+			}
+		}
 	}
 }

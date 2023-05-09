@@ -21,13 +21,12 @@ class AudioStreamThing extends FlxBasic
 	var vorb:VorbisFile;
 	var _length:Float;
 	var _volume:Float = 1.0;
-	var audioSource = AL.createSource();
-	var audioBuffer = AL.createBuffer();
-	var audioAux = AL.createAux();
-	var audioEffect = AL.createEffect();
-	var audioFilter = AL.createFilter();
+	var audioSource = null;
+	var audioBuffer = null;
 
 	public var fadeTween:FlxTween;
+
+	public var persist:Bool = false;
 
 	public var volume(get, set):Float;
 	public var time(get, set):Float;
@@ -82,31 +81,28 @@ class AudioStreamThing extends FlxBasic
 		super();
 	}
 
-	/*
-		Manual Destroy to null out each variable for reusing audio purposes (like restarting a song for ex) 
-		and common destroy function applies in every state switching and it's not cool for this.
-	 */
-	// USE THIS IF YOUR AUDIO VAR IS GONNA BE REUSED AND YOU DON'T WANT TO LOAD THE AUDIO AGAIN.
-	public function destroyAudio()
+	public function dispose()
 	{
 		#if cpp
 		AL.deleteSource(audioSource);
 		AL.deleteBuffer(audioBuffer);
+		fadeTween = null;
 		vorb = null;
 		_length = 0;
-		_volume = 1.0;
+		_volume = 0.0;
 		audioSource = null;
 		audioBuffer = null;
-		audioAux = null;
-		audioEffect = null;
-		audioFilter = null;
 		onComplete = null;
 		#end
 	}
 
 	public override function destroy()
 	{
-		// super.destroy(); // FUK U NO DESTROY FOR THIS
+		if (!persist)
+		{
+			dispose();
+			super.destroy();
+		}
 	}
 
 	public override function update(elapsed:Float):Void

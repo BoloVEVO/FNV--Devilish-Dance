@@ -30,6 +30,9 @@ import lime.system.System;
 import lime.ui.Window;
 import sys.io.Process;
 #end
+#if FEATURE_MULTITHREADING
+import sys.thread.Mutex;
+#end
 
 class Main extends Sprite
 {
@@ -50,6 +53,8 @@ class Main extends Sprite
 	public static var appName:String = ''; // Application name.
 
 	public static var internetConnection:Bool = false; // If the user is connected to internet.
+
+	public static var gameContainer:Main = null; // Main instance to access when needed.
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
@@ -118,8 +123,12 @@ class Main extends Sprite
 		#if !mobile
 		fpsCounter = new StatsCounter(10, 10, 0xFFFFFF);
 		#end
+		gameContainer = this;
+
 		addChild(new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate, game.framerate,
 			game.skipSplash, game.startFullscreen));
+
+		FlxG.fixedTimestep = false;
 
 		FlxG.signals.focusGained.add(function()
 		{
@@ -133,7 +142,6 @@ class Main extends Sprite
 
 		#if !mobile
 		addChild(fpsCounter);
-		toggleFPS(FlxG.save.data.fps);
 		#end
 
 		// Finish up loading debug tools.
@@ -150,31 +158,6 @@ class Main extends Sprite
 
 	var fpsCounter:StatsCounter;
 
-	public static function dumpCache()
-	{
-		///* SPECIAL THANKS TO HAYA
-		#if PRELOAD_ALL
-		@:privateAccess
-		for (key in FlxG.bitmap._cache.keys())
-		{
-			var obj = FlxG.bitmap._cache.get(key);
-			if (obj != null)
-			{
-				Assets.cache.removeBitmapData(key);
-				FlxG.bitmap._cache.remove(key);
-				obj.destroy();
-			}
-		}
-
-		Assets.cache.clear("songs");
-		#end
-		// */
-	}
-
-	public function toggleFPS(fpsEnabled:Bool):Void
-	{
-	}
-
 	public function changeFPSColor(color:FlxColor)
 	{
 		fpsCounter.textColor = color;
@@ -182,8 +165,8 @@ class Main extends Sprite
 
 	public function setFPSCap(cap:Int)
 	{
-		FlxG.drawFramerate = cap;
 		FlxG.updateFramerate = cap;
+		FlxG.drawFramerate = FlxG.updateFramerate;
 	}
 
 	public function checkInternetConnection()

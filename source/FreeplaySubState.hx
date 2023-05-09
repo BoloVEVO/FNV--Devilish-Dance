@@ -1,31 +1,20 @@
 package;
 
 import CoolUtil.CoolText;
-import flixel.util.FlxTimer;
-import flixel.FlxCamera;
 import flixel.FlxSubState;
 import flixel.input.gamepad.FlxGamepad;
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
-import openfl.Lib;
 import Modifiers;
-import Controls.Control;
 import FreeplayState;
-import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.input.keyboard.FlxKey;
-import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
-import flixel.ui.FlxBar;
 
 // Uuh... Direct copy of OptionsMenu.hx xD
-class ModMenu extends FlxSubState
+class ModMenu extends MusicBeatSubstate
 {
-	public static var instance:ModMenu;
+	public static var instance:ModMenu = null;
 
 	public var background:FlxSprite;
 
@@ -70,7 +59,7 @@ class ModMenu extends FlxSubState
 		];
 
 		titleObject = new FlxText(176, 49, 0, 'GAMEPLAY MODIFIERS');
-		titleObject.setFormat(Paths.font("vcr.ttf"), 35, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		titleObject.setFormat(Paths.font("vcr.ttf"), 35, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
 		titleObject.borderSize = 3;
 
 		for (i in 0...modifiers.length)
@@ -78,7 +67,8 @@ class ModMenu extends FlxSubState
 			var mod = modifiers[i];
 			text = new CoolText(72, titleObject.y + 72 + (46 * i), 35, 35, Paths.bitmapFont('fonts/vcr'));
 			text.autoSize = true;
-			text.borderStyle = FlxTextBorderStyle.OUTLINE;
+			text.borderStyle = FlxTextBorderStyle.OUTLINE_FAST;
+
 			text.borderSize = 2;
 			text.borderQuality = 1;
 			text.scrollFactor.set();
@@ -117,7 +107,7 @@ class ModMenu extends FlxSubState
 
 		descText = new CoolText(62, 650, 20, 20, Paths.bitmapFont('fonts/vcr'));
 		descText.autoSize = true;
-		descText.borderStyle = FlxTextBorderStyle.OUTLINE;
+		descText.borderStyle = FlxTextBorderStyle.OUTLINE_FAST;
 		descText.antialiasing = FlxG.save.data.antialiasing;
 
 		descText.borderSize = 2;
@@ -164,12 +154,6 @@ class ModMenu extends FlxSubState
 		Debug.logTrace("Changed mod: " + selectedModifierIndex);
 
 		Debug.logTrace("Bounds: " + visibleRange[0] + "," + visibleRange[1]);
-	}
-
-	override function close()
-	{
-		FlxG.save.flush();
-		super.close();
 	}
 
 	override function update(elapsed:Float)
@@ -324,5 +308,11 @@ class ModMenu extends FlxSubState
 			if (selectedModifierIndex == 0)
 				FreeplayState.instance.updateDiffCalc();
 		#end
+	}
+
+	override function destroy()
+	{
+		instance = null;
+		super.destroy();
 	}
 }

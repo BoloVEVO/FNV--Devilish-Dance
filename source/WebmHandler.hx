@@ -6,6 +6,7 @@ import openfl.display.Sprite;
 import webm.*;
 #end
 
+@:deprecated
 class WebmHandler
 {
 	#if FEATURE_WEBM

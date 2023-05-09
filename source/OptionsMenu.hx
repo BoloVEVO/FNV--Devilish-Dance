@@ -1,27 +1,19 @@
 package;
 
 import CoolUtil.CoolText;
-import flixel.util.FlxTimer;
-import flixel.FlxCamera;
 import flixel.FlxSubState;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import openfl.Lib;
 import PlayState;
 import Options;
-import Controls.Control;
-import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.input.keyboard.FlxKey;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
-import flixel.ui.FlxBar;
-import flixel.math.FlxRect;
+import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
@@ -29,11 +21,11 @@ class OptionCata extends FlxSprite
 {
 	public var title:String;
 
-	public static var instance:OptionCata;
-
 	public var options:Array<Option>;
 
 	public var optionObjects:FlxTypedGroup<OptionText>;
+
+	public var graphics:Array<FlxSprite> = [];
 
 	public var titleObject:FlxText;
 
@@ -48,8 +40,17 @@ class OptionCata extends FlxSprite
 		super(x, y);
 		title = _title;
 		middle = middleType;
+
+		graphics = [];
+
+		var blackGraphic = new FlxSprite().makeGraphic(295, 64, FlxColor.BLACK);
+		var cumGraphic = new FlxSprite().makeGraphic(295, 64, FlxColor.WHITE);
+
+		graphics.push(blackGraphic);
+		graphics.push(cumGraphic);
+
 		if (!middleType)
-			makeGraphic(295, 64, FlxColor.BLACK);
+			loadGraphic(graphics[0].graphic);
 		alpha = 0.4;
 
 		options = _options;
@@ -97,7 +98,27 @@ class OptionCata extends FlxSprite
 
 	public function changeColor(color:FlxColor)
 	{
-		makeGraphic(295, 64, color);
+		if (color == FlxColor.BLACK)
+			loadGraphic(graphics[0].graphic);
+		else if (color == FlxColor.WHITE)
+			loadGraphic(graphics[1].graphic);
+	}
+
+	override function destroy()
+	{
+		for (graphic in graphics)
+			graphic.destroy();
+		graphics.resize(0);
+		for (shit in optionObjects)
+		{
+			shit.destroy();
+		}
+
+		optionObjects.clear();
+
+		options.resize(0);
+
+		super.destroy();
 	}
 }
 
@@ -122,9 +143,9 @@ class OptionText extends CoolText
 	}
 }
 
-class OptionsMenu extends FlxSubState
+class OptionsMenu extends MusicBeatSubstate
 {
-	public static var instance:OptionsMenu;
+	public static var instance:OptionsMenu = null;
 
 	public var background:FlxSprite;
 
@@ -150,27 +171,13 @@ class OptionsMenu extends FlxSubState
 
 	var changedOption = false;
 
+	var holdTime:Float = 0;
+
 	public function new(pauseMenu:Bool = false)
 	{
 		super();
 
 		isInPause = pauseMenu;
-	}
-
-	public var menu:FlxTypedGroup<FlxSprite>;
-
-	public var descText:CoolText;
-	public var descBack:FlxSprite;
-
-	override function create()
-	{
-		#if cpp
-		if (isInPause)
-		{
-			add(PlayState.pauseStream);
-			PlayState.pauseStream.play();
-		}
-		#end
 
 		options = [
 			new OptionCata(50, 40, "Gameplay", [
@@ -178,7 +185,6 @@ class OptionsMenu extends FlxSubState
 				new OffsetThing("Change the note visual offset (how many milliseconds a note looks like it is offset in a chart)"),
 				new AccuracyDOption("Change how accuracy is calculated. (Accurate = Simple, Complex = Milisecond Based)"),
 				new ScoreDOption("Change how score is calculated. (Simple = Normal, Complex = Note Rating Amount Based"),
-				new NoteCamera("Toggle Camera movement to the note direction the character sings"),
 				new HitSoundOption("Toogle hitsound every time you hit a Strum Note."),
 				new HitSoundVolume("Set hitsound volume."),
 				new HitSoundMode("Set at what condition you want the hitsound to play."),
@@ -189,6 +195,7 @@ class OptionsMenu extends FlxSubState
 
 				new ResetButtonOption("Toggle pressing R to gameover. (Use it with caution!)"),
 				new InstantRespawn("Toggle if you instantly respawn after dying."),
+				new NoteCamera("Toggle Camera movement to the note direction the character sings"),
 				new CamZoomOption("Toggle the camera zoom in-game."),
 				// new OffsetMenu("Get a note offset based off of your inputs!"),
 				new DFJKOption(),
@@ -197,12 +204,13 @@ class OptionsMenu extends FlxSubState
 			]),
 			new OptionCata(345, 40, "Appearance", [
 				new NoteskinOption("Change your current noteskin"),
-				new RotateSpritesOption("Rotate the sprites to do color quantization (turn off for bar skins)"),
 				new ScoreSmoothing("Toggle smoother poping score for Score Text (High CPU usage)."),
 				new MiddleScrollOption("Put your lane in the center or on the right."),
 				new HealthBarOption("Toggles health bar visibility"),
 				new JudgementCounter("Show your judgements that you've gotten in the song"),
 				new LaneUnderlayOption("How transparent your lane is, higher = more visible."),
+
+				new HitErrorBarOption("Toggle Hit Error Bar to see how late/early are your hits."),
 				new StepManiaOption("Sets the colors of the arrows depending on quantization instead of direction."),
 				new AccuracyOption("Display accuracy information on the info bar."),
 				new RoundAccuracy("Round your accuracy to the nearest whole number for the score text (cosmetic only)."),
@@ -218,9 +226,10 @@ class OptionsMenu extends FlxSubState
 				new FPSOption("Toggle the FPS Counter"),
 				new DisplayMemory("Toggle the Memory Usage"),
 				#if FEATURE_DISCORD
-				new DiscordOption("Change your Discord Rich Presence update style."),
+				new DiscordOption("Change your Discord Rich Presence update interval."),
 				#end
 				new FlashingLightsOption("Toggle flashing lights that can cause epileptic seizures and strain."),
+				new WatermarkOption("Enable and disable all watermarks from the engine."),
 				new AntialiasingOption("Toggle antialiasing, improving graphics quality at a slight performance penalty."),
 				new MissSoundsOption("Toggle miss sounds playing when you don't hit a note."),
 				new ScoreScreen("Show the score screen after the end of a song"),
@@ -231,7 +240,7 @@ class OptionsMenu extends FlxSubState
 				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
 				new Background("Toogle Stage Background depending of your computer performance."),
 				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory."),
-				new NotePostProcessing("Toggle Note Post processing to load notes while song elapses. (Useful for low-end computers)")
+				// new NotePostProcessing("Toggle Note Post processing to load notes while song elapses. (Useful for low-end computers)")
 			]),
 			new OptionCata(50, 104, "Saves", [
 
@@ -256,15 +265,13 @@ class OptionsMenu extends FlxSubState
 				new FullscreenBind("The keybind used to fullscreen the game")
 			], true),
 			new OptionCata(-1, 125, "Editing Judgements", [
-				new SwagMSOption("How many milliseconds are in the Marv-CRIT hit window"),
-				new SickMSOption("How many milliseconds are in the S-CRIT hit window"),
-				new GoodMsOption("How many milliseconds are in the CRIT hit window"),
-				new BadMsOption("How many milliseconds are in the NEAR hit window"),
-				new ShitMsOption("How many milliseconds are in the ERROR hit window")
+
+				new SickMSOption("How many milliseconds are in the SICK hit window"),
+				new GoodMsOption("How many milliseconds are in the GOOD hit window"),
+				new BadMsOption("How many milliseconds are in the BAD hit window"),
+				new ShitMsOption("How many milliseconds are in the SHIT hit window")
 			], true)
 		];
-
-		instance = this;
 
 		menu = new FlxTypedGroup<FlxSprite>();
 
@@ -273,12 +280,10 @@ class OptionsMenu extends FlxSubState
 		background = new FlxSprite(50, 40).makeGraphic(1180, 640, FlxColor.BLACK);
 		background.alpha = 0.5;
 		background.scrollFactor.set();
-		menu.add(background);
 
 		descBack = new FlxSprite(50, 642).makeGraphic(1180, 38, FlxColor.BLACK);
 		descBack.alpha = 0.3;
 		descBack.scrollFactor.set();
-		menu.add(descBack);
 
 		if (isInPause)
 		{
@@ -294,11 +299,39 @@ class OptionsMenu extends FlxSubState
 			cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 		}
 
+		descText = new CoolText(65, 648, 20, 20, Paths.bitmapFont('fonts/vcr'));
+		descText.autoSize = false;
+		descText.fieldWidth = 1750;
+		descText.antialiasing = FlxG.save.data.antialiasing;
+		descText.borderStyle = FlxTextBorderStyle.OUTLINE;
+		descText.borderSize = 2;
+
+		openCallback = refresh;
+	}
+
+	public var menu:FlxTypedGroup<FlxSprite>;
+
+	public var descText:CoolText;
+	public var descBack:FlxSprite;
+
+	override function create()
+	{
+		instance = this;
+
+		menu.add(background);
+
+		menu.add(descBack);
+
 		selectedCat = options[0];
 
 		add(menu);
 
 		add(shownStuff);
+
+		add(descBack);
+		add(descText);
+
+		isInCat = true;
 
 		for (i in 0...options.length - 1)
 		{
@@ -309,21 +342,21 @@ class OptionsMenu extends FlxSubState
 			add(cat.titleObject);
 		}
 
-		descText = new CoolText(65, 648, 20, 20, Paths.bitmapFont('fonts/vcr'));
-		descText.autoSize = false;
-		descText.fieldWidth = 1750;
-		descText.antialiasing = FlxG.save.data.antialiasing;
-		descText.borderStyle = FlxTextBorderStyle.OUTLINE;
-		descText.borderSize = 2;
-
-		add(descBack);
-		add(descText);
-
-		isInCat = true;
-
 		switchCat(selectedCat);
 
 		super.create();
+	}
+
+	function refresh()
+	{
+		#if cpp
+		if (isInPause)
+		{
+			add(PlayState.pauseStream);
+			PlayState.pauseStream.play();
+		}
+		#end
+		switchCat(selectedCat);
 	}
 
 	var saveIndex:Int = 0;
@@ -373,10 +406,13 @@ class OptionsMenu extends FlxSubState
 			selectedOptionIndex = 0;
 		}
 
-		while (shownStuff.members.length != 0)
+		for (leStuff in shownStuff)
 		{
-			shownStuff.members.remove(shownStuff.members[0]);
+			shownStuff.remove(leStuff, true);
 		}
+
+		shownStuff.members.resize(0);
+		shownStuff.clear();
 
 		if (selectedCat.middle)
 			add(selectedCat.titleObject);
@@ -449,6 +485,10 @@ class OptionsMenu extends FlxSubState
 		var escape = false;
 		var clickedCat = false;
 
+		var rightHold = FlxG.keys.pressed.RIGHT || (gamepad != null ? gamepad.pressed.DPAD_RIGHT : false);
+
+		var leftHold = FlxG.keys.pressed.LEFT || (gamepad != null ? gamepad.pressed.DPAD_LEFT : false);
+
 		changedOption = false;
 
 		accept = FlxG.keys.justPressed.ENTER || (gamepad != null ? gamepad.justPressed.A : false);
@@ -467,17 +507,20 @@ class OptionsMenu extends FlxSubState
 				if (selectedCat.middle)
 				{
 					i.screenCenter(X);
+					i.updateHitbox();
 				}
 
-				i.updateHitbox();
-
 				// I wanna die!!!
-				if (i.y < visibleRange[0] - 24)
-					i.alpha = 0;
-				else if (i.y > visibleRange[1] - 24)
-					i.alpha = 0;
+				if (i.y < visibleRange[0] - 24 || i.y > visibleRange[1] - 24)
+				{
+					if (i.visible)
+						i.visible = false;
+				}
 				else
 				{
+					if (!i.visible)
+						i.visible = true;
+
 					if (selectedCat.optionObjects.members[selectedOptionIndex].text != i.text || isInCat)
 						i.alpha = 0.4;
 					else
@@ -549,6 +592,8 @@ class OptionsMenu extends FlxSubState
 						ease: FlxEase.smootherStepInOut,
 						onComplete: function(twn:FlxTween)
 						{
+							close();
+
 							MusicBeatState.switchState(new MainMenuState());
 						}
 					});
@@ -675,26 +720,27 @@ class OptionsMenu extends FlxSubState
 			if (!selectedOption.acceptType)
 			{
 				if (right)
-				{
-					FlxG.sound.play(Paths.sound('scrollMenu'));
-					var object = selectedCat.optionObjects.members[selectedOptionIndex];
-					selectedOption.right();
-					changedOption = true;
-
-					object.text = "> " + selectedOption.getValue();
-					object.updateHitbox();
-					Debug.logTrace("New text: " + object.text);
-				}
+					changeOptionValue(true);
 				else if (left)
-				{
-					FlxG.sound.play(Paths.sound('scrollMenu'));
-					var object = selectedCat.optionObjects.members[selectedOptionIndex];
-					selectedOption.left();
-					changedOption = true;
+					changeOptionValue(false);
 
-					object.text = "> " + selectedOption.getValue();
-					object.updateHitbox();
-					Debug.logTrace("New text: " + object.text);
+				if (selectedOption.getAccept())
+				{
+					if (rightHold || leftHold)
+						holdTime += elapsed;
+					else
+						resetHoldTime();
+
+					if (holdTime > 0.5)
+					{
+						if (Math.floor(elapsed) % 10 == 0)
+						{
+							if (rightHold)
+								changeOptionValue(true);
+							else if (leftHold)
+								changeOptionValue(false);
+						}
+					}
 				}
 			}
 
@@ -706,14 +752,6 @@ class OptionsMenu extends FlxSubState
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 
 				PlayerSettings.player1.controls.loadKeyBinds();
-
-				Ratings.timingWindows = [
-					FlxG.save.data.shitMs,
-					FlxG.save.data.badMs,
-					FlxG.save.data.goodMs,
-					FlxG.save.data.sickMs,
-					FlxG.save.data.swagMs
-				];
 
 				if (selectedCat.middle)
 				{
@@ -773,11 +811,46 @@ class OptionsMenu extends FlxSubState
 	override function close():Void
 	{
 		#if desktop
-		PlayState.pauseStream.pause();
-		remove(PlayState.pauseStream);
+		if (isInPause)
+		{
+			PlayState.pauseStream.pause();
+			remove(PlayState.pauseStream);
+		}
 		#end
+
 		FlxG.save.flush();
+
 		super.close();
+	}
+
+	override function destroy():Void
+	{
+		instance = null;
+		for (cata in options)
+			if (cata != null)
+				cata.destroy();
+		options.resize(0);
+
+		super.destroy();
+	}
+
+	function resetHoldTime()
+	{
+		holdTime = 0;
+	}
+
+	function changeOptionValue(?right:Bool = false)
+	{
+		var object = selectedCat.optionObjects.members[selectedOptionIndex];
+
+		if (right)
+			selectedOption.right();
+		else
+			selectedOption.left();
+		changedOption = true;
+
+		object.text = "> " + selectedOption.getValue();
+		object.updateHitbox();
 	}
 
 	function updateOptColors():Void

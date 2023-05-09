@@ -31,6 +31,8 @@ class LoadingState extends MusicBeatState
 	var loadBar:FlxSprite;
 	var targetShit:Float = 0;
 
+	public static var instance:LoadingState = null;
+
 	function new(target:FlxState, stopMusic:Bool)
 	{
 		super();
@@ -42,6 +44,7 @@ class LoadingState extends MusicBeatState
 
 	override function create()
 	{
+		instance = this;
 		logo = new FlxSprite(-150, -100);
 		logo.frames = Paths.getSparrowAtlas('logoBumpin');
 
@@ -77,6 +80,7 @@ class LoadingState extends MusicBeatState
 
 		FlxTransitionableState.skipNextTransOut = false;
 
+		#if NO_PRELOAD_ALL
 		initSongsManifest().onComplete(function(lib)
 		{
 			callbacks = new MultiCallback(onLoad);
@@ -107,6 +111,9 @@ class LoadingState extends MusicBeatState
 			FlxG.camera.fade(FlxG.camera.bgColor, fadeTime, true);
 			new FlxTimer().start(fadeTime + MIN_TIME, function(_) introComplete());
 		});
+		#else
+		onLoad();
+		#end
 	}
 
 	function checkLoadSong(path:String)

@@ -28,7 +28,7 @@ class CreditsState extends MusicBeatState
 
 	private var grpCredits:FlxTypedGroup<Alphabet>;
 
-	public static var instance:CreditsState;
+	public static var instance:CreditsState = null;
 
 	var camGame:FlxCamera;
 
@@ -47,8 +47,6 @@ class CreditsState extends MusicBeatState
 		instance = this;
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
-
-		FlxG.mouse.visible = true;
 
 		populateCreditsData();
 
@@ -286,6 +284,12 @@ class CreditsState extends MusicBeatState
 				}
 			});
 		}
+	}
+
+	override function destroy()
+	{
+		instance = null;
+		super.destroy();
 	}
 }
 

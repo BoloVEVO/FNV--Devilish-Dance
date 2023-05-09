@@ -70,8 +70,6 @@ class AnimationDebug extends MusicBeatState
 		// gridBG.scrollFactor.set(0.5, 0.5);
 		// add(gridBG);
 
-		FlxG.mouse.visible = true;
-
 		background = new FlxSprite(-600, -525).loadGraphic(Paths.image('stageback', 'shared'));
 		front = new FlxSprite(-650, 325).loadGraphic(Paths.image('stagefront', 'shared'));
 		curt = new FlxSprite(-500, -625).loadGraphic(Paths.image('stagecurtains', 'shared'));

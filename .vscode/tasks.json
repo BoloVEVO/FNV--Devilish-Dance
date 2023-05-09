@@ -2,20 +2,40 @@
 	"version": "2.0.0",
 	"tasks": [
     {
-      "label": "Build Windows (Debug)",
+      "label": "Build Windows x64 (Debug)",
       "type": "lime",
-      "targetConfiguration": "Build Windows (Debug)",
-      "command": "test",
+      "targetConfiguration": "Build Windows x64 (Debug)",
+      "command": "build",
       "group": {
         "kind": "build",
         "isDefault": true
       }
     },
     {
-      "label": "Build Windows (Release)",
+      "label": "Build Windows x64 (Release)",
       "type": "lime",
-      "targetConfiguration": "Build Windows (Release)",
-      "command": "test",
+      "targetConfiguration": "Build Windows x64 (Release)",
+      "command": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build Windows x32 (Release)",
+      "type": "lime",
+      "targetConfiguration": "Build Windows x32 (Release)",
+      "command": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build Windows x32 (Debug)",
+      "type": "lime",
+      "targetConfiguration": "Build Windows x32 (Debug)",
+      "command": "build",
       "group": {
         "kind": "build",
         "isDefault": true

@@ -74,7 +74,7 @@ class StatsCounter extends TextField
 			if (currentColor >= array.length)
 				currentColor = 0;
 			currentColor = Math.round(FlxMath.lerp(0, array.length, skippedFrames / (FlxG.save.data.fpsCap / 3)));
-			(cast(Lib.current.getChildAt(0), Main)).changeFPSColor(array[currentColor]);
+			textColor = array[currentColor];
 			currentColor++;
 			skippedFrames++;
 			if (skippedFrames > (FlxG.save.data.fpsCap / 3))
@@ -137,9 +137,10 @@ class StatsCounter extends TextField
 			text = (FlxG.save.data.fps ? "FPS: "
 				+ '${currentFPS}\n'
 				+ '$memoryUsage'
-				+ (Main.watermarks?'\n$engineName' + "v" + MainMenuState.kadeEngineVer + "\nFNV: Devilish Dance 1.0" #if debug
+				+ (Main.watermarks?'\n$engineName' + "v" + MainMenuState.kadeEngineVer + '\n${MainMenuState.modContext}' #if debug
 					+ "\nDEBUG MODE" #end : "") : memoryUsage
-				+ (Main.watermarks?'\n$engineName' + "v" + MainMenuState.kadeEngineVer + "\nFNV: Devilish Dance 1.0" #if debug + "\nDEBUG MODE" #end : ""));
+				+ (Main.watermarks?'\n$engineName' + "v" + MainMenuState.kadeEngineVer + '\n${MainMenuState.modContext}' #if debug
+					+ "\nDEBUG MODE" #end : ""));
 		}
 
 		cacheCount = currentCount;

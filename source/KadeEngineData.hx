@@ -51,12 +51,6 @@ class KadeEngineData
 		if (FlxG.save.data.lerpScore == null)
 			FlxG.save.data.lerpScore = false;
 
-		if (FlxG.save.data.noteCamera == null)
-			FlxG.save.data.noteCamera = true;
-
-		if (FlxG.save.data.rotateSprites == null)
-			FlxG.save.data.rotateSprites = true;
-
 		if (FlxG.save.data.fpsRain == null)
 			FlxG.save.data.fpsRain = false;
 
@@ -76,10 +70,10 @@ class KadeEngineData
 			FlxG.save.data.frames = 10;
 
 		if (FlxG.save.data.scoreMod == null)
-			FlxG.save.data.scoreMod = 1;
+			FlxG.save.data.scoreMod = 0;
 
 		if (FlxG.save.data.accuracyMod == null)
-			FlxG.save.data.accuracyMod = 0;
+			FlxG.save.data.accuracyMod = 1;
 
 		if (FlxG.save.data.watermark == null)
 			FlxG.save.data.watermark = true;
@@ -156,7 +150,7 @@ class KadeEngineData
 			FlxG.save.data.laneTransparency = 0;
 
 		if (FlxG.save.data.shitMs == null)
-			FlxG.save.data.shitMs = 160.0;
+			FlxG.save.data.shitMs = 180.0;
 
 		if (FlxG.save.data.badMs == null)
 			FlxG.save.data.badMs = 135.0;
@@ -168,20 +162,33 @@ class KadeEngineData
 			FlxG.save.data.sickMs = 45.0;
 
 		if (FlxG.save.data.swagMs == null)
-			FlxG.save.data.swagMs = 16.0;
+			FlxG.save.data.swagMs = 22.5;
 
-		Ratings.timingWindows = [
-			FlxG.save.data.shitMs,
-			FlxG.save.data.badMs,
-			FlxG.save.data.goodMs,
-			FlxG.save.data.sickMs,
-			FlxG.save.data.swagMs
-		];
+		if (FlxG.save.data.errorMs == null)
+			FlxG.save.data.errorMs = 180.0;
+
+		if (FlxG.save.data.nearMs == null)
+			FlxG.save.data.nearMs = 135.0;
+
+		if (FlxG.save.data.critMs == null)
+			FlxG.save.data.critMs = 90.0;
+
+		if (FlxG.save.data.scritMs == null)
+			FlxG.save.data.scritMs = 45.0;
+
+		if (FlxG.save.data.noteCamera == null)
+			FlxG.save.data.noteCamera = true;
+
+		if (FlxG.save.data.hitErrorBar == null)
+			FlxG.save.data.hitErrorBar = true;
 
 		if (FlxG.save.data.background == null)
 			FlxG.save.data.background = true;
 
 		if (FlxG.save.data.noteskin == null)
+			FlxG.save.data.noteskin = 0;
+
+		if (NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin) == null)
 			FlxG.save.data.noteskin = 0;
 
 		if (FlxG.save.data.hgain == null)
@@ -242,10 +249,10 @@ class KadeEngineData
 		if (FlxG.save.data.characters == null)
 			FlxG.save.data.characters = true;
 
-		if (FlxG.save.data.postProcessNotes == null)
-		{
-			FlxG.save.data.postProcessNotes = true;
-		}
+		/*if (FlxG.save.data.postProcessNotes == null)
+			{
+				FlxG.save.data.postProcessNotes = true;
+		}*/
 
 		if (FlxG.save.data.shaders == null)
 			FlxG.save.data.shaders = true;
@@ -259,17 +266,22 @@ class KadeEngineData
 		if (FlxG.save.data.mute == null)
 			FlxG.save.data.mute = false;
 
-		if (FlxG.save.data.leChangedHitX == null)
-			FlxG.save.data.leChangedHitX = 530.5;
+		if (FlxG.save.data.newChangedHitX == null)
+			FlxG.save.data.newChangedHitX = 525;
 
-		if (FlxG.save.data.leChangedHitY == null)
-			FlxG.save.data.leChangedHitY = 218;
+		if (FlxG.save.data.newChangedHitY == null)
+			FlxG.save.data.newChangedHitY = 218;
+
+		if (FlxG.save.data.changedHitX == null)
+			FlxG.save.data.changedHitX = FlxG.width * 0.55 - 135;
+
+		if (FlxG.save.data.changedHitY == null)
+			FlxG.save.data.changedHitY = FlxG.height / 2 - 50;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 
 		KeyBinds.gamepad = gamepad != null;
 
-		Conductor.recalculateTimings();
 		PlayerSettings.player1.controls.loadKeyBinds();
 		KeyBinds.keyCheck();
 

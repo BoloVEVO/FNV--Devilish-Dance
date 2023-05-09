@@ -37,7 +37,7 @@ class StaticArrow extends FlxSprite
 
 	public function loadLane()
 	{
-		bgLane = new FlxSprite(0, 0).makeGraphic(Std.int(Note.swagWidth), 2160);
+		bgLane = new FlxSprite(0, 0).makeGraphic(Std.int(NoteSpr.swagWidth), 2160);
 		bgLane.antialiasing = FlxG.save.data.antialiasing;
 		bgLane.color = FlxColor.BLACK;
 		bgLane.visible = true;

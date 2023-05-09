@@ -5,6 +5,7 @@ import polymod.format.ParseRules.LinesParseFormat;
 import polymod.format.ParseRules.TextFileFormat;
 import polymod.Polymod;
 #end
+import flixel.FlxG;
 
 /**
  * Okay now this is epic.
@@ -34,16 +35,14 @@ class ModCore
 	#if FEATURE_MODCORE
 	public static function loadModsById(ids:Array<String>)
 	{
-		Debug.logInfo('Attempting to load ${ids.length} mods...');
-		var loadedModList = polymod.Polymod.init({
+		Debug.logTrace('Attempting to load ${ids.length} mods...');
+		Polymod.init({
 			// Root directory for all mods.
 			modRoot: MOD_DIRECTORY,
 			// The directories for one or more mods to load.
 			dirs: ids,
 			// Framework being used to load assets. We're using a CUSTOM one which extends the OpenFL one.
 			framework: CUSTOM,
-			// The current version of our API.
-			apiVersion: API_VERSION,
 			// Call this function any time an error occurs.
 			errorCallback: onPolymodError,
 			// Enforce semantic version patterns for each mod.
@@ -64,13 +63,7 @@ class ModCore
 			parseRules: buildParseRules(),
 		});
 
-		Debug.logInfo('Mod loading complete. We loaded ${loadedModList.length} / ${ids.length} mods.');
-
-		for (mod in loadedModList)
-			Debug.logTrace('  * ${mod.title} v${mod.modVersion} [${mod.id}]');
-
 		var fileList = Polymod.listModFiles("IMAGE");
-		Debug.logInfo('Installed mods have replaced ${fileList.length} images.');
 		for (item in fileList)
 			Debug.logTrace('  * $item');
 
@@ -86,14 +79,11 @@ class ModCore
 
 		fileList = Polymod.listModFiles("SOUND");
 		Debug.logInfo('Installed mods have replaced ${fileList.length} sound files.');
-		for (item in fileList)
-			Debug.logTrace('  * $item');
 	}
 
-	static function getModIds():Array<String>
+	public static function getModIds():Array<String>
 	{
-		Debug.logInfo('Scanning the mods folder...');
-		var modMetadata = Polymod.scan(MOD_DIRECTORY);
+		var modMetadata = Polymod.scan({modRoot: MOD_DIRECTORY});
 		Debug.logInfo('Found ${modMetadata.length} mods when scanning.');
 		var modIds = [for (i in modMetadata) i.id];
 		return modIds;
@@ -105,8 +95,6 @@ class ModCore
 		// Ensure TXT files have merge support.
 		output.addType("txt", TextFileFormat.LINES);
 
-		// You can specify the format of a specific file, with file extension.
-		// output.addFile("data/introText.txt", TextFileFormat.LINES)
 		return output;
 	}
 
@@ -136,22 +124,6 @@ class ModCore
 		// Perform an action based on the error code.
 		switch (error.code)
 		{
-			// case "parse_mod_version":
-			// case "parse_api_version":
-			// case "parse_mod_api_version":
-			// case "missing_mod":
-			// case "missing_meta":
-			// case "missing_icon":
-			// case "version_conflict_mod":
-			// case "version_conflict_api":
-			// case "version_prerelease_api":
-			// case "param_mod_version":
-			// case "framework_autodetect":
-			// case "framework_init":
-			// case "undefined_custom_backend":
-			// case "failed_create_backend":
-			// case "merge_error":
-			// case "append_error":
 			default:
 				// Log the message based on its severity.
 				switch (error.severity)
@@ -174,36 +146,37 @@ class ModCoreBackend extends OpenFLBackend
 	public function new()
 	{
 		super();
-		Debug.logTrace('Initialized custom asset loader backend.');
+		// Debug.logTrace('Initialized custom asset loader backend.');
 	}
 
 	public override function clearCache()
 	{
+		Paths.runGC();
 		super.clearCache();
-		Debug.logWarn('Custom asset cache has been cleared.');
+		// Debug.logInfo('Custom asset cache has been cleared.');
 	}
 
 	public override function exists(id:String):Bool
 	{
-		Debug.logTrace('Call to ModCoreBackend: exists($id)');
+		// Debug.logTrace('Call to ModCoreBackend: exists($id)');
 		return super.exists(id);
 	}
 
 	public override function getBytes(id:String):lime.utils.Bytes
 	{
-		Debug.logTrace('Call to ModCoreBackend: getBytes($id)');
+		// Debug.logTrace('Call to ModCoreBackend: getBytes($id)');
 		return super.getBytes(id);
 	}
 
 	public override function getText(id:String):String
 	{
-		Debug.logTrace('Call to ModCoreBackend: getText($id)');
+		// Debug.logTrace('Call to ModCoreBackend: getText($id)');
 		return super.getText(id);
 	}
 
 	public override function list(type:PolymodAssetType = null):Array<String>
 	{
-		Debug.logTrace('Listing assets in custom asset cache ($type).');
+		// Debug.logTrace('Listing assets in custom asset cache ($type).');
 		return super.list(type);
 	}
 }

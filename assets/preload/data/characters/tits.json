@@ -1,0 +1,72 @@
+{
+    "name": "tits",
+    "animations": [
+        {
+            "offsets": [
+                -5,
+                0
+            ],
+            "indices": [],
+            "frameRate": 24,
+            "name": "idle",
+            "looped": false,
+            "prefix": "tits idle"
+        },
+        {
+            "offsets": [
+                129,
+                235
+            ],
+            "indices": [],
+            "frameRate": 24,
+            "name": "singLEFT",
+            "looped": false,
+            "prefix": "tits left"
+        },
+        {
+            "offsets": [
+                0,
+                -40
+            ],
+            "frameRate": 24,
+            "name": "singDOWN",
+            "looped": false,
+            "prefix": "tits down"
+        },
+        {
+            "offsets": [
+                31,
+                61
+            ],
+            "frameRate": 24,
+            "name": "singUP",
+            "looped": false,
+            "prefix": "tits up"
+        },
+        {
+            "offsets": [
+                27,
+                -4
+            ],
+            "frameRate": 24,
+            "name": "singRIGHT",
+            "looped": false,
+            "prefix": "tits right"
+        }
+    ],
+    "no_antialiasing": false,
+    "asset": "characters/tits",
+    "charPos": [
+        0,
+        150
+    ],
+    "flipX": false,
+    "barColor": "#FF6000",
+    "camPos": [
+        270,
+        170
+    ],
+    "holdLength": 4,
+    "scale": 1,
+    "startingAnim": "idle"
+}

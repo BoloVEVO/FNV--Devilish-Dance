@@ -2,10 +2,13 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import MusicBeatState.subStates;
 
 class OptionsDirect extends MusicBeatState
 {
 	var menuBG:FlxSprite;
+
+	public static var instance:OptionsDirect = null;
 
 	var colorArray:Array<FlxColor> = [
 		FlxColor.fromRGB(148, 0, 211),
@@ -19,10 +22,11 @@ class OptionsDirect extends MusicBeatState
 
 	override function create()
 	{
+		instance = this;
 		FlxG.camera.fade(FlxColor.BLACK, 0.8, true);
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
-
+		subStates.push(new OptionsMenu());
 		menuBG = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
 		menuBG.color = 0xFFea71fd;
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
@@ -30,8 +34,12 @@ class OptionsDirect extends MusicBeatState
 		menuBG.screenCenter();
 		menuBG.antialiasing = FlxG.save.data.antialiasing;
 		add(menuBG);
-		openSubState(new OptionsMenu());
+
 		tweenColorShit();
+
+		super.create();
+
+		openSubState(subStates[0]);
 	}
 
 	function tweenColorShit()

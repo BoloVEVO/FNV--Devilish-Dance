@@ -44,9 +44,13 @@ class MainMenuState extends MusicBeatState
 
 	public static var gameVer:String = "0.2.8";
 
-	public static var buildVer:String = "1.4.2c";
+	public static var buildVer:String = "1.4.2";
 
 	public static var kadeEngineVer:String = '1.8.1 (v$buildVer)' + nightly;
+
+	public static var modVer:String = '1.0';
+
+	public static var modContext:String = 'FNV: Devilish Dance v' + modVer;
 
 	public static var updateShit:Bool = false;
 
@@ -63,10 +67,8 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
-		TimingStruct.clearTimings();
 		Paths.clearStoredMemory();
-		Paths.clearUnusedMemory();
-		trace(0 / 2);
+
 		PlayState.inDaPlay = false;
 		#if FEATURE_DISCORD
 		// Updating Discord Rich Presence
@@ -146,6 +148,7 @@ class MainMenuState extends MusicBeatState
 				scr = 0;
 			menuItem.scrollFactor.set(0, scr);
 			menuItem.updateHitbox();
+			menuItem.screenCenter(X);
 		}
 
 		firstStart = false;
@@ -167,6 +170,8 @@ class MainMenuState extends MusicBeatState
 		changeItem();
 
 		super.create();
+
+		Paths.clearUnusedMemory();
 	}
 
 	var selectedSomethin:Bool = false;
@@ -291,11 +296,6 @@ class MainMenuState extends MusicBeatState
 		}
 
 		super.update(elapsed);
-
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			spr.screenCenter(X);
-		});
 	}
 
 	function goToState()
@@ -345,6 +345,8 @@ class MainMenuState extends MusicBeatState
 			spr.animation.curAnim.frameRate = 15;
 
 			spr.updateHitbox();
+
+			spr.screenCenter(X);
 		});
 	}
 

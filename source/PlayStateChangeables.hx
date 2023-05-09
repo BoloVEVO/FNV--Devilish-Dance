@@ -10,10 +10,8 @@ class PlayStateChangeables
 	public static var healthGain:Float;
 	public static var healthLoss:Float;
 	public static var useDownscroll:Bool;
-	public static var safeFrames:Int;
+	public static var middleScroll:Bool;
 	public static var botPlay:Bool;
 	public static var Optimize:Bool;
 	public static var zoom:Float;
-	public static var stepMania:Bool;
-	public static var middleScroll:Bool;
 }

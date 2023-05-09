@@ -42,7 +42,7 @@
     {
       "name": "cheer",
       "prefix": "GF Cheer",
-      "offsets": [0, 0]
+      "offsets": [3, 0]
     },
     {
       "name": "hairBlow",

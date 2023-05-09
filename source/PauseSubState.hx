@@ -5,13 +5,9 @@ import openfl.Lib;
 #if FEATURE_LUAMODCHART
 import llua.Lua;
 #end
-import Controls.Control;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.FlxSubState;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.input.keyboard.FlxKey;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
@@ -20,12 +16,12 @@ import flixel.util.FlxColor;
 
 class PauseSubState extends MusicBeatSubstate
 {
-	public static var grpMenuShit:FlxTypedGroup<Alphabet>;
+	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	public static var goToOptions:Bool = false;
 	public static var goBack:Bool = false;
 
-	public var tweenManager:FlxTweenManager;
+	var tweenManager:FlxTweenManager = null;
 
 	var curSelected:Int = 0;
 
@@ -53,38 +49,63 @@ class PauseSubState extends MusicBeatSubstate
 		"Lag issues? Don't worry we are currently mining cryptocurrencies with ur pc :D (-Bolo)",
 		"Are you really reading this thing? (-Bolo)",
 		"I fced Sex mod with only one hand! (-Bolo)",
+		"EPIC EMBED FAIL (-Bolo)",
 		"Don't take these dialogues seriously lol (-Bolo)",
+		"Fireable actually used my fork. Pog (-Bolo)",
+		"I'm not gay, I'm default :trollface: (-Bolo)", // homhopobic 😭
 		"0.01% batch (-PopCat)",
 		"Are you have the stupid? (-BombasticTom)",
 		"I am here (-Faid)",
 		"I love men (-HomoKori)",
 		"Why do I have a pic of Mario with massive tits on my phone? (-Rudy)",
 		"I mom (-NxtVithor)",
+		"Ur black in real life or ur black in discord theme (-Bolo)",
+		"I'm not longer a minor :( (-Bolo)",
 		"We are gonna be using your fork as a base for myth engine (-Awoo)",
-		"Cool ass looking shit. (-BeastlyGhost)",
+		"Cool ass looking shit. Imma go steal ur code and give u credit (-BeastlyGhost)",
 		"Camellia's 2.5 fork poggers. (-Bolo)",
 		"Myth Engine Peak (-Bolo)",
-		"MYCOCK (-Zeurunix)",
-		"Shawty trifling, she must be from dirty docks! (-Jaldabo)",
-		"oh we're even quoted oh boy (-Tomato Sauce)",
-		"TinyBreasts (-TeneBrysté)",
-		"100HEX (-Garacide)",
-		"fire emoji 🔥 (-Faid)",
-		"bolo dot com (-Tomato Sauce)",
-		"wishlist average4k on steam (-Tomato Sauce)",
-		"hi mom im in a fnf mod (-Tomato Sauce)",
-		"subscribe to aleonepic (-Aleon)",
-		"who made this cover it sounds like ass (-Tomato Sauce)",
-		"Search Infinity Stones in discord gif tab (-Bolo)",
-		"download phigros on the google play and appstore (-Tomato Sauce)"
+		"MYCOCK (-Zeurunix)"
 	];
 
 	public function new()
 	{
 		super();
+
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
+
 		tweenManager = new FlxTweenManager();
 		openCallback = refresh;
+
+		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		bg.alpha = 0;
+		bg.scrollFactor.set();
+
+		levelInfo = new FlxText(20, 15, 0, "", 32);
+		levelInfo.text += PlayState.SONG.songName.toUpperCase();
+		levelInfo.scrollFactor.set();
+		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
+		levelInfo.updateHitbox();
+
+		levelDifficulty = new FlxText(20, 15 + 32, 0, "", 32);
+		levelDifficulty.text += CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase();
+		levelDifficulty.scrollFactor.set();
+		levelDifficulty.setFormat(Paths.font('vcr.ttf'), 32);
+		levelDifficulty.updateHitbox();
+
+		perSongOffset = new FlxText(0, FlxG.height - 18, FlxG.width, textArray[FlxG.random.int(0, textArray.length - 1)], 12);
+		perSongOffset.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+
+		perSongOffset.scrollFactor.set();
+
+		for (i in 0...CoolUtil.pauseMenuItems.length)
+		{
+			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, CoolUtil.pauseMenuItems[i], true, false);
+			songText.isMenuItem = true;
+			songText.targetY = i;
+			if (!grpMenuShit.members.contains(songText))
+				grpMenuShit.add(songText);
+		}
 	}
 
 	override public function create()
@@ -109,23 +130,10 @@ class PauseSubState extends MusicBeatSubstate
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
 		#end
 
-		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		bg.alpha = 0;
-		bg.scrollFactor.set();
 		add(bg);
 
-		levelInfo = new FlxText(20, 15, 0, "", 32);
-		levelInfo.text += PlayState.SONG.songName.toUpperCase();
-		levelInfo.scrollFactor.set();
-		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
-		levelInfo.updateHitbox();
 		add(levelInfo);
 
-		levelDifficulty = new FlxText(20, 15 + 32, 0, "", 32);
-		levelDifficulty.text += CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase();
-		levelDifficulty.scrollFactor.set();
-		levelDifficulty.setFormat(Paths.font('vcr.ttf'), 32);
-		levelDifficulty.updateHitbox();
 		add(levelDifficulty);
 
 		levelDifficulty.alpha = 0;
@@ -137,23 +145,10 @@ class PauseSubState extends MusicBeatSubstate
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 
 		add(grpMenuShit);
-		perSongOffset = new FlxText(0, FlxG.height - 18, FlxG.width, textArray[FlxG.random.int(0, textArray.length - 1)], 12);
-		perSongOffset.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-
-		perSongOffset.scrollFactor.set();
 
 		#if FEATURE_FILESYSTEM
 		add(perSongOffset);
 		#end
-
-		for (i in 0...CoolUtil.pauseMenuItems.length)
-		{
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, CoolUtil.pauseMenuItems[i], true, false);
-			songText.isMenuItem = true;
-			songText.targetY = i;
-			if (!grpMenuShit.members.contains(songText))
-				grpMenuShit.add(songText);
-		}
 
 		changeSelection();
 
@@ -240,7 +235,7 @@ class PauseSubState extends MusicBeatSubstate
 			{
 				case "Resume":
 					close();
-					PlayState.instance.scrollSpeed = (FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed * PlayState.songMultiplier : FlxG.save.data.scrollSpeed * PlayState.songMultiplier);
+					PlayState.instance.scrollSpeed = (FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed : FlxG.save.data.scrollSpeed) * PlayState.instance.scrollMult;
 				case "Restart Song":
 					PlayState.startTime = 0;
 					MusicBeatState.resetState();
@@ -249,9 +244,6 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 				case "Exit to menu":
 					PlayState.startTime = 0;
-
-					/*if (FlxG.save.data.fpsCap > 300)
-						(cast(Lib.current.getChildAt(0), Main)).setFPSCap(300); */
 
 					if (PlayState.isStoryMode)
 					{
@@ -266,6 +258,7 @@ class PauseSubState extends MusicBeatSubstate
 					#if !cpp
 					pauseMusic.pause();
 					#end
+					close();
 			}
 		}
 
@@ -278,6 +271,8 @@ class PauseSubState extends MusicBeatSubstate
 
 	override function destroy()
 	{
+		tweenManager.clear();
+		tweenManager.destroy();
 		super.destroy();
 	}
 
@@ -291,6 +286,7 @@ class PauseSubState extends MusicBeatSubstate
 		#else
 		pauseMusic.pause();
 		#end
+
 		super.close();
 	}
 

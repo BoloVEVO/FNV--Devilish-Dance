@@ -392,6 +392,16 @@ class Alphabet extends FlxSpriteGroup
 		super.update(elapsed);
 	}
 
+	public function finishLerp()
+	{
+		var scaledY = FlxMath.remapToRange(targetY, 0, 1, 0, 1.3);
+		if (changeY)
+			y = (scaledY * yMult) + (FlxG.height * 0.48) + yAdd;
+
+		if (changeX)
+			x = (targetY * 20) + 90 + xAdd;
+	}
+
 	public function killTheTimer()
 	{
 		if (typeTimer != null)

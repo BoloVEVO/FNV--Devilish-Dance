@@ -2,18 +2,32 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Windows (Debug)",
+      "name": "Windows x64 (Debug)",
       "type": "hxcpp",
-      "preLaunchTask": "Build Windows (Debug)",
+      "preLaunchTask": "Build Windows x64 (Debug)",
       "request": "launch",
       "program": "${workspaceFolder}/export/debug/windows/bin/Kade Engine.exe"
     },
     {
-      "name": "Windows (Release)",
+      "name": "Windows x64 (Release)",
       "type": "hxcpp",
-      "preLaunchTask": "Build Windows (Release)",
+      "preLaunchTask": "Build Windows x64 (Release)",
       "request": "launch",
-      "program": "${workspaceFolder}/export/debug/windows/bin/Kade Engine.exe"
+      "program": "${workspaceFolder}/export/release/windows/bin/Kade Engine.exe"
+    },
+    {
+      "name": "Windows x32 (Debug)",
+      "type": "hxcpp",
+      "preLaunchTask": "Build Windows x32 (Debug)",
+      "request": "launch",
+      "program": "${workspaceFolder}/export/debug-32bits/windows/bin/Kade Engine.exe"
+    },
+    {
+      "name": "Windows x32 (Release)",
+      "type": "hxcpp",
+      "preLaunchTask": "Build Windows x32 (Release)",
+      "request": "launch",
+      "program": "${workspaceFolder}/export/release-32bits/windows/bin/Kade Engine.exe"
     },
     {
       "name": "HTML5 (Debug)",
@@ -34,14 +48,14 @@
       "type": "hxcpp",
       "preLaunchTask": "Build MacOS (Debug)",
       "request": "launch",
-      "program": "${workspaceFolder}/export/debug/macos/bin/Kade Engine"
+      "program": "${workspaceFolder}/export/debug/macos/bin/Kade Engine.app"
     },
     {
       "name": "MacOS (Release)",
       "type": "hxcpp",
       "preLaunchTask": "Build MacOS (Release)",
       "request": "launch",
-      "program": "${workspaceFolder}/export/debug/macos/bin/Kade Engine"
+      "program": "${workspaceFolder}/export/release/macos/bin/Kade Engine.app"
     },
     {
       "name": "Linux (Debug)",

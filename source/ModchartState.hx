@@ -36,9 +36,7 @@ using StringTools;
 class ModchartState
 {
 	// public static var shaders:Array<LuaShader> = null;
-	public static var lua:State = null;
-
-	public static var shownNotes:Array<LuaNote> = [];
+	public var lua:State = null;
 
 	function callLua(func_name:String, args:Array<Dynamic>, ?type:String):Dynamic
 	{
@@ -224,7 +222,7 @@ class ModchartState
 	{
 		// trace('setting variable ' + var_name + ' to ' + object);
 
-		Lua.pushnumber(lua, object);
+		Convert.toLua(lua, object);
 		Lua.setglobal(lua, var_name);
 	}
 
@@ -415,7 +413,6 @@ class ModchartState
 
 	public function new()
 	{
-		shownNotes = [];
 		trace('opening a lua state (because we are cool :))');
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
@@ -465,19 +462,17 @@ class ModchartState
 
 		setVar("difficulty", PlayState.storyDifficulty);
 		setVar("bpm", Conductor.bpm);
-		setVar("scrollspeed",
-			FlxG.save.data.scrollSpeed != 1 ? FlxG.save.data.scrollSpeed * PlayState.songMultiplier : PlayState.SONG.speed * PlayState.songMultiplier);
+		setVar("scrollspeed", FlxG.save.data.scrollSpeed != 1 ? FlxG.save.data.scrollSpeed : PlayState.SONG.speed);
 		setVar("fpsCap", FlxG.save.data.fpsCap);
 		setVar("flashing", FlxG.save.data.flashing);
 		setVar("distractions", FlxG.save.data.distractions);
 		setVar("colour", FlxG.save.data.colour);
 		setVar("middlescroll", FlxG.save.data.middleScroll);
-		setVar("rate", PlayState.songMultiplier); // Kinda XD since you can modify this through Lua and break the game.
+		setVar("rate", PlayState.instance.songMultiplier); // Kinda XD since you can modify this through Lua and break the game.
 
 		setVar("curStep", 0);
 		setVar("curBeat", 0);
 		setVar("crochet", Conductor.stepCrochet);
-		setVar("safeZoneOffset", Conductor.safeZoneOffset);
 
 		setVar("hudZoom", PlayState.instance.camHUD.zoom);
 		setVar("cameraZoom", FlxG.camera.zoom);
@@ -505,7 +500,7 @@ class ModchartState
 
 		Lua_helper.add_callback(lua, "precache", function(asset:String, type:String, ?library:String)
 		{
-			PlayState.instance.precacheThing(asset, type, library);
+			PlayState.precacheThing(asset, type, library);
 		});
 
 		// callbacks
@@ -563,14 +558,14 @@ class ModchartState
 			PlayState.instance.strumLine.y = y;
 		});
 
-		Lua_helper.add_callback(lua, "getNotes", function(y:Float)
+		Lua_helper.add_callback(lua, "getNotes", function()
 		{
 			Lua.newtable(lua);
 
 			for (i in 0...PlayState.instance.notes.members.length)
 			{
 				var note = PlayState.instance.notes.members[i];
-				Lua.pushstring(lua, note.LuaNote.className);
+				Lua.pushstring(lua, note._def.LuaNote.className);
 				Lua.rawseti(lua, -2, i);
 			}
 		});
@@ -602,7 +597,7 @@ class ModchartState
 		new LuaWindow().Register(lua);
 	}
 
-	public function initLuaReceptors()
+	public function registerStrums()
 	{
 		for (i in 0...PlayState.instance.strumLineNotes.length)
 		{

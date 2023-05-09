@@ -1,6 +1,6 @@
 Mod Devs:category: :1:
 Faid:twitter.com/Faiding_:Mod Director & Charter:0:#FF5F1F
-Aleon:twitter.com/aleonepic:Mod Artist & Charter:0:#F41762
+Aleon:twitter.com/aleonepic:Mod Artist & Charter:#F41762
 Tomato Sauce:twitter.com/ToamtoSauce:Vocal Covers & Main Menu Remix & Charter:0:#00ff73
 Bolo:twitter.com/BoloVEVO:Mod Programmer:0:#A5004D
 Jaldabo:twitter.com/jaldabopls:Logo Artist:0:#ff8400
@@ -13,7 +13,6 @@ Bolo:twitter.com/BoloVEVO:Main Programmer of this KE fork:0:#A5004D
 TOP Contributors:category: :1
 Awoo2u:twitter.com/Awoofle:Tween Manager and Optimization Tweaks:0
 MAJigsaw77:github.com/MAJigsaw77:Code optimization and fixes:0
-Glowsoony:github.com/glowsoony:Future Hscript Support:0
 Special Thanks:category: :1
 KadeDeveloper:twitter.com/kade0912:Creator of OG Kade Engine:0:#64A250
 ShadowMario:twitter.com/Shadow_Mario_:Psych Engine Features:0:#444444

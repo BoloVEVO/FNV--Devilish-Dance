@@ -1,5 +1,6 @@
 package animateatlas;
 
+import flixel.util.FlxDestroyUtil;
 import flixel.FlxG;
 import openfl.geom.Rectangle;
 import flixel.math.FlxPoint;
@@ -130,13 +131,14 @@ class AtlasFrameMaker extends FlxFramesCollection
 
 	static function convertBitmap(bitmap:BitmapData, key:String):BitmapData
 	{
-		var texture = FlxG.stage.context3D.createTexture(bitmap.width, bitmap.height, BGRA, false);
+		var texture = FlxG.stage.context3D.createRectangleTexture(bitmap.width, bitmap.height, BGRA, true);
 		texture.uploadFromBitmapData(bitmap);
-		Paths.currentTrackedTextures.set(key, texture);
-		bitmap.dispose();
 		bitmap.disposeImage();
-		bitmap = null;
+		FlxDestroyUtil.dispose(bitmap);
+		bitmap = BitmapData.fromTexture(texture);
+
 		Paths.localTrackedAssets.push(key);
-		return BitmapData.fromTexture(texture);
+
+		return bitmap;
 	}
 }

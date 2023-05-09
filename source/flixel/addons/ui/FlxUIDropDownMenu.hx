@@ -229,7 +229,7 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 				button.y = -99999;
 			}
 		}
-		for (i in currentScroll...currentScroll + 5)
+		for (i in currentScroll...currentScroll + 3)
 		{
 			var button:FlxUIButton = list[i];
 			if (button != null)
@@ -238,7 +238,7 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 				offset += buttonHeight;
 			}
 		}
-		for (i in currentScroll + 5...list.length)
+		for (i in currentScroll + 3...list.length)
 		{
 			var button:FlxUIButton = list[i];
 			if (button != null)
@@ -288,8 +288,8 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 	private function getPanelHeight():Float
 	{
 		var maxLength = list.length;
-		if (maxLength > 5)
-			maxLength = 5;
+		if (maxLength > 3)
+			maxLength = 3;
 		return maxLength * header.background.height;
 	}
 

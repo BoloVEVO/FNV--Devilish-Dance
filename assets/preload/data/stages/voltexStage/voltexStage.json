@@ -1,0 +1,41 @@
+{
+    "staticCam": true,
+    "loadGF": false,
+    "camZoom": 0.65,
+    "camPosition": [
+        650,
+        350
+    ],
+    "charPositions": {
+        "bf": [
+            1150,
+            300
+        ],
+        "tits": [
+            -445,
+            -75
+        ],
+        "huge-tits": [
+            25,
+            700
+        ]
+    },
+    "spritesPositions": {
+        "bg": [
+            -414.5,
+            -234
+        ],
+        "stageFront": [
+            -414.5,
+            -234
+        ],
+        "lateStageFront": [
+            -414.5,
+            -234
+        ],
+        "sword": [
+            0,
+            90
+        ]
+    }
+}

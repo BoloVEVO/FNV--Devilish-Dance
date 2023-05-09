@@ -8,16 +8,7 @@ using StringTools;
 
 class NoteskinHelpers
 {
-	public static var noteskinArray = [];
-
-	public static function updateNoteskins()
-	{
-		noteskinArray = [];
-
-		noteskinArray = ["Arrows", "Circles", "Voltex-Arrows", "Voltex-Circles", "Voltex-Bars"];
-
-		return noteskinArray;
-	}
+	public static var noteskinArray = ["Arrows", "Circles", "Voltex-Arrows", "Voltex-Circles", "Voltex-Bars"];
 
 	public static function getNoteskins()
 	{
@@ -29,43 +20,33 @@ class NoteskinHelpers
 		return noteskinArray[id];
 	}
 
-	static public function generateNoteskinSprite(id:Int, type:String, unique:Bool)
+	static public function generateNoteskinSprite(id:Int, type:String, style:String = 'default')
 	{
 		// Debug.logTrace("bruh momento");
 
 		if (type == null)
 			type = '';
 
-		var suffix = '_$type';
+		var suffix = '_${type.toUpperCase()}';
 
 		if (type == '')
-			suffix = '';
+			suffix = '_NORMAL';
 
 		var atlas = null;
 
-		if (unique)
-			atlas = Paths.getSparrowAtlas('noteskins/NOTE$suffix', 'shared');
-		else
-			atlas = Paths.getSparrowAtlas('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}$suffix', 'shared');
+		atlas = Paths.getSparrowAtlas('hud/$style/noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}/NOTE_ASSETS$suffix', 'shared');
 
 		return atlas;
 	}
 
-	static public function generatePixelSprite(id:Int, type:String, unique:Bool, ends:Bool = false)
+	static public function generatePixelSprite(id:Int, ends:Bool = false, type:String)
 	{
-		if (type == null)
-			type = '';
-
-		var suffix = '_$type';
+		var suffix = '_${type.toUpperCase()}';
 
 		if (type == '')
-			suffix = '';
+			suffix = '_NORMAL';
 
-		var image = null;
-		if (unique)
-			image = Paths.image('noteskins/NOTE-pixel${(ends ? '-ends' : '')}$suffix', "shared");
-		else
-			image = Paths.image('noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}-pixel${(ends ? '-ends' : '')}$suffix', "shared");
-		return image;
+		return Paths.image('hud/pixel/noteskins/${NoteskinHelpers.getNoteskinByID(FlxG.save.data.noteskin)}/NOTE_ASSETS$suffix${(ends ? '_ENDS' : '')}',
+			"shared");
 	}
 }

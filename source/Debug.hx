@@ -279,7 +279,6 @@ class Debug
 		// Example: This will display all the properties that FlxSprite does, along with curCharacter and barColor.
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(Character, ["curCharacter", "isPlayer", "barColor"], [FlxSprite]));
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(HealthIcon, ["char", "isPlayer", "isOldIcon"], [FlxSprite]));
-		FlxG.debugger.addTrackerProfile(new TrackerProfile(Note, ["x", "y", "strumTime", "mustPress", "rawNoteData", "sustainLength"], []));
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(Song, [
 			"chartVersion",
 			"song",

@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxSpriteUtil;
 import Modifiers.Modifier;
 import haxe.Exception;
 #if FEATURE_STEPMANIA
@@ -34,12 +35,11 @@ import flixel.input.FlxKeyManager;
 
 using StringTools;
 
-class ResultsScreen extends FlxSubState
+class ResultsScreen extends MusicBeatSubstate
 {
 	public var background:FlxSprite;
 	public var text:FlxText;
 
-	public var anotherBackground:FlxSprite;
 	public var graph:HitGraph;
 	public var graphSprite:OFLSprite;
 
@@ -50,40 +50,28 @@ class ResultsScreen extends FlxSubState
 	public var songText:FlxText;
 	public var music:FlxSound;
 
-	public var graphData:BitmapData;
-
-	public var ranking:String;
-	public var accuracy:String;
-
 	public var modifiers:String;
 
 	public var activeMods:FlxText;
 
 	public var superMegaConditionShit:Bool;
 
+	public static var instance:ResultsScreen = null;
+
 	public function new()
 	{
 		super();
-		openCallback = refresh;
-	}
+		instance = this;
 
-	override function create()
-	{
+		openCallback = refresh;
+
 		background = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		background.scrollFactor.set();
-		add(background);
 
-		if (!PlayState.inResults)
-		{
-			#if !cpp
-			music = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
-			music.volume = 0;
-			music.play(false, FlxG.random.int(0, Std.int(music.length / 2)));
-			FlxG.sound.list.add(music);
-			#end
-		}
+		#if !cpp
+		music = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
+		#end
 
-		// I was gonna use Arrays to do this but I'm dumb. So, I had to chose the mortal way XP
 		if (!PlayState.isStoryMode)
 		{
 			modifiers = 'Active Modifiers:\n${(PlayStateChangeables.opponentMode ? '- Opponent Mode\n' : '')}${(PlayStateChangeables.mirrorMode ? '- Mirror Mode\n' : '')}${(PlayStateChangeables.practiceMode ? '- Practice Mode\n' : '')}${(PlayStateChangeables.skillIssue ? '- No Misses mode\n' : '')}${(!PlayStateChangeables.holds ? '- Hold Notes OFF\n' : '')}${(!PlayStateChangeables.modchart #if FEATURE_LUAMODCHART && FileSystem.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart')) #else && PlayState.instance.sourceModchart #end ? '- Song modchart OFF\n' : '')}${(PlayStateChangeables.healthDrain ? '- Health Drain ON\n' : '')}${(HelperFunctions.truncateFloat(PlayStateChangeables.healthGain,2) != 1 ? '- HP Gain ${HelperFunctions.truncateFloat(PlayStateChangeables.healthGain, 2)}x\n': '')}${(HelperFunctions.truncateFloat(PlayStateChangeables.healthLoss,2) != 1 ? '- HP Loss ${HelperFunctions.truncateFloat(PlayStateChangeables.healthLoss, 2)}x\n':'')}';
@@ -93,126 +81,122 @@ class ResultsScreen extends FlxSubState
 			activeMods.size = 24;
 			activeMods.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 			activeMods.scrollFactor.set();
-			add(activeMods);
 		}
-
-		background.alpha = 0;
 
 		text = new FlxText(20, -55, 0, "Song Cleared!");
 		text.size = 34;
 		text.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 		text.color = FlxColor.WHITE;
 		text.scrollFactor.set();
-		add(text);
+
+		if (PlayState.isStoryMode)
+		{
+			text.text = 'Week Cleared on ${PlayState.instance.storyDifficultyText.toUpperCase()}!';
+		}
+		comboText = new FlxText(20, -75, 0, '');
 
 		if (!PlayState.isStoryMode)
 		{
-			songText = new FlxText(20, -65, FlxG.width, 'Played on ${PlayState.SONG.songName} -	 ${PlayState.instance.storyDifficultyText.toUpperCase()}');
+			songText = new FlxText(20, -65, FlxG.width,
+				'Played on ${PlayState.SONG.songName} - ${CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase()}');
 			songText.size = 34;
 			songText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 			songText.color = FlxColor.WHITE;
 			songText.scrollFactor.set();
-			add(songText);
 		}
 
-		var score = PlayState.instance.songScore;
-		var acc = PlayState.instance.accuracy;
-		if (PlayState.isStoryMode)
-		{
-			acc = PlayState.campaignAccuracy;
-			score = PlayState.campaignScore;
-			text.text = 'Week Cleared on ${PlayState.instance.storyDifficultyText.toUpperCase()}!';
-		}
-
-		var swags = PlayState.isStoryMode ? PlayState.campaignSwags : PlayState.swags;
-		var sicks = PlayState.isStoryMode ? PlayState.campaignSicks : PlayState.sicks;
-		var goods = PlayState.isStoryMode ? PlayState.campaignGoods : PlayState.goods;
-		var bads = PlayState.isStoryMode ? PlayState.campaignBads : PlayState.bads;
-		var shits = PlayState.isStoryMode ? PlayState.campaignShits : PlayState.shits;
-
-		var judgeStats = '';
-
-		switch (PlayState.SONG.noteStyle)
-		{
-			case 'voltex':
-				judgeStats = 'Judgements:\nS-Criticals - ${sicks + swags}\nCriticals - ${goods}\nNears - ${bads}\n\nErrors: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.songMultiplier, 2)}x';
-			default:
-				judgeStats = 'Judgements:\nSicks - ${sicks}\nGoods - ${goods}\nBads - ${bads}\n\nCombo Breaks: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.songMultiplier, 2)}x';
-		}
-
-		comboText = new FlxText(20, -75, 0, judgeStats);
 		comboText.size = 28;
 		comboText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 		comboText.color = FlxColor.WHITE;
 		comboText.scrollFactor.set();
-		add(comboText);
 
 		contText = new FlxText(FlxG.width - 525, FlxG.height + 50, 0, 'Click or Press ${KeyBinds.gamepad ? 'A' : 'ENTER'} to continue.');
-		#if mobile
-		contText.text = "Touch to continue";
-		#end
+
 		contText.size = 24;
 		contText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 4, 1);
 		contText.color = FlxColor.WHITE;
 		contText.scrollFactor.set();
+
+		graph = new HitGraph(FlxG.width - 600, 45, 525, 180);
+
+		settingsText = new FlxText(20, FlxG.height + 75, 0, '');
+		settingsText.size = 16;
+		settingsText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 2, 1);
+		settingsText.color = FlxColor.WHITE;
+		settingsText.scrollFactor.set();
+	}
+
+	var mean:Float = 0;
+
+	override function create()
+	{
+		add(background);
+		if (!PlayState.inResults)
+		{
+			#if !cpp
+			music.volume = 0;
+			music.play(false, FlxG.random.int(0, Std.int(music.length / 2)));
+			FlxG.sound.list.add(music);
+			#end
+		}
+
+		add(activeMods);
+
+		background.alpha = 0;
+
+		add(text);
+
+		if (!PlayState.isStoryMode)
+			add(songText);
+
+		var score = PlayState.instance.songScore;
+		var acc = PlayState.instance.accuracy;
+
+		if (PlayState.isStoryMode)
+		{
+			acc = PlayState.campaignAccuracy;
+			score = PlayState.campaignScore;
+		}
+
+		var judgeCounter:String = '';
+
+		var timingWins = Ratings.timingWindows.copy();
+		timingWins.reverse();
+
+		for (rating in timingWins)
+			judgeCounter += '${rating.name}s: ${rating.count}\n';
+
+		comboText.text = 'Judgements:\n$judgeCounter\nCombo Breaks: ${(PlayState.isStoryMode ? PlayState.campaignMisses : PlayState.misses)}\nHighest Combo: ${PlayState.highestCombo + 1}\nScore: $score\n${(PlayState.isStoryMode ? 'Average Accuracy' : 'Accuracy')}: ${HelperFunctions.truncateFloat(acc, 2)}% ( ${(FlxG.save.data.accuracyMod == 0 ? 'Accurate' : 'Complex')} )\n\n${Ratings.GenerateComboRank(PlayState.instance.accuracy)} ${Ratings.GenerateLetterRank(PlayState.instance.accuracy)}\nRate: ${HelperFunctions.truncateFloat(PlayState.instance.songMultiplier, 2)}x';
+
+		add(comboText);
+
+		#if mobile
+		contText.text = "Touch to continue";
+		#end
+
 		add(contText);
 
-		anotherBackground = new FlxSprite(FlxG.width - 500, 45).makeGraphic(450, 240, FlxColor.BLACK);
-		anotherBackground.scrollFactor.set();
-		anotherBackground.alpha = 0;
-		add(anotherBackground);
+		graph.update();
 
-		graph = new HitGraph(FlxG.width - 500, 45, 495, 240);
-		graph.alpha = 0;
-
-		graphSprite = new OFLSprite(FlxG.width - 510, 45, 460, 240, graph);
+		graphSprite = new OFLSprite(graph.xPos, graph.yPos, Std.int(graph._width), Std.int(graph._rectHeight), graph);
+		FlxSpriteUtil.drawRect(graphSprite, 0, 0, graphSprite.width, graphSprite.height, FlxColor.TRANSPARENT, {thickness: 1.5, color: FlxColor.WHITE});
 
 		graphSprite.scrollFactor.set();
 		graphSprite.alpha = 0;
 
 		add(graphSprite);
 
-		var sicks = HelperFunctions.truncateFloat(PlayState.sicks / PlayState.goods, 1);
-		var goods = HelperFunctions.truncateFloat(PlayState.goods / PlayState.bads, 1);
-
-		if (sicks == Math.POSITIVE_INFINITY)
-			sicks = 0;
-		if (goods == Math.POSITIVE_INFINITY)
-			goods = 0;
-
-		var mean:Float = 0;
-
-		for (i in 0...PlayState.instance.saveNotes.length)
+		var legitTimings:Bool = true;
+		for (rating in Ratings.timingWindows)
 		{
-			// 0 = time
-			// 1 = length
-			// 2 = type
-			// 3 = diff
-			var obj = PlayState.instance.saveNotes[i];
-			// judgement
-			var obj2 = PlayState.instance.saveJudge[i];
-
-			var obj3 = obj[0];
-
-			var diff = obj[3];
-			var judge = obj2;
-			if (diff != (Ratings.timingWindows[0] * Math.floor((10 / 60) * 1000) / Ratings.timingWindows[0]))
-				mean += diff;
-			if (obj[1] != -1)
-				graph.addToHistory(diff / PlayState.songMultiplier, judge, obj3 / PlayState.songMultiplier);
+			if (rating.timingWindow != rating.defaultTimingWindow)
+			{
+				legitTimings = false;
+				break;
+			}
 		}
 
-		if (sicks == Math.POSITIVE_INFINITY || sicks == Math.NaN)
-			sicks = 0;
-		if (goods == Math.POSITIVE_INFINITY || goods == Math.NaN)
-			goods = 0;
-
-		graph.update();
-
-		superMegaConditionShit = Ratings.timingWindows[3] == 45
-			&& Ratings.timingWindows[2] == 90
-			&& Ratings.timingWindows[1] == 135
-			&& Ratings.timingWindows[0] == 160
+		superMegaConditionShit = legitTimings
 			&& !PlayState.usedBot
 			&& !FlxG.save.data.practice
 			&& PlayStateChangeables.holds
@@ -222,45 +206,41 @@ class ResultsScreen extends FlxSubState
 
 		if (PlayState.SONG.validScore && superMegaConditionShit)
 		{
-			Highscore.saveScore(PlayState.SONG.songId, Math.round(PlayState.instance.songScore), PlayState.storyDifficulty, PlayState.songMultiplier);
+			Highscore.saveScore(PlayState.SONG.songId, Math.round(PlayState.instance.songScore), PlayState.storyDifficulty, PlayState.instance.songMultiplier);
 			Highscore.saveCombo(PlayState.SONG.songId, Ratings.GenerateLetterRank(PlayState.instance.accuracy), PlayState.storyDifficulty,
-				PlayState.songMultiplier);
+				PlayState.instance.songMultiplier);
 			Highscore.saveAcc(PlayState.SONG.songId, HelperFunctions.truncateFloat(PlayState.instance.accuracy, 2), PlayState.storyDifficulty,
-				PlayState.songMultiplier);
+				PlayState.instance.songMultiplier);
 			Highscore.saveLetter(PlayState.SONG.songId, Ratings.GenerateLetterRank(PlayState.instance.accuracy), PlayState.storyDifficulty,
-				PlayState.songMultiplier);
+				PlayState.instance.songMultiplier);
 		}
 
-		mean = HelperFunctions.truncateFloat(mean / PlayState.instance.saveNotes.length, 2);
-		var acceptShit:String = (superMegaConditionShit && FlxG.save.data.accuracyMod == 0 ? '| Accepted' : '| Rejected');
+		mean = HelperFunctions.truncateFloat(mean / PlayState.instance.playerNotes, 2);
+		var acceptShit:String = (superMegaConditionShit && FlxG.save.data.accuracyMod == 0 ? 'Accepted' : 'Rejected');
 
 		if (!PlayStateChangeables.modchart #if FEATURE_LUAMODCHART
 			&& FileSystem.exists(Paths.lua('songs/${PlayState.SONG.songId}/modchart')) #else && PlayState.instance.sourceModchart #end)
-			acceptShit = '| Rejected';
+			acceptShit = 'Rejected';
 
 		#if debug
-		acceptShit = '| Debug';
+		acceptShit = 'Debug';
 		#end
 
 		if (PlayState.isStoryMode)
-			acceptShit = '';
+			acceptShit = 'Rejected | Not In Freeplay Mode';
 
-		var meanText = '';
-
-		switch (PlayState.SONG.noteStyle)
+		settingsText.text = 'Mean: ${mean}ms \nJudgement config: (';
+		var reverseWins = Ratings.timingWindows.copy();
+		reverseWins.reverse();
+		for (i in 0...reverseWins.length)
 		{
-			case 'voltex':
-				meanText = 'Mean: ${mean}ms\nSettings: (S-CRIT:${Ratings.timingWindows[3]}ms,CRIT:${Ratings.timingWindows[2]}ms,NEAR:${Ratings.timingWindows[1]}ms,ERROR:${Ratings.timingWindows[0]}ms) $acceptShit';
-			default:
-				meanText = 'Mean: ${mean}ms\nSettings: (SICK:${Ratings.timingWindows[3]}ms,GOOD:${Ratings.timingWindows[2]}ms,BAD:${Ratings.timingWindows[1]}ms,SHIT:${Ratings.timingWindows[0]}ms) $acceptShit';
+			var timing = reverseWins[i];
+			settingsText.text += '${timing.name.toUpperCase()}:${timing.timingWindow}ms';
+			if (i != reverseWins.length - 1)
+				settingsText.text += ',';
 		}
+		settingsText.text += ')\nStatus: $acceptShit';
 
-		settingsText = new FlxText(20, FlxG.height + 50, 0, meanText);
-
-		settingsText.size = 16;
-		settingsText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK, 2, 1);
-		settingsText.color = FlxColor.WHITE;
-		settingsText.scrollFactor.set();
 		add(settingsText);
 
 		FlxTween.tween(background, {alpha: 0.5}, 0.5);
@@ -272,19 +252,33 @@ class ResultsScreen extends FlxSubState
 		FlxTween.tween(text, {y: 20}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(comboText, {y: 145}, 0.5, {ease: FlxEase.expoInOut});
 		FlxTween.tween(contText, {y: FlxG.height - 45}, 0.5, {ease: FlxEase.expoInOut});
-		FlxTween.tween(settingsText, {y: FlxG.height - 55}, 0.5, {ease: FlxEase.expoInOut});
-
-		FlxTween.tween(anotherBackground, {alpha: 0.6}, 0.5, {
-			onUpdate: function(tween:FlxTween)
-			{
-				graph.alpha = FlxMath.lerp(0, 1, tween.percent);
-				graphSprite.alpha = FlxMath.lerp(0, 1, tween.percent);
-			}
-		});
+		FlxTween.tween(settingsText, {y: FlxG.height - 65}, 0.5, {ease: FlxEase.expoInOut});
+		FlxTween.tween(graphSprite, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 
 		super.create();
+	}
+
+	public function registerHit(note:NoteDef, isMiss:Bool = false)
+	{
+		var noteRating = note.rating;
+
+		var noteDiff = note.strumTime - Conductor.songPosition;
+
+		if (isMiss)
+			noteDiff = Ratings.timingWindows[0].timingWindow;
+
+		if (PlayStateChangeables.botPlay)
+			noteDiff = 0;
+		// judgement
+
+		var strumTime = note.strumTime;
+
+		if (noteDiff != Ratings.timingWindows[0].timingWindow)
+			mean += noteDiff;
+
+		graph.addToHistory(noteDiff, noteRating, strumTime);
 	}
 
 	var frames = 0;
@@ -311,12 +305,12 @@ class ResultsScreen extends FlxSubState
 			if (PlayState.isStoryMode)
 			{
 				FlxG.sound.playMusic(Paths.music(FlxG.save.data.watermark ? "ke_freakyMenu" : "freakyMenu"));
-				Conductor.changeBPM(140);
+				Conductor.changeBPM(102);
 				MusicBeatState.switchState(new MainMenuState());
 			}
 			else
 			{
-				Conductor.changeBPM(140);
+				Conductor.changeBPM(102);
 				MusicBeatState.switchState(new FreeplayState());
 			}
 		}
@@ -336,6 +330,15 @@ class ResultsScreen extends FlxSubState
 		}
 
 		super.update(elapsed);
+	}
+
+	override function destroy()
+	{
+		instance = null;
+		graph.destroy();
+		graph = null;
+		graphSprite.destroy();
+		super.destroy();
 	}
 
 	private function refresh()

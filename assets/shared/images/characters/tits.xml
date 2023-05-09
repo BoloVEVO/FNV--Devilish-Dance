@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.0.2 https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="tits.png" width="2754" height="3293">
+	<SubTexture name="tits left0001" x="3" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0003" x="3" y="667" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0005" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits right0001" x="712" y="667" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0003" x="712" y="1311" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0005" x="3" y="1331" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0007" x="1421" y="3" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0009" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits up0001" x="1421" y="1291" width="628" height="705" frameX="-0" frameY="-0" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0003" x="712" y="1955" width="624" height="689" frameX="-5" frameY="-16" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0005" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits idle0009" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0007" x="1975" y="2002" width="625" height="640" frameX="-2" frameY="-2" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0001" x="2055" y="1291" width="625" height="635" frameX="-1" frameY="-7" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0003" x="2130" y="3" width="621" height="631" frameX="-5" frameY="-11" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits down0001" x="1975" y="2648" width="647" height="604" frameX="-0" frameY="-0" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0003" x="634" y="2650" width="647" height="604" frameX="-0" frameY="-0" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits idle0005" x="3" y="2658" width="617" height="632" frameX="-8" frameY="-10" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits down0005" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0002" x="1975" y="2648" width="647" height="604" frameX="-0" frameY="-0" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0004" x="634" y="2650" width="647" height="604" frameX="-0" frameY="-0" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0006" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0007" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0008" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0009" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0010" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0011" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0012" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0013" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits down0014" x="1287" y="2650" width="647" height="601" frameX="-0" frameY="-3" frameWidth="647" frameHeight="604"/>
+	<SubTexture name="tits idle0002" x="2055" y="1291" width="625" height="635" frameX="-1" frameY="-7" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0004" x="2130" y="3" width="621" height="631" frameX="-5" frameY="-11" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0006" x="3" y="2658" width="617" height="632" frameX="-8" frameY="-10" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0008" x="1975" y="2002" width="625" height="640" frameX="-2" frameY="-2" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0010" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0011" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0012" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0013" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits idle0014" x="1342" y="2002" width="627" height="642" frameX="-0" frameY="-0" frameWidth="627" frameHeight="642"/>
+	<SubTexture name="tits left0002" x="3" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0004" x="3" y="667" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0006" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0007" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0008" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0009" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0010" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0011" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0012" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0013" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits left0014" x="712" y="3" width="703" height="658" frameX="-14" frameY="-225" frameWidth="718" frameHeight="883"/>
+	<SubTexture name="tits right0002" x="712" y="667" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0004" x="712" y="1311" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0006" x="3" y="1331" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0008" x="1421" y="3" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0010" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0011" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0012" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0013" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits right0014" x="1421" y="647" width="703" height="638" frameX="-0" frameY="-1" frameWidth="704" frameHeight="639"/>
+	<SubTexture name="tits up0002" x="1421" y="1291" width="628" height="705" frameX="-0" frameY="-0" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0004" x="712" y="1955" width="624" height="689" frameX="-5" frameY="-16" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0006" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0007" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0008" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0009" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0010" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0011" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0012" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0013" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+	<SubTexture name="tits up0014" x="3" y="1975" width="625" height="677" frameX="-4" frameY="-28" frameWidth="629" frameHeight="705"/>
+</TextureAtlas>

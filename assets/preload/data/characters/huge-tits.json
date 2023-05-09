@@ -1,0 +1,30 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				-5,
+				0
+			],
+			"indices": [],
+			"frameRate": 24,
+			"name": "idle",
+			"looped": false,
+			"prefix": "HUGE TITS IDLE"
+		}
+	],
+	"asset": "characters/HUGE_TITS",
+	"charPos": [
+		0,
+		150
+	],
+	"healthicon": "tits",
+	"flipX": false,
+	"barColor": "#FF6000",
+	"camPos": [
+		-390,
+		40
+	],
+	"holdLength": 4,
+	"scale": 1,
+	"startingAnim": "idle"
+}
