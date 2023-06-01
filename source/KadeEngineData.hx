@@ -278,6 +278,9 @@ class KadeEngineData
 		if (FlxG.save.data.changedHitY == null)
 			FlxG.save.data.changedHitY = FlxG.height / 2 - 50;
 
+		if (FlxG.save.data.alpha == null)
+			FlxG.save.data.alpha = 0.6;	
+
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 
 		KeyBinds.gamepad = gamepad != null;

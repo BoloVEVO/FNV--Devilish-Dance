@@ -618,8 +618,8 @@ class FreeplayState extends MusicBeatState
 
 		opponentText.updateHitbox();
 
-		var upP = FlxG.keys.justPressed.UP;
-		var downP = FlxG.keys.justPressed.DOWN;
+		var upP = FlxG.keys.justPressed.UP || controls.UP_P;
+		var downP = FlxG.keys.justPressed.DOWN || controls.DOWN_P;
 		var accepted = FlxG.keys.justPressed.ENTER && !FlxG.keys.pressed.ALT;
 		var dadDebug = FlxG.keys.justPressed.SIX;
 		var charting = FlxG.keys.justPressed.SEVEN;
@@ -748,9 +748,9 @@ class FreeplayState extends MusicBeatState
 			}
 			else
 			{
-				if (FlxG.keys.justPressed.LEFT)
+				if (FlxG.keys.justPressed.LEFT || controls.LEFT_P)
 					changeDiff(-1);
-				if (FlxG.keys.justPressed.RIGHT)
+				if (FlxG.keys.justPressed.RIGHT || controls.RIGHT_P)
 					changeDiff(1);
 			}
 

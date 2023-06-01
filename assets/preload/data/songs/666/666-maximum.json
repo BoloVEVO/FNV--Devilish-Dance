@@ -23871,7 +23871,7 @@
         "offset": 0,
         "validScore": true,
         "needsVoices": true,
-        "stage": "voltexStage",
+        "stage": "voltexStage2",
         "noteStyle": "voltex",
         "speed": 2.8,
         "bpm": 333

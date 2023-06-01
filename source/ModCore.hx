@@ -107,14 +107,7 @@ class ModCore
 				"songs" => "./songs",
 				"shared" => "./",
 				"videos" => "./videos",
-				"tutorial" => "./tutorial",
-				"week1" => "./week1",
-				"week2" => "./week2",
-				"week3" => "./week3",
-				"week4" => "./week4",
-				"week5" => "./week5",
-				"week6" => "./week6",
-				"week7" => "./week7",
+				"voltex" => "./voltex",
 			]
 		}
 	}

@@ -229,14 +229,14 @@ class MainMenuState extends MusicBeatState
 				}
 			}
 
-			if (FlxG.keys.justPressed.UP)
+			if (FlxG.keys.justPressed.UP || controls.UP_P)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 
 				changeItem(-1);
 			}
 
-			if (FlxG.keys.justPressed.DOWN)
+			if (FlxG.keys.justPressed.DOWN || controls.DOWN_P)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				changeItem(1);

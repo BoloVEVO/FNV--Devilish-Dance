@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="Sex3.png">
+	<!-- Created with Adobe Animate version 18.0.1.115 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="sex 3, the enemy returns0000" x="1920" y="0" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0001" x="3840" y="0" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0002" x="5760" y="0" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0003" x="0" y="1080" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0004" x="1920" y="1080" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0005" x="3840" y="1080" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0006" x="5760" y="1080" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0007" x="0" y="2160" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0008" x="1920" y="2160" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0009" x="3840" y="2160" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0010" x="5760" y="2160" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0011" x="0" y="3240" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0012" x="1920" y="3240" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0013" x="3840" y="3240" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0014" x="5760" y="3240" width="1920" height="1080"/>
+	<SubTexture name="sex 3, the enemy returns0015" x="5760" y="3240" width="1920" height="1080"/>
+</TextureAtlas>

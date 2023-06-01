@@ -85,10 +85,11 @@ class OptionCata extends FlxSprite
 			text.ID = i;
 
 			text.text = opt.getValue();
-			text.updateHitbox();
 
 			if (middleType)
 				text.alignment = FlxTextAlign.RIGHT;
+
+			text.updateHitbox();	
 
 			text.scrollFactor.set();
 
@@ -191,8 +192,6 @@ class OptionsMenu extends MusicBeatSubstate
 				new GhostTapOption("Toggle counting pressing a directional input when no arrow is there as a miss."),
 				new DownscrollOption("Toggle making the notes scroll down rather than up."),
 				new BotPlay("A bot plays for you!"),
-				new FPSCapOption("Change your FPS Cap."),
-
 				new ResetButtonOption("Toggle pressing R to gameover. (Use it with caution!)"),
 				new InstantRespawn("Toggle if you instantly respawn after dying."),
 				new NoteCamera("Toggle Camera movement to the note direction the character sings"),
@@ -209,7 +208,7 @@ class OptionsMenu extends MusicBeatSubstate
 				new HealthBarOption("Toggles health bar visibility"),
 				new JudgementCounter("Show your judgements that you've gotten in the song"),
 				new LaneUnderlayOption("How transparent your lane is, higher = more visible."),
-
+				new ScrollAlpha("Changes the Transparancy of the Hold Notes."),
 				new HitErrorBarOption("Toggle Hit Error Bar to see how late/early are your hits."),
 				new StepManiaOption("Sets the colors of the arrows depending on quantization instead of direction."),
 				new AccuracyOption("Display accuracy information on the info bar."),
@@ -222,24 +221,24 @@ class OptionsMenu extends MusicBeatSubstate
 				new NoteCocks("Toggle The Note Splashes every time you get a SICK!")
 			]),
 			new OptionCata(640, 40, "Misc", [
-
-				new FPSOption("Toggle the FPS Counter"),
-				new DisplayMemory("Toggle the Memory Usage"),
 				#if FEATURE_DISCORD
 				new DiscordOption("Change your Discord Rich Presence update interval."),
 				#end
 				new FlashingLightsOption("Toggle flashing lights that can cause epileptic seizures and strain."),
 				new WatermarkOption("Enable and disable all watermarks from the engine."),
-				new AntialiasingOption("Toggle antialiasing, improving graphics quality at a slight performance penalty."),
 				new MissSoundsOption("Toggle miss sounds playing when you don't hit a note."),
 				new ScoreScreen("Show the score screen after the end of a song"),
 				new ShowInput("Display every single input on the score screen."),
 			]),
 			new OptionCata(935, 40, "Performance", [
-				new GPURendering("Toggle GPU rendering to push Graphics textures to GPU, reducing RAM memory usage. "),
-				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
+				new FPSOption("Toggle the FPS Counter"),
+				new FPSCapOption("Change your FPS Cap."),
+				new DisplayMemory("Toggle the Memory Usage"),
 				new Background("Toogle Stage Background depending of your computer performance."),
+				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
 				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory."),
+				new GPURendering("Toggle GPU rendering to push Graphics textures to GPU, reducing RAM memory usage. "),
+				new AntialiasingOption("Toggle antialiasing, improving graphics quality at a slight performance penalty."),
 				// new NotePostProcessing("Toggle Note Post processing to load notes while song elapses. (Useful for low-end computers)")
 			]),
 			new OptionCata(50, 104, "Saves", [
@@ -485,20 +484,20 @@ class OptionsMenu extends MusicBeatSubstate
 		var escape = false;
 		var clickedCat = false;
 
-		var rightHold = FlxG.keys.pressed.RIGHT || (gamepad != null ? gamepad.pressed.DPAD_RIGHT : false);
+		var rightHold = controls.RIGHT_P || FlxG.keys.pressed.RIGHT || (gamepad != null ? gamepad.pressed.DPAD_RIGHT : false);
 
-		var leftHold = FlxG.keys.pressed.LEFT || (gamepad != null ? gamepad.pressed.DPAD_LEFT : false);
+		var leftHold = controls.LEFT_P || FlxG.keys.pressed.LEFT || (gamepad != null ? gamepad.pressed.DPAD_LEFT : false);
 
 		changedOption = false;
 
-		accept = FlxG.keys.justPressed.ENTER || (gamepad != null ? gamepad.justPressed.A : false);
-		right = FlxG.keys.justPressed.RIGHT || (gamepad != null ? gamepad.justPressed.DPAD_RIGHT : false);
-		left = FlxG.keys.justPressed.LEFT || (gamepad != null ? gamepad.justPressed.DPAD_LEFT : false);
-		up = FlxG.keys.justPressed.UP || (gamepad != null ? gamepad.justPressed.DPAD_UP : false);
-		down = FlxG.keys.justPressed.DOWN || (gamepad != null ? gamepad.justPressed.DPAD_DOWN : false);
+		accept = controls.ACCEPT || FlxG.keys.justPressed.ENTER || (gamepad != null ? gamepad.justPressed.A : false);
+		right = controls.RIGHT_P || FlxG.keys.justPressed.RIGHT || (gamepad != null ? gamepad.justPressed.DPAD_RIGHT : false);
+		left = controls.LEFT_P || FlxG.keys.justPressed.LEFT || (gamepad != null ? gamepad.justPressed.DPAD_LEFT : false);
+		up = controls.UP_P || FlxG.keys.justPressed.UP || (gamepad != null ? gamepad.justPressed.DPAD_UP : false);
+		down = controls.DOWN_P || FlxG.keys.justPressed.DOWN || (gamepad != null ? gamepad.justPressed.DPAD_DOWN : false);
 
 		any = FlxG.keys.justPressed.ANY || (gamepad != null ? gamepad.justPressed.ANY : false);
-		escape = FlxG.keys.justPressed.ESCAPE || (gamepad != null ? gamepad.justPressed.B : false);
+		escape = controls.BACK || FlxG.keys.justPressed.ESCAPE || (gamepad != null ? gamepad.justPressed.B : false);
 
 		if (selectedCat != null && !exiting)
 		{
@@ -865,6 +864,8 @@ class OptionsMenu extends MusicBeatSubstate
 				optObject.color = FlxColor.YELLOW;
 			else
 				optObject.color = FlxColor.WHITE;
+
+			optObject.updateHitbox();	
 		}
 	}
 }

@@ -2214,6 +2214,56 @@ class LaneUnderlayOption extends Option
 	}
 }
 
+class ScrollAlpha extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+		acceptValues = true;
+	}
+
+	public override function press():Bool
+	{
+		return false;
+	}
+
+	private override function updateDisplay():String
+	{
+		return ("Scroll Alpha");
+	}
+
+	override function right():Bool
+	{
+		FlxG.save.data.alpha += 0.1;
+
+		if (FlxG.save.data.alpha < 0)
+			FlxG.save.data.alpha = 0;
+
+		if (FlxG.save.data.alpha > 1)
+			FlxG.save.data.alpha = 1;
+		return true;
+	}
+
+	override function getValue():String
+	{
+		return "Hold note transparency: < " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1) + " >";
+	}
+
+	override function left():Bool
+	{
+		FlxG.save.data.alpha -= 0.1;
+
+		if (FlxG.save.data.alpha < 0)
+			FlxG.save.data.alpha = 0;
+
+		if (FlxG.save.data.alpha > 1)
+			FlxG.save.data.alpha = 1;
+
+		return true;
+	}
+}
+
 class ScoreSmoothing extends Option
 {
 	public function new(desc:String)

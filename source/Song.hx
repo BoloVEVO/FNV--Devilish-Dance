@@ -131,8 +131,6 @@ class Song
 	{
 		var songFile = '$songId/$songId$difficulty';
 
-		Debug.logInfo('Loading song JSON: $songFile');
-
 		var rawJson = Paths.loadJSON('songs/$songFile');
 		var rawMetaJson = Paths.loadJSON('songs/$songId/_meta');
 

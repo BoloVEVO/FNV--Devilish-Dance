@@ -11,6 +11,7 @@ import PlayState;
 import flixel.util.FlxDestroyUtil;
 import NoteDef;
 import flixel.util.FlxPool;
+import flixel.math.FlxRect;
 
 using StringTools;
 
@@ -184,7 +185,7 @@ class NoteSpr extends FlxSprite
 
 				noteYOff = -stepHeight + swagWidth * 0.5;
 
-				alpha = !_def.sustainActive && _def.parent.wasGoodHit ? 0.3 : 0.6;
+				alpha = !_def.sustainActive && _def.parent.wasGoodHit ? 0.3 : FlxG.save.data.alpha;
 
 				if (PlayStateChangeables.useDownscroll)
 					flipY = true;
@@ -220,6 +221,7 @@ class NoteSpr extends FlxSprite
 		}
 
 		angle = localAngle + modAngle;
+		moves = false;
 	}
 
 	override function update(elapsed:Float)
@@ -410,5 +412,16 @@ class NoteSpr extends FlxSprite
 				return;
 			}
 		}
+	}
+
+	@:noCompletion
+	override function set_clipRect(rect:FlxRect):FlxRect
+	{
+		clipRect = rect;
+
+		if (frames != null)
+			frame = frames.frames[animation.frameIndex];
+
+		return rect;
 	}
 }

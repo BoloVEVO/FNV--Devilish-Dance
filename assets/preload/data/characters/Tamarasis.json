@@ -1,0 +1,39 @@
+{
+	"name": "Tamarasis",
+	"asset": "characters/Tamarasis",
+	"barColor": "#D8557A",
+	"camPos": [0,0],
+	"startingAnim": "idle",
+	"animations": [
+		{
+			"offsets": [0,0],
+			"name": "idle",
+			"looped": false,
+			"prefix": "DUALRT_IdleDance"
+		},
+		{
+			"offsets": [50,-6],
+			"name": "singLEFT",
+			"looped": false,
+			"prefix": "DUALRT_pose_backward"
+		},
+		{
+			"offsets": [10,-30],
+			"name": "singRIGHT",
+			"looped": false,
+			"prefix": "DUALRT_pose_forward"
+		},
+		{
+			"offsets": [0,-133],
+			"name": "singDOWN",
+			"looped": false,
+			"prefix": "DUALRT_pose_downward"
+		},
+		{
+			"offsets": [-6,31],
+			"name": "singUP",
+			"looped": false,
+			"prefix": "DUALRT_pose_upward"
+		}
+	]
+}

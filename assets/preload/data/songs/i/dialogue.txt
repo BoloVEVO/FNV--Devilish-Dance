@@ -1,0 +1,7 @@
+:bf:normalBox:angry:nya!
+:dad:normalBox:normal:There you are, Boyfriend.
+:dad:normalBox:normal:You have impressed me so far.
+:bf:normalBox:normal:Bap
+:dad:normalBox:excited:Are you ready for an epic battle?
+:bf:normalBox:excited:Ba Beep Boo!
+:dad:normalBox:scared:Good Luck, you're going to need it.

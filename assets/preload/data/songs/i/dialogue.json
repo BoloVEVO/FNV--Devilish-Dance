@@ -1,0 +1,53 @@
+{
+	"dialogue": [
+		{
+			"speed": 0.05,
+			"portrait": "bf",
+			"boxState": "normal",
+			"expression": "excited",
+			"text": "nya!"
+		},
+		{
+			"speed": 0.05,
+			"portrait": "rasis",
+			"boxState": "normal",
+			"expression": "talk",
+			"text": "There you are, Boyfriend."
+		},
+		{
+			"speed": 0.05,
+			"portrait": "rasis",
+			"boxState": "normal",
+			"expression": "excited",
+			"text": "You have impressed me so far."
+		},
+		{
+			"speed": 0.05,
+			"portrait": "bf",
+			"boxState": "normal",
+			"expression": "talk",
+			"text": "Bap"
+		},
+		{
+			"speed": 0.05,
+			"portrait": "rasis",
+			"boxState": "normal",
+			"expression": "excited",
+			"text": "Are you ready for an epic battle?"
+		},
+		{
+			"speed": 0.05,
+			"portrait": "bf",
+			"boxState": "normal",
+			"expression": "talk",
+			"text": "Ba Beep Boo!"
+		},
+		{
+			"speed": 0.05,
+			"portrait": "Rasis",
+			"boxState": "normal",
+			"expression": "shocked",
+			"text": "Good Luck, you're going to need it."
+		}
+	]
+}

@@ -1,0 +1,42 @@
+{
+	"name": "Rasis",
+	"asset": "characters/Rasis",
+	"flipX": false,
+	"barColor": "#d8558e",
+	"camPos": [0,0],
+	"scale": 1,
+	"startingAnim": "idle",
+	"animations": [
+		{
+			"offsets": [0,0],
+			"looped": false,
+			"name": "idle",
+			"prefix": "Mom Idle"
+		},
+		{
+			"offsets": [50,-23],
+			"looped": false,
+			"name": "singLEFT",
+			"prefix": "Mom Left Pose"
+		},
+		{
+			"offsets": [10,-60],
+			"looped": false,
+			"name": "singRIGHT",
+			"prefix": "Mom Pose Left"
+		},
+		{
+			"offsets": [20,-160],
+			"looped": false,
+			"name": "singDOWN",
+			"prefix": "MOM DOWN POSE"
+		},
+		{
+			"offsets": [14,40],
+			"looped": false,
+			"name": "singUP",
+			"indices": [],
+			"prefix": "Mom Up Pose"
+		}
+	]
+}

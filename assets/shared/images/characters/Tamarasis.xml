@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="Tamarasis.png">
+	<!-- Created with Adobe Animate version 20.5.1.31044 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="DUALRT_IdleDance0000" x="0" y="0" width="554" height="742" frameX="-24" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0001" x="0" y="0" width="554" height="742" frameX="-24" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0002" x="556" y="0" width="541" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0003" x="556" y="0" width="541" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0004" x="1099" y="0" width="548" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0005" x="1649" y="0" width="548" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0006" x="2199" y="0" width="541" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0007" x="2199" y="0" width="541" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0008" x="2742" y="0" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0009" x="2742" y="0" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0010" x="3309" y="0" width="569" height="742" frameX="0" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0011" x="3309" y="0" width="569" height="742" frameX="0" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0012" x="0" y="744" width="579" height="742"/>
+	<SubTexture name="DUALRT_IdleDance0013" x="0" y="744" width="579" height="742"/>
+	<SubTexture name="DUALRT_IdleDance0014" x="581" y="744" width="578" height="742" frameX="0" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0015" x="581" y="744" width="578" height="742" frameX="0" frameY="0" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0016" x="1161" y="744" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0017" x="1161" y="744" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0018" x="1728" y="744" width="572" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0019" x="2302" y="744" width="572" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0020" x="2876" y="744" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0021" x="2876" y="744" width="565" height="740" frameX="0" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0022" x="3443" y="744" width="565" height="739" frameX="0" frameY="-3" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0023" x="3443" y="744" width="565" height="739" frameX="0" frameY="-3" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0024" x="0" y="1488" width="547" height="738" frameX="-22" frameY="-4" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0025" x="0" y="1488" width="547" height="738" frameX="-22" frameY="-4" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0026" x="549" y="1488" width="555" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_IdleDance0027" x="549" y="1488" width="555" height="740" frameX="-24" frameY="-2" frameWidth="579" frameHeight="742"/>
+	<SubTexture name="DUALRT_pose_backward0000" x="1106" y="1488" width="552" height="705" frameX="0" frameY="-1" frameWidth="557" frameHeight="706"/>
+	<SubTexture name="DUALRT_pose_backward0001" x="1106" y="1488" width="552" height="705" frameX="0" frameY="-1" frameWidth="557" frameHeight="706"/>
+	<SubTexture name="DUALRT_pose_backward0002" x="1660" y="1488" width="557" height="706"/>
+	<SubTexture name="DUALRT_pose_backward0003" x="2219" y="1488" width="557" height="706"/>
+	<SubTexture name="DUALRT_pose_backward0004" x="2219" y="1488" width="557" height="706"/>
+	<SubTexture name="DUALRT_pose_downward0000" x="2778" y="1488" width="575" height="606" frameX="-19" frameY="0" frameWidth="602" frameHeight="606"/>
+	<SubTexture name="DUALRT_pose_downward0001" x="2778" y="1488" width="575" height="606" frameX="-19" frameY="0" frameWidth="602" frameHeight="606"/>
+	<SubTexture name="DUALRT_pose_downward0002" x="3355" y="1488" width="602" height="605" frameX="0" frameY="0" frameWidth="602" frameHeight="606"/>
+	<SubTexture name="DUALRT_pose_downward0003" x="3355" y="1488" width="602" height="605" frameX="0" frameY="0" frameWidth="602" frameHeight="606"/>
+	<SubTexture name="DUALRT_pose_downward0004" x="3355" y="1488" width="602" height="605" frameX="0" frameY="0" frameWidth="602" frameHeight="606"/>
+	<SubTexture name="DUALRT_pose_forward0000" x="0" y="2230" width="539" height="698" frameX="-1" frameY="-10" frameWidth="540" frameHeight="708"/>
+	<SubTexture name="DUALRT_pose_forward0001" x="0" y="2230" width="539" height="698" frameX="-1" frameY="-10" frameWidth="540" frameHeight="708"/>
+	<SubTexture name="DUALRT_pose_forward0002" x="541" y="2230" width="536" height="707" frameX="0" frameY="0" frameWidth="540" frameHeight="708"/>
+	<SubTexture name="DUALRT_pose_forward0003" x="1079" y="2230" width="502" height="703" frameX="-34" frameY="-4" frameWidth="540" frameHeight="708"/>
+	<SubTexture name="DUALRT_pose_forward0004" x="1079" y="2230" width="502" height="703" frameX="-34" frameY="-4" frameWidth="540" frameHeight="708"/>
+	<SubTexture name="DUALRT_pose_upward0000" x="1583" y="2230" width="528" height="767" frameX="-4" frameY="0" frameWidth="532" frameHeight="768"/>
+	<SubTexture name="DUALRT_pose_upward0001" x="1583" y="2230" width="528" height="767" frameX="-4" frameY="0" frameWidth="532" frameHeight="768"/>
+	<SubTexture name="DUALRT_pose_upward0002" x="2113" y="2230" width="527" height="768" frameX="0" frameY="0" frameWidth="532" frameHeight="768"/>
+	<SubTexture name="DUALRT_pose_upward0003" x="2113" y="2230" width="527" height="768" frameX="0" frameY="0" frameWidth="532" frameHeight="768"/>
+	<SubTexture name="DUALRT_pose_upward0004" x="2113" y="2230" width="527" height="768" frameX="0" frameY="0" frameWidth="532" frameHeight="768"/>
+	<!-- YO-shiBobby here -->
+	<!-- i really would've loved to make rasis hold tamaneko while they alternate singing, just like mom + dad on the xmas week, but i unfortunately didn't have time to draw new stuff for that :< -->
+	<!-- anyway if you're seeing this go brush your teeth and and do some stretches!!! aight, peace -->
+</TextureAtlas>

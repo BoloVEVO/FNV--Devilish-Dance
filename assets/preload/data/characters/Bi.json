@@ -1,0 +1,41 @@
+{
+	"name": "Bi",
+	"asset": "characters/Bi",
+	"flipX": false,
+	"barColor": "#d8558e",
+	"camPos": [0,0],
+	"scale": 1,
+	"startingAnim": "idle",
+	"animations": [
+		{
+			"offsets": [-50,-100],
+			"name": "idle",
+			"looped": true,
+			"prefix": "Bi_IdleDance"
+		},
+		{
+			"offsets": [75,-125],
+			"name": "singLEFT",
+			"looped": false,
+			"prefix": "bi_pose_backward"
+		},
+		{
+			"offsets": [-200,-100],
+			"name": "singRIGHT",
+			"looped": false,
+			"prefix": "bi_pose_forward"
+		},
+		{
+			"offsets": [0,-225],
+			"name": "singDOWN",
+			"looped": false,
+			"prefix": "bi_pose_downward"
+		},
+		{
+			"offsets": [-25,50],
+			"name": "singUP",
+			"looped": false,
+			"prefix": "bi_pose_upward"
+		}
+	]
+}
