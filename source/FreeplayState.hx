@@ -946,7 +946,7 @@ class FreeplayState extends MusicBeatState
 		{
 			if (instance.songs[curSelected].songCharacter == "sm")
 			{
-				currentSongData = Song.loadFromJsonRAW(File.getContent(instance.songs[curSelected].sm.jsonPath));
+				currentSongData = Song.loadFromJsonRAW(#if FEATURE_FILESYSTEM File.getContent(instance.songs[curSelected].sm.jsonPath) #else OpenFlAssets.getText(instance.songs[curSelected].songName) #end);
 			}
 			else
 			{
@@ -959,6 +959,8 @@ class FreeplayState extends MusicBeatState
 			Debug.logError(ex);
 			return;
 		}
+
+		// Fix HTML5 Compile. Which is broken anyway because CoolText.
 
 		PlayState.SONG = currentSongData;
 		PlayState.storyDifficulty = CoolUtil.difficultyArray.indexOf(instance.songs[curSelected].diffs[difficulty]);
