@@ -3,14 +3,10 @@ package;
 import SectionRender.SustainRender;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
-import flixel.util.FlxColor;
 import LuaClass;
 import PlayState;
-import flixel.util.FlxDestroyUtil;
 import NoteDef;
-import flixel.util.FlxPool;
 import flixel.math.FlxRect;
 
 using StringTools;
@@ -22,18 +18,18 @@ class NoteSpr extends FlxSprite
 	public var noteYOff:Float = 0;
 
 	public static var swagWidth:Float = 160 * 0.7;
-	public static var PURP_NOTE:Int = 0;
-	public static var GREEN_NOTE:Int = 2;
-	public static var BLUE_NOTE:Int = 1;
-	public static var RED_NOTE:Int = 3;
+	public static final PURP_NOTE:Int = 0;
+	public static final GREEN_NOTE:Int = 2;
+	public static final BLUE_NOTE:Int = 1;
+	public static final RED_NOTE:Int = 3;
 
 	public var modAngle:Float = 0; // The angle set by modcharts
 	public var localAngle:Float = 0; // The angle to be edited inside Note.hx
 	public var originAngle:Float = 0; // The angle the OG note of the sus note had (?)
 
-	public static var dataColor:Array<String> = ['purple', 'blue', 'green', 'red'];
-	public static var quantityColor:Array<Int> = [RED_NOTE, 2, BLUE_NOTE, 2, PURP_NOTE, 2, GREEN_NOTE, 2];
-	public static var arrowAngles:Array<Int> = [180, 90, 270, 0];
+	public static final dataColor:Array<String> = ['purple', 'blue', 'green', 'red'];
+	public static final quantityColor:Array<Int> = [RED_NOTE, 2, BLUE_NOTE, 2, PURP_NOTE, 2, GREEN_NOTE, 2];
+	public static final arrowAngles:Array<Int> = [180, 90, 270, 0];
 
 	public var stepHeight:Float = 0;
 
@@ -48,6 +44,8 @@ class NoteSpr extends FlxSprite
 	public var selectedBox:ChartingBox;
 
 	var nullSafety:Bool = true;
+
+	var modAlpha:Float = 1;
 
 	public function new()
 	{
@@ -185,8 +183,6 @@ class NoteSpr extends FlxSprite
 
 				noteYOff = -stepHeight + swagWidth * 0.5;
 
-				alpha = !_def.sustainActive && _def.parent.wasGoodHit ? 0.3 : FlxG.save.data.alpha;
-
 				if (PlayStateChangeables.useDownscroll)
 					flipY = true;
 
@@ -248,26 +244,7 @@ class NoteSpr extends FlxSprite
 
 			angle = localAngle + modAngle;
 
-			if (_def.isSustainNote)
-			{
-				if (!_def.sustainActive && _def.parent.tooLate)
-				{
-					alpha = 0.3;
-				}
-			}
-
-			if (!_def.mustPress)
-			{
-				// CPU NOTES
-				_def.canBeHit = false;
-
-				if (_def.strumTime - Conductor.songPosition < (Ratings.timingWindows[0].timingWindow) * _def.earlyHitMult)
-				{
-					if ((_def.isSustainNote && _def.prevNote.wasGoodHit) || _def.strumTime <= Conductor.songPosition)
-						_def.wasGoodHit = true;
-				}
-			}
-			else
+			if (_def.mustPress)
 			{
 				switch (_def.noteType)
 				{
@@ -297,14 +274,27 @@ class NoteSpr extends FlxSprite
 			}
 
 			if (_def.isSustainNote)
-				_def.isSustainEnd = _def.spotInLine == _def.parent.children.length - 1;
-
-			if (_def.tooLate && !_def.wasGoodHit)
 			{
-				if (alpha > 0.3)
-					alpha = 0.3;
+				_def.isSustainEnd = _def.spotInLine == _def.parent.children.length - 1;
+				alpha = !_def.sustainActive
+					&& (_def.parent.tooLate || _def.parent.wasGoodHit) ? (modAlpha * FlxG.save.data.alpha) / 2 : modAlpha * FlxG.save.data.alpha; // This is the correct way
+			}
+			else if (_def.tooLate && !_def.wasGoodHit)
+			{
+				if (alpha > modAlpha * 0.3)
+					alpha = modAlpha * 0.3;
 			}
 		}
+	}
+
+	@:noCompletion
+	override function set_y(value:Float):Float
+	{
+		if (_def != null)
+			if (_def.isSustainNote)
+				if (PlayStateChangeables.useDownscroll)
+					value -= height - swagWidth;
+		return super.set_y(value);
 	}
 
 	override function destroy()

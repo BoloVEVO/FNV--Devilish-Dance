@@ -3,6 +3,8 @@
 		"sectionLengths": [],
 		"player1": "bf",
 		"player2": "Tamaneko",
+		"judgeStyle": "voltex",
+		"noteStyle": "voltex",
 		"notes": [
 			{
 				"typeOfSection": 0,

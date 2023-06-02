@@ -299,9 +299,9 @@ class Paths
 		return file;
 	}
 
-	inline static public function voices(song:String, ?returnString:Bool = false):Any
+	inline static public function voices(song:String, ?returnString:Bool = false, extraSuffix:String = ''):Any
 	{
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices';
+		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase() + '/Voices$extraSuffix';
 		switch (songLowercase)
 		{
 			case 'dad-battle':
@@ -392,7 +392,7 @@ class Paths
 
 	static public function video(key:String, type:String = VIDEO_EXT)
 	{
-		return 'assets/videos/$key.$type';
+		return 'videos:assets/videos/$key.$type';
 	}
 
 	inline static public function image(key:String, ?library:String, ?gpuRender:Bool):FlxGraphic

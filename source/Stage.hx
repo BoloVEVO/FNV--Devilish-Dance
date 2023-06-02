@@ -18,7 +18,9 @@ import flixel.util.FlxColor;
 class Stage extends MusicBeatState
 {
 	public var stageJSON:StageData;
+
 	var pos:Float = 0;
+
 	public var curStage:String = '';
 	public var camZoom:Float = 1.05; // The zoom of the camera to have at the start of the game
 	public var toAdd:Array<Dynamic> = []; // Add BGs on stage startup, load BG in by using "toAdd.push(bgVar);"
@@ -106,92 +108,120 @@ class Stage extends MusicBeatState
 
 		switch (curStage)
 		{
-			case 'voltexStage2':
-				camZoom = 0.65;
-				var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image(PlayState.SONG.songId.toLowerCase(), 'voltex'));
-
-				bg.antialiasing = FlxG.save.data.antialiasing;
-
-				swagBacks['bg'] = bg;
-
-				toAdd.push(bg);
-
-				var stageFront:FlxSprite = new FlxSprite().loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
-				stageFront.alpha = 1;
-				stageFront.antialiasing = FlxG.save.data.antialiasing;
-				swagBacks['stageFront'] = stageFront;
-
-				toAdd.push(stageFront);
-
-				var lateStageFront:FlxSprite = new FlxSprite().loadGraphicFromSprite(stageFront);
-				lateStageFront.antialiasing = FlxG.save.data.antialiasing;
-				lateStageFront.alpha = 0.0001;
-				swagBacks['lateStageFront'] = lateStageFront;
-
-				layInFront[1].push(lateStageFront);
-
-				var sword:FlxSprite = new FlxSprite();
-				sword.frames = Paths.getSparrowAtlas('pussy_destroyer', 'voltex');
-				sword.animation.addByPrefix('slice', 'slice', 24, false);
-				sword.alpha = 0.0001;
-				sword.scale.set(1.5, 1.5);
-				swagBacks['sword'] = sword;
-				layInFront[2].push(sword);
 			case 'voltexStage':
 				camZoom = 0.65;
 				var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image(PlayState.SONG.songId.toLowerCase(), 'voltex'));
+
 				bg.antialiasing = FlxG.save.data.antialiasing;
-				bg.active = false;
-				bg.moves = false;
+
 				swagBacks['bg'] = bg;
+
 				toAdd.push(bg);
 
-				var stageFront:FlxSprite = new FlxSprite().loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
-				stageFront.alpha = 1;
-				stageFront.moves = false;
-				stageFront.active = false;
-				stageFront.antialiasing = FlxG.save.data.antialiasing;
-				swagBacks['stageFront'] = stageFront;
-
-				toAdd.push(stageFront);	
-
-				if (PlayState.SONG.songId.toLowerCase() == 'i')
+				switch (PlayState.SONG.songId)
 				{
-					var bg2:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('BG_back_finale', 'voltex'));
-					bg2.antialiasing = FlxG.save.data.antialiasing;
-					swagBacks['bg2'] = bg2;
-					bg2.visible = false;
-					bg2.screenCenter();
-					var stageFront:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
-					stageFront.antialiasing = FlxG.save.data.antialiasing;
-					swagBacks['stageFront'] = stageFront;
-					stageFront.screenCenter();
-					stageFront.visible = false;
-					toAdd.push(bg2);
-					if (FlxG.save.data.distractions)
-					{
-						var hotGirlBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('dualrasis_glow', 'shared'));
-						hotGirlBG.screenCenter();
-						hotGirlBG.antialiasing = FlxG.save.data.antialiasing;
-						swagBacks['hotGirlBG'] = hotGirlBG;
+					case '666':
+						var stageFront:FlxSprite = new FlxSprite().loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
+						stageFront.alpha = 1;
+						stageFront.antialiasing = FlxG.save.data.antialiasing;
+						swagBacks['stageFront'] = stageFront;
+						toAdd.push(stageFront);
 
-						var coolCatBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('dualtama_glow', 'shared'));
-						coolCatBG.screenCenter();
-						coolCatBG.antialiasing = FlxG.save.data.antialiasing;
-						swagBacks['coolCatBG'] = coolCatBG;
-						hotGirlBG.visible = false;
-						coolCatBG.visible = false;
+						var lateStageFront:FlxSprite = new FlxSprite().loadGraphicFromSprite(stageFront);
+						lateStageFront.antialiasing = FlxG.save.data.antialiasing;
+						lateStageFront.alpha = 0.0001;
+						swagBacks['lateStageFront'] = lateStageFront;
 
-						hotGirlBG.x += 75;
-						hotGirlBG.y -= 75;
-						coolCatBG.x += 75;
-						coolCatBG.y -= 75;
-						pos = hotGirlBG.y;
-						toAdd.push(coolCatBG);
-						toAdd.push(hotGirlBG);
-					}
-					toAdd.push(stageFront);
+						layInFront[1].push(lateStageFront);
+
+						var sword:FlxSprite = new FlxSprite();
+						sword.frames = Paths.getSparrowAtlas('pussy_destroyer', 'voltex');
+						sword.animation.addByPrefix('slice', 'slice', 24, false);
+						sword.alpha = 0.0001;
+						sword.scale.set(1.5, 1.5);
+						swagBacks['sword'] = sword;
+						layInFront[2].push(sword);
+					case 'i':
+						var stageFront:FlxSprite = new FlxSprite().loadGraphic(Paths.image('BG_floor_symmetrical', 'voltex'));
+
+						stageFront.antialiasing = FlxG.save.data.antialiasing;
+						stageFront.alpha = 0.0001;
+						swagBacks['stageFront'] = stageFront;
+
+						Paths.image('BG_back_finale', 'voltex');
+
+						if (FlxG.save.data.distractions)
+						{
+							var hotGirlBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('dualrasis_glow', 'voltex'));
+							hotGirlBG.screenCenter();
+							hotGirlBG.antialiasing = FlxG.save.data.antialiasing;
+							swagBacks['hotGirlBG'] = hotGirlBG;
+
+							var coolCatBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('dualtama_glow', 'voltex'));
+							coolCatBG.screenCenter();
+							coolCatBG.antialiasing = FlxG.save.data.antialiasing;
+							swagBacks['coolCatBG'] = coolCatBG;
+							hotGirlBG.alpha = 0.001;
+							coolCatBG.alpha = 0.001;
+
+							hotGirlBG.x += 75;
+							hotGirlBG.y -= 75;
+							coolCatBG.x += 75;
+							coolCatBG.y -= 75;
+							pos = hotGirlBG.y;
+							toAdd.push(coolCatBG);
+							toAdd.push(hotGirlBG);
+						}
+
+						toAdd.push(stageFront);
+
+						if (FlxG.save.data.distractions)
+						{
+							var lightsWentBRRR = new FlxSprite();
+							lightsWentBRRR.frames = Paths.getSparrowAtlas('Sex', 'voltex');
+							lightsWentBRRR.animation.addByPrefix('Sex', 'sex', 60, false);
+							lightsWentBRRR.scrollFactor.set();
+							lightsWentBRRR.updateHitbox();
+							lightsWentBRRR.screenCenter();
+							lightsWentBRRR.camera = PlayState.instance.mainCam;
+							swagBacks['lightsWentBRRR'] = lightsWentBRRR;
+
+							var littleLight = new FlxSprite();
+							littleLight.frames = Paths.getSparrowAtlas('Sex2', 'voltex');
+							littleLight.animation.addByPrefix('Sex2', 'sex 2, the squeakquel', 60, false);
+							littleLight.scrollFactor.set();
+							littleLight.updateHitbox();
+							littleLight.screenCenter();
+							littleLight.camera = PlayState.instance.mainCam;
+							swagBacks['littleLight'] = littleLight;
+
+							var lightsWentBRRRnt = new FlxSprite();
+							lightsWentBRRRnt.frames = Paths.getSparrowAtlas('Sex3', 'voltex');
+							lightsWentBRRRnt.animation.addByPrefix('Sex3', 'sex 3, the enemy returns', 60, false);
+							lightsWentBRRRnt.scrollFactor.set();
+							lightsWentBRRRnt.updateHitbox();
+							lightsWentBRRRnt.screenCenter();
+							lightsWentBRRRnt.camera = PlayState.instance.mainCam;
+							swagBacks['lightsWentBRRRnt'] = lightsWentBRRRnt;
+
+							lightsWentBRRR.alpha = 0.001;
+							littleLight.alpha = 0.001;
+							lightsWentBRRRnt.alpha = 0.001;
+							toAdd.push(lightsWentBRRRnt);
+							toAdd.push(lightsWentBRRR);
+							toAdd.push(littleLight);
+						}
+						else
+						{
+							var conalep_pc = new FlxSprite().makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
+							conalep_pc.screenCenter();
+							conalep_pc.camera = PlayState.instance.mainCam;
+							conalep_pc.alpha = 0.001;
+							swagBacks['conalep_pc'] = conalep_pc;
+							toAdd.push(conalep_pc);
+						}
 				}
+
 			case 'void': // In case you want to do chart with videos.
 
 				var black:FlxSprite = new FlxSprite().makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.BLACK);
@@ -307,39 +337,68 @@ class Stage extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
-		if (FlxG.save.data.background)
-		{
-			
-		}
+		if (!FlxG.save.data.background)
+			return;
+
 		super.update(elapsed);
 	}
 
 	override function stepHit()
 	{
 		super.stepHit();
+		if (!FlxG.save.data.background)
+			return;
 
 		switch (curStage)
 		{
 			case 'voltexStage':
-				if (PlayState.SONG.songId == 'i')
+				switch (PlayState.SONG.songId)
 				{
-					if (PlayState.instance.generatedMusic)
-					{
-						if (curStep == Std.int(1304 * PlayState.rate))
+					case 'i':
+						switch (curStep)
 						{
-							remove(swagBacks['bg']);
-							swagBacks['bg'].destroy();
-							swagBacks['bg2'].visible = true;
-							if (FlxG.save.data.distractions)
-							{
-								swagBacks['stageFront'].visible = true;
-								swagBacks['coolCatBG'].visible = true;
-								swagBacks['hotGirlBG'].visible = true;
-								epicCatSpin();
-								verticalSway();
-							}
+							case 1304:
+								swagBacks['bg'].loadGraphic(Paths.image('BG_back_finale', 'voltex'));
+
+								// Using cast method to interpret them as FlxSprite because too many var defining
+
+								cast(swagBacks['stageFront'], FlxSprite).alpha = 1;
+
+								if (FlxG.save.data.distractions)
+								{
+									cast(swagBacks['coolCatBG'], FlxSprite).alpha = 1;
+									cast(swagBacks['hotGirlBG'], FlxSprite).alpha = 1;
+
+									epicCatSpin();
+									verticalSway();
+
+									cast(swagBacks['lightsWentBRRR'], FlxSprite).alpha = 1;
+									cast(swagBacks['littleLight'], FlxSprite).alpha = 1;
+									cast(swagBacks['lightsWentBRRRnt'], FlxSprite).alpha = 1;
+									cast(swagBacks['lightsWentBRRR'], FlxSprite).animation.play('Sex', false, false, 0);
+									cast(swagBacks['littleLight'], FlxSprite).animation.play('Sex2', false, false, 0);
+								}
+								else
+								{
+									cast(swagBacks['conalep_pc'], FlxSprite).alpha = 1;
+									PlayState.instance.mainCam.fade(FlxColor.WHITE, 0.75 / PlayState.instance.songMultiplier, true);
+								}
+							case 1352:
+								if (FlxG.save.data.distractions)
+								{
+									PlayState.instance.dad.alpha = 0;
+									cast(swagBacks['lightsWentBRRR'], FlxSprite).alpha = 0;
+									cast(swagBacks['littleLight'], FlxSprite).alpha = 0;
+									cast(swagBacks['lightsWentBRRRnt'], FlxSprite).animation.play('Sex3', false, false, 0);
+								}
+							case 1364:
+								if (!FlxG.save.data.distractions)
+								{
+									cast(swagBacks['conalep_pc'], FlxSprite).alpha = 0;
+
+									PlayState.instance.mainCam.fade(FlxColor.WHITE, 0.75 / PlayState.instance.songMultiplier, true);
+								}
 						}
-					}
 				}
 		}
 	}
@@ -347,6 +406,9 @@ class Stage extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
+
+		if (!FlxG.save.data.background)
+			return;
 
 		if (FlxG.save.data.distractions && FlxG.save.data.background && animatedBacks.length > 0)
 		{
@@ -399,7 +461,7 @@ class Stage extends MusicBeatState
 
 	function epicCatSpin()
 	{
-		spinCat = PlayState.instance.createTween(swagBacks['coolCatBG'], {angle: 180}, 8 / PlayState.rate, {
+		spinCat = PlayState.instance.createTween(swagBacks['coolCatBG'], {angle: 180}, 8 / PlayState.instance.songMultiplier, {
 			ease: FlxEase.linear,
 			onComplete: function(tween:FlxTween)
 			{
@@ -421,7 +483,7 @@ class Stage extends MusicBeatState
 
 	function verticalSway()
 	{
-		rasisTween = PlayState.instance.createTween(swagBacks['hotGirlBG'], {y: pos + 30}, 2 / PlayState.rate, {
+		rasisTween = PlayState.instance.createTween(swagBacks['hotGirlBG'], {y: pos + 30}, 2 / PlayState.instance.songMultiplier, {
 			ease: FlxEase.sineInOut,
 			onComplete: function(tween:FlxTween)
 			{

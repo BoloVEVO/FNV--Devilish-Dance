@@ -1,6 +1,5 @@
 {
     "song": {
-        "songName": "666",
         "songId": "666",
         "player1": "bf",
         "gfVersion": "gf",
@@ -18937,7 +18936,7 @@
         ],
         "offset": 0,
         "song": "666",
-        "stage": "voltexStage2",
+        "stage": "voltexStage",
         "validScore": true,
         "needsVoices": true,
         "noteStyle": "voltex",

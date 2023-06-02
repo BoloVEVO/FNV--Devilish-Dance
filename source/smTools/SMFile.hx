@@ -12,7 +12,9 @@ class SMFile
 {
 	public static function loadFile(path):SMFile
 	{
-		return new SMFile(File.getContent(path).split('\n'));
+		var stepFile = new SMFile(File.getContent(path).split('\n'));
+
+		return stepFile;
 	}
 
 	private var _fileData:Array<String>;
@@ -25,6 +27,8 @@ class SMFile
 
 	public var header:SMHeader;
 	public var measures:Array<SMMeasure>;
+
+	public var jsonPath:String = '';
 
 	public function new(data:Array<String>)
 	{
@@ -124,6 +128,7 @@ class SMFile
 		// init a fnf song
 
 		var song = {
+			song: header.TITLE,
 			songId: header.TITLE,
 			songName: header.TITLE,
 			notes: [],
@@ -238,7 +243,7 @@ class SMFile
 					}
 
 					// get the lane and note type
-					var lane = index + 4;
+					var lane = index;
 					var numba = Std.parseInt(i);
 
 					// switch through the type and add the note
@@ -246,16 +251,16 @@ class SMFile
 					switch (numba)
 					{
 						case 1: // normal
-							section.sectionNotes.push([rowTime, lane, 0, 0, currentBeat]);
+							section.sectionNotes.push([rowTime, lane, 0, 0, 1.0]);
 						case 2: // held head
-							heldNotes[lane] = [rowTime, lane, 0, 0, currentBeat];
+							heldNotes[lane] = [rowTime, lane, 0, 0, 1.0];
 						case 3: // held tail
 							var data = heldNotes[lane];
 							var timeDiff = rowTime - data[0];
 							section.sectionNotes.push([data[0], lane, timeDiff, 0, data[4]]);
 							heldNotes[index] = [];
 						case 4: // roll head
-							heldNotes[lane] = [rowTime, lane, 0, 0, currentBeat];
+							heldNotes[lane] = [rowTime, lane, 0, 0, 1.0];
 					}
 					index++;
 				}

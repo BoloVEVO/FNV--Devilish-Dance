@@ -1,6 +1,5 @@
 {
     "song": {
-        "songName": "666",
         "songId": "666",
         "player1": "bf",
         "gfVersion": "gf",
@@ -18971,7 +18970,7 @@
         "offset": 0,
         "validScore": true,
         "needsVoices": true,
-        "stage": "voltexStage2",
+        "stage": "voltexStage",
         "noteStyle": "voltex",
         "speed": 2.5,
         "bpm": 333

@@ -12,16 +12,28 @@
             300
         ],
         "Tamaneko": [
-           -350, 275
+            -350,
+            275
         ],
-        "TamaNekoDark":[
-            -350, 275
+        "TamaNekoDark": [
+            -350,
+            275
         ],
-        "Rasis":[
-            -275, -50
+        "Rasis": [
+            -275,
+            -50
         ],
-        "Tamarasis":[
-            -275, -50
+        "Tamarasis": [
+            -275,
+            -50
+        ],
+        "tits": [
+            -445,
+            -75
+        ],
+        "huge-tits": [
+            25,
+            700
         ]
     },
     "spritesPositions": {
@@ -32,6 +44,14 @@
         "stageFront": [
             -414.5,
             -234
+        ],
+        "lateStageFront": [
+            -414.5,
+            -234
+        ],
+        "sword": [
+            0,
+            90
         ]
     }
 }

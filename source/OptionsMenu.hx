@@ -89,7 +89,7 @@ class OptionCata extends FlxSprite
 			if (middleType)
 				text.alignment = FlxTextAlign.RIGHT;
 
-			text.updateHitbox();	
+			text.updateHitbox();
 
 			text.scrollFactor.set();
 
@@ -221,6 +221,9 @@ class OptionsMenu extends MusicBeatSubstate
 				new NoteCocks("Toggle The Note Splashes every time you get a SICK!")
 			]),
 			new OptionCata(640, 40, "Misc", [
+				new FPSOption("Toggle the FPS Counter"),
+				new FPSCapOption("Change your FPS Cap."),
+				new DisplayMemory("Toggle the Memory Usage"),
 				#if FEATURE_DISCORD
 				new DiscordOption("Change your Discord Rich Presence update interval."),
 				#end
@@ -231,9 +234,7 @@ class OptionsMenu extends MusicBeatSubstate
 				new ShowInput("Display every single input on the score screen."),
 			]),
 			new OptionCata(935, 40, "Performance", [
-				new FPSOption("Toggle the FPS Counter"),
-				new FPSCapOption("Change your FPS Cap."),
-				new DisplayMemory("Toggle the Memory Usage"),
+
 				new Background("Toogle Stage Background depending of your computer performance."),
 				new CharacterOption("Toogle Characters on Stage depending of your computer performance."),
 				new DistractionsAndEffectsOption("Toggle stage distractions that can hinder your gameplay and save memory."),
@@ -865,7 +866,7 @@ class OptionsMenu extends MusicBeatSubstate
 			else
 				optObject.color = FlxColor.WHITE;
 
-			optObject.updateHitbox();	
+			optObject.updateHitbox();
 		}
 	}
 }

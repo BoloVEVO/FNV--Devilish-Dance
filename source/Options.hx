@@ -2237,8 +2237,8 @@ class ScrollAlpha extends Option
 	{
 		FlxG.save.data.alpha += 0.1;
 
-		if (FlxG.save.data.alpha < 0)
-			FlxG.save.data.alpha = 0;
+		if (FlxG.save.data.alpha < 0.3)
+			FlxG.save.data.alpha = 0.3;
 
 		if (FlxG.save.data.alpha > 1)
 			FlxG.save.data.alpha = 1;
@@ -2247,15 +2247,15 @@ class ScrollAlpha extends Option
 
 	override function getValue():String
 	{
-		return "Hold note transparency: < " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1) + " >";
+		return "Hold note Transparency: < " + HelperFunctions.truncateFloat(FlxG.save.data.alpha, 1) + " >";
 	}
 
 	override function left():Bool
 	{
 		FlxG.save.data.alpha -= 0.1;
 
-		if (FlxG.save.data.alpha < 0)
-			FlxG.save.data.alpha = 0;
+		if (FlxG.save.data.alpha < 0.3)
+			FlxG.save.data.alpha = 0.3;
 
 		if (FlxG.save.data.alpha > 1)
 			FlxG.save.data.alpha = 1;
