@@ -1,5 +1,11 @@
 package;
 
+import openfl.filters.ShaderFilter;
+import openfl.geom.ColorTransform;
+import lime.math.Rectangle;
+import flixel.input.FlxKeyManager;
+import flixel.util.FlxSpriteUtil;
+import FlxCameraSprite;
 import flixel.animation.FlxAnimationController;
 import flixel.tweens.FlxEase;
 import haxe.DynamicAccess;
@@ -14,6 +20,8 @@ import flixel.math.FlxMath;
 import flixel.math.FlxAngle;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
+import openfl.geom.ColorTransform;
+import openfl.utils.Assets as OpenFlAssets;
 
 class Stage extends MusicBeatState
 {
@@ -169,6 +177,7 @@ class Stage extends MusicBeatState
 							coolCatBG.x += 75;
 							coolCatBG.y -= 75;
 							pos = hotGirlBG.y;
+
 							toAdd.push(coolCatBG);
 							toAdd.push(hotGirlBG);
 						}
@@ -195,21 +204,30 @@ class Stage extends MusicBeatState
 							littleLight.camera = PlayState.instance.mainCam;
 							swagBacks['littleLight'] = littleLight;
 
-							var lightsWentBRRRnt = new FlxSprite();
-							lightsWentBRRRnt.frames = Paths.getSparrowAtlas('Sex3', 'voltex');
-							lightsWentBRRRnt.animation.addByPrefix('Sex3', 'sex 3, the enemy returns', 60, false);
-							lightsWentBRRRnt.scrollFactor.set();
-							lightsWentBRRRnt.updateHitbox();
-							lightsWentBRRRnt.screenCenter();
-							lightsWentBRRRnt.camera = PlayState.instance.mainCam;
-							swagBacks['lightsWentBRRRnt'] = lightsWentBRRRnt;
-
 							lightsWentBRRR.alpha = 0.001;
 							littleLight.alpha = 0.001;
-							lightsWentBRRRnt.alpha = 0.001;
-							toAdd.push(lightsWentBRRRnt);
+
 							toAdd.push(lightsWentBRRR);
 							toAdd.push(littleLight);
+
+							var blackBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK, true, 'blackBG');
+
+							FlxSpriteUtil.drawCircle(blackBG, -1, -1, 25, FlxColor.GREEN, {}, {
+								smoothing: true
+							});
+
+							blackBG.antialiasing = false;
+
+							blackBG.camera = PlayState.instance.mainCam;
+
+							blackBG.alpha = 0.001;
+
+							swagBacks['blackBG'] = blackBG;
+
+							blackBG.pixels.applyFilter(blackBG.pixels, blackBG.pixels.rect, new openfl.geom.Point(),
+								new ShaderFilter(new FNFShader('greenScreen', OpenFlAssets.getText(Paths.shaderFragment('green')), null)));
+
+							toAdd.push(blackBG);
 						}
 						else
 						{
@@ -218,6 +236,7 @@ class Stage extends MusicBeatState
 							conalep_pc.camera = PlayState.instance.mainCam;
 							conalep_pc.alpha = 0.001;
 							swagBacks['conalep_pc'] = conalep_pc;
+
 							toAdd.push(conalep_pc);
 						}
 				}
@@ -374,7 +393,7 @@ class Stage extends MusicBeatState
 
 									cast(swagBacks['lightsWentBRRR'], FlxSprite).alpha = 1;
 									cast(swagBacks['littleLight'], FlxSprite).alpha = 1;
-									cast(swagBacks['lightsWentBRRRnt'], FlxSprite).alpha = 1;
+
 									cast(swagBacks['lightsWentBRRR'], FlxSprite).animation.play('Sex', false, false, 0);
 									cast(swagBacks['littleLight'], FlxSprite).animation.play('Sex2', false, false, 0);
 								}
@@ -389,7 +408,21 @@ class Stage extends MusicBeatState
 									PlayState.instance.dad.alpha = 0;
 									cast(swagBacks['lightsWentBRRR'], FlxSprite).alpha = 0;
 									cast(swagBacks['littleLight'], FlxSprite).alpha = 0;
-									cast(swagBacks['lightsWentBRRRnt'], FlxSprite).animation.play('Sex3', false, false, 0);
+									cast(swagBacks['blackBG'], FlxSprite).shader = new FNFShader('greenScreen',
+										OpenFlAssets.getText(Paths.shaderFragment('green')), null);
+									cast(swagBacks['blackBG'], FlxSprite).alpha = 1;
+
+									// This is probably the worst way to do this effect. With a simple shader simulating this it would be totally a W but Idk about shaders
+
+									PlayState.instance.tweenManager.tween(cast(swagBacks['blackBG'], FlxSprite).scale, {x: 35, y: 35},
+										0.3 / PlayState.instance.songMultiplier, {
+											onComplete: function(twn)
+											{
+												cast(swagBacks['blackBG'], FlxSprite).alpha = 0;
+												cast(swagBacks['blackBG'], FlxSprite).shader = null;
+												cast(swagBacks['blackBG'], FlxSprite).scale.set(1, 1);
+											}
+										});
 								}
 							case 1364:
 								if (!FlxG.save.data.distractions)
@@ -399,6 +432,7 @@ class Stage extends MusicBeatState
 									PlayState.instance.mainCam.fade(FlxColor.WHITE, 0.75 / PlayState.instance.songMultiplier, true);
 								}
 						}
+					default:
 				}
 		}
 	}

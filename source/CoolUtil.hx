@@ -11,6 +11,11 @@ import Options.AccuracyDOption;
 import flixel.FlxSprite;
 import openfl.utils.Assets as OpenFlAssets;
 import lime.utils.Assets as LimeAssets;
+import openfl.display.BitmapData;
+import openfl.geom.Rectangle;
+import openfl.geom.ColorTransform;
+import openfl.geom.Point;
+import openfl.display.BitmapDataChannel;
 import flixel.text.FlxText; #if FEATURE_FILESYSTEM import sys.io.File; #end
 
 using StringTools;
@@ -229,6 +234,16 @@ class CoolUtil
 				returnArray.push(el2);
 
 		return returnArray;
+	}
+
+	public static function invertedAlphaMaskFlxSprite(sprite:FlxSprite, mask:FlxSprite, output:FlxSprite):FlxSprite
+	{
+		sprite.drawFrame();
+		var data:BitmapData = sprite.pixels.clone();
+		data.copyChannel(mask.pixels, new Rectangle(0, 0, sprite.width, sprite.height), new Point(), BitmapDataChannel.ALPHA, BitmapDataChannel.ALPHA);
+		data.colorTransform(new Rectangle(0, 0, sprite.width, sprite.height), new ColorTransform(0, 0, 0, -1, 0, 0, 0, 255));
+		output.pixels = data;
+		return output;
 	}
 }
 
